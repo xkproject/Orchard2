@@ -42,6 +42,7 @@
         "Orchard.Deployment.Remote",
         "Orchard.Feeds",
         "Orchard.Indexing",
+        "Orchard.OpenId",
         "Orchard.Lists",
         "Orchard.Menu",
         "Orchard.Title",
