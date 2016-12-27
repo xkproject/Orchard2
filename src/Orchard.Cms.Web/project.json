@@ -17,8 +17,10 @@
     "Microsoft.AspNetCore.Authentication.JwtBearer": "1.1.0",
     "Microsoft.AspNetCore.DataProtection.Extensions": "1.1.0",
     "System.Dynamic.Runtime": "4.3.0",
+    "NLog.Extensions.Logging": "1.0.0-*",
     "Microsoft.Extensions.Localization.Abstractions": "1.1.0",
-    "Microsoft.AspNetCore.Mvc.Razor.ViewCompilation.Design": "1.1.0-*"
+    "Microsoft.AspNetCore.Mvc.Razor.ViewCompilation.Design": "1.1.0-*",
+    "Microsoft.Extensions.Logging.Debug": "1.0.0"
   },
   "runtimeOptions": {
     "configProperties": {
@@ -35,6 +37,7 @@
         "node_modules",
         "App_Data",
         "Modules",
+        "UserModules",
         "Themes"
       ]
     }
@@ -76,11 +79,13 @@
     "include": [
       "app_data",
       "modules",
+      "UserModules",
       "themes",
       "views",
       "_ViewStart.cshtml",
       "wwwroot",
-      "web.config"
+      "web.config",
+      "nlog.config"
     ],
     "exclude": [
       "**/obj"
