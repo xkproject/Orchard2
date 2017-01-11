@@ -2,3 +2,6 @@
 	path = src/Orchard.Cms.Web/UserModules/Orchard2.PCCom
 	url = https://github.com/xkproject/Orchard2.Pccom.git
 	branch = master
+[submodule "src/Orchard.Cms.Web/UserModules/Orchard.SSLCertificate"]
+	path = src/Orchard.Cms.Web/UserModules/Orchard.SSLCertificate
+	url = https://github.com/xkproject/Orchard.SSLCertificate.git

@@ -23,6 +23,7 @@
     "Microsoft.Extensions.Logging.Debug": "1.0.0",
     "DasMulli.Win32.ServiceUtils": "1.0.1",
     "Microsoft.Extensions.Configuration.CommandLine": "1.0.0",
+    "Microsoft.AspNetCore.Server.Kestrel.Https": "1.0.1",
     "Orchard.SSLCertificate": "2.0.0-*"
   },
   "runtimeOptions": {
