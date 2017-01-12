@@ -99,8 +99,6 @@ namespace Orchard.Cms.Web
             new Win32ServiceManager()
               .CreateService(serviceName, serviceDisplayName, serviceDescription, fullServiceCommand, new Win32ServiceCredentials("NT SERVICE\\" + serviceName, null), autoStart: true, startImmediately: false, errorSeverity: ErrorSeverity.Normal);
 
-
-
             Console.WriteLine($@"Successfully registered ""{serviceDisplayName}"" (""{serviceDescription}"")");
         }
 
