@@ -19,6 +19,8 @@
     "System.Dynamic.Runtime": "4.3.0",
     "Microsoft.Extensions.Localization.Abstractions": "1.1.0",
     "Microsoft.AspNetCore.Mvc.Razor.ViewCompilation.Design": "1.1.0-*"
+    "DasMulli.Win32.ServiceUtils": "1.0.1",
+    "Microsoft.Extensions.Configuration.CommandLine": "1.0.0",
   },
   "runtimeOptions": {
     "configProperties": {
@@ -30,6 +32,7 @@
     "debugType": "portable",
     "preserveCompilationContext": true,
     "compile": {
+      "excludeFiles": [ "Program.cs" ],
       "exclude": [
         "wwwroot",
         "node_modules",
