@@ -47,6 +47,7 @@ namespace Orchard.Cms.Web
 
             _host = new WebHostBuilder()
                 .UseIISIntegration()
+                .UseKestrelWithSSL()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseStartup<Startup>()
                 .UseConfiguration(config)
