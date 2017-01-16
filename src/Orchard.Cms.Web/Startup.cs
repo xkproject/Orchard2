@@ -34,6 +34,7 @@ namespace Orchard.Cms.Web
             services.AddManifestDefinition("Theme.txt", "theme");
             services.AddExtensionLocation("Themes");
             services.AddExtensionLocation("UserModules");
+            services.AddExtensionLocation("UserModules\\Orchard2.PCCom\\Modules");
             services.AddSitesFolder("App_Data", "Sites");
             services.AddModuleServices(Configuration).WithDefaultFeatures("Orchard.Commons");
         }
