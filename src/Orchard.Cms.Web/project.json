@@ -17,8 +17,10 @@
     "Microsoft.AspNetCore.Authentication.JwtBearer": "1.1.0",
     "Microsoft.AspNetCore.DataProtection.Extensions": "1.1.0",
     "System.Dynamic.Runtime": "4.3.0",
+    "NLog.Extensions.Logging": "1.0.0-*",
     "Microsoft.Extensions.Localization.Abstractions": "1.1.0",
-    "Microsoft.AspNetCore.Mvc.Razor.ViewCompilation.Design": "1.1.0-*"
+    "Microsoft.AspNetCore.Mvc.Razor.ViewCompilation.Design": "1.1.0-*",
+    "Microsoft.Extensions.Logging.Debug": "1.0.0",
     "DasMulli.Win32.ServiceUtils": "1.0.1",
     "Microsoft.Extensions.Configuration.CommandLine": "1.0.0",
     "Orchard.SSLCertificate": "2.0.0-*"
@@ -86,7 +88,8 @@
       "views",
       "_ViewStart.cshtml",
       "wwwroot",
-      "web.config"
+      "web.config",
+      "nlog.config"
     ],
     "exclude": [
       "**/obj"

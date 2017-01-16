@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Modules.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
 using Orchard.DisplayManagement;
 using Orchard.Environment.Extensions;
 using Orchard.Environment.Extensions.Manifests;
@@ -42,7 +43,8 @@ namespace Orchard.Cms.Web
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration);
-
+			loggerFactory.AddNLog();
+			
             app.UseModules();
         }
     }
