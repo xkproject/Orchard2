@@ -1,12 +1,12 @@
 [submodule "src/Orchard.Cms.Web/UserModules/Orchard2.PCCom"]
 	path = src/Orchard.Cms.Web/UserModules/Orchard2.PCCom
 	url = https://github.com/xkproject/Orchard2.Pccom.git
-	branch = master
+	branch = pre
 [submodule "Orchard2.StandaloneInstaller"]
 	path = Orchard2.StandaloneInstaller
 	url = https://github.com/xkproject/Orchard2.StandaloneInstaller.git
-	branch = master
+	branch = pre
 [submodule "src/Orchard.Cms.Web/UserModules/Orchard.SSLCertificate"]
 	path = src/Orchard.Cms.Web/UserModules/Orchard.SSLCertificate
 	url = https://github.com/xkproject/Orchard.SSLCertificate.git
-	branch = master
+	branch = pre
