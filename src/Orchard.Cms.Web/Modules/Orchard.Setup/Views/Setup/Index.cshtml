@@ -135,6 +135,7 @@
             <input asp-for="ConnectionString" class="form-control" />
             <span asp-validation-for="ConnectionString" class="text-danger"></span>
             <span class="text-muted form-text small">@T["The connection string to your database instance. e.g., Data Source=<em>localhost</em>;Initial Catalog=<em>Orchard</em>;User Id=<em>userid</em>;Password=<em>password</em>"]</span>
+            <span class="text-muted form-text small">@T["Recommended configuration is to use a Trusted Connection providing access to SQL Server through 'NT SERVICE\\Distrib WebAPI' with following roles enabled for the db: db_datareader, db_datawriter, db_ddladmin."]</span>
         </div>
     </fieldset>
     }
@@ -169,6 +170,62 @@
             <span asp-validation-for="PasswordConfirmation" class="text-danger"></span>
         </div>
     </div>
+
+    <h6>
+        @T["Distrib B2B User"]
+        <span class="text-muted form-text small">@T["The Distrib B2B user has rights only for operations needed to keep in sync a B2B/B2C server with Distrib ERP."]</span>
+    </h6>
+    <div class="row">
+        <div class="form-group col-md-6" asp-validation-class-for="DistribB2BUserName">
+            <label asp-for="DistribB2BUserName">@T["User name"]</label>
+            <input asp-for="DistribB2BUserName" class="form-control" />
+            <span asp-validation-for="DistribB2BUserName" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-6" asp-validation-class-for="DistribB2BUserEmail">
+            <label for="DistribB2BUserEmail">@T["Email"]</label>
+            <input asp-for="DistribB2BUserEmail" class="form-control" type="email" />
+            <span asp-validation-for="DistribB2BUserEmail" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group col-md-6" asp-validation-class-for="DistribB2BUserPassword">
+            <label asp-for="DistribB2BUserPassword">@T["Password"]</label>
+            <input asp-for="DistribB2BUserPassword" type="password" class="form-control" data-toggle="popover" data-placement="top" data-trigger="focus" title="@T["Password strength"]" data-content="@passwordTooltip" />
+            <span asp-validation-for="DistribB2BUserPassword" class="text-danger"></span>
+        </div>
+
+        <div class="form-group col-md-6" asp-validation-class-for="DistribB2BUserPasswordConfirmation">
+            <label asp-for="DistribB2BUserPasswordConfirmation">@T["Password Confirmation"]</label>
+            <input asp-for="DistribB2BUserPasswordConfirmation" type="password" class="form-control" />
+            <span asp-validation-for="DistribB2BUserPasswordConfirmation" class="text-danger"></span>
+        </div>
+    </div>
+
+    <h6>
+        @T["B2B OpenID Application"]
+        <span class="text-muted form-text small">@T["Register the client app that will connect to Web API."]</span>
+    </h6>
+    <div class="row">
+        <div class="form-group col-md-6" asp-validation-class-for="OpenIDAppId">
+            <label asp-for="OpenIDAppId">@T["Appplication Id"]</label>
+            <input asp-for="OpenIDAppId" class="form-control" />
+            <span asp-validation-for="OpenIDAppId" class="text-danger">@T["The Application Id is required."]</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-md-6" asp-validation-class-for="ClientSecret">
+            <label asp-for="ClientSecret">@T["Client Secret"]</label>
+            <input asp-for="ClientSecret" type="password" class="form-control" data-toggle="popover" data-placement="top" data-trigger="focus" title="@T["Password strength"]" data-content="@passwordTooltip" />
+        </div>
+
+        <div class="form-group col-md-6" asp-validation-class-for="ClientSecretConfirmation">
+            <label asp-for="ClientSecretConfirmation">@T["Client Secret Confirmation"]</label>
+            <input asp-for="ClientSecretConfirmation" type="password" class="form-control" />
+            <span asp-validation-for="ClientSecretConfirmation" class="text-danger"></span>
+        </div>
+    </div>
+
     <fieldset>
         <div class="form-group">
             <button class="btn btn-primary" type="submit">@T["Finish Setup"]</button>
@@ -189,6 +246,13 @@
             style: "margin-top: 7px; height: 7px; border-radius: 5px"
         });
         $('#Password').popover({
+            trigger: 'focus'
+        })
+
+        $('#DistribB2BUserPassword').popover({
+            trigger: 'focus'
+        })
+        $('#ClientSecret').popover({
             trigger: 'focus'
         })
     })

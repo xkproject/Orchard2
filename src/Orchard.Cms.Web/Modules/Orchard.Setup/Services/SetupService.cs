@@ -182,7 +182,15 @@ namespace Orchard.Setup.Services
                         AdminPassword = context.AdminPassword,
                         DatabaseProvider = context.DatabaseProvider,
                         DatabaseConnectionString = context.DatabaseConnectionString,
-                        DatabaseTablePrefix = context.DatabaseTablePrefix
+                        DatabaseTablePrefix = context.DatabaseTablePrefix,
+
+                        DistribB2BUserName = context.DistribB2BUserName,
+                        DistribB2BUserEmail = context.DistribB2BUserEmail,
+                        DistribB2BUserPassword = context.DistribB2BUserPassword,
+                        DistribB2BUserPasswordConfirmation = context.DistribB2BUserPasswordConfirmation,
+                        OpenIDAppId = context.OpenIDAppId,
+                        ClientSecret = context.ClientSecret,
+                        ClientSecretConfirmation = context.ClientSecretConfirmation
                     }); 
                     //});
 

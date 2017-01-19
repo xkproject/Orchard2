@@ -26,7 +26,7 @@ namespace Orchard.Setup.ViewModels
         [Required]
         public string UserName { get; set; }
 
-        [EmailAddress]
+        [EmailAddress, Required]
         public string Email { get; set; }
 
         [DataType(DataType.Password)]
@@ -40,5 +40,25 @@ namespace Orchard.Setup.ViewModels
         public IEnumerable<RecipeDescriptor> Recipes { get; set; }
 
         public string RecipeName { get; set; }
+
+
+        [Required]
+        public string DistribB2BUserName { get; set; }
+
+        [EmailAddress, Required]
+        public string DistribB2BUserEmail { get; set; }
+
+        [DataType(DataType.Password), Required]
+        public string DistribB2BUserPassword { get; set; }
+
+        [DataType(DataType.Password), Required]
+        public string DistribB2BUserPasswordConfirmation { get; set; }
+
+        [Required]
+        public string OpenIDAppId { get; set; }
+        [Required]
+        public string ClientSecret { get; set; }
+        [Required]
+        public string ClientSecretConfirmation { get; set; }
     }
 }
