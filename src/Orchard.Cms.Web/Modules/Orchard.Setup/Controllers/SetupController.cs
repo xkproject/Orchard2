@@ -65,7 +65,10 @@ namespace Orchard.Setup.Controllers
             }
             model.SiteName = "Distrib Web API";
             model.TablePrefixPreset = true;
-            model.ConnectionString = "Data Source={DATASOURCE};Initial Catalog=DistribWebAPI;Trusted_Connection=Yes;";// User ID=orchard;Password={PASSWORD};";
+            if (Request.Query.ContainsKey("ConnectionString"))
+                model.ConnectionString = Request.Query["ConnectionString"];
+            else
+                model.ConnectionString = "Data Source={DATASOURCE};Initial Catalog=DistribWebAPI;Trusted_Connection=Yes;";// User ID=orchard;Password={PASSWORD};";
             model.UserName = "admin";
             model.DistribB2BUserName = "distribb2b";
             model.OpenIDAppId = "distribb2b";
