@@ -63,6 +63,12 @@ namespace Orchard.Setup.Controllers
                 model.TablePrefixPreset = true;
                 model.TablePrefix = _shellSettings.TablePrefix;
             }
+            model.SiteName = "Distrib Web API";
+            model.TablePrefixPreset = true;
+            model.ConnectionString = "Data Source={DATASOURCE};Initial Catalog=DistribWebAPI;Trusted_Connection=Yes;";// User ID=orchard;Password={PASSWORD};";
+            model.UserName = "admin";
+            model.DistribB2BUserName = "distribb2b";
+            model.OpenIDAppId = "distribb2b";
 
             return View(model);
         }
@@ -115,6 +121,38 @@ namespace Orchard.Setup.Controllers
                 model.TablePrefix = _shellSettings.TablePrefix;
             }
 
+            model.TablePrefixPreset = true;
+
+            if (model.DistribB2BUserPassword != model.DistribB2BUserPasswordConfirmation)
+            {
+                ModelState.AddModelError(nameof(model.DistribB2BUserPasswordConfirmation), T["The password confirmation doesn't match the password."]);
+            }
+
+            if (model.Email == model.DistribB2BUserEmail)
+            {
+                ModelState.AddModelError(nameof(model.DistribB2BUserEmail), T["The Distrib B2B user cannot have same email as admin user."]);
+            }
+
+            if (model.ClientSecret != model.ClientSecretConfirmation)
+            {
+                ModelState.AddModelError(nameof(model.ClientSecretConfirmation), T["The client secret confirmation doesn't match the password."]);
+            }
+
+            if (model.Password == model.DistribB2BUserPassword)
+            {
+                ModelState.AddModelError(nameof(model.DistribB2BUserPassword), T["The admin password cannot be same password as the Distrib B2B user password."]);
+            }
+
+            if (model.Password == model.ClientSecret)
+            {
+                ModelState.AddModelError(nameof(model.ClientSecret), T["The client secret cannot be same password as the admin password."]);
+            }
+
+            if (model.DistribB2BUserPassword == model.ClientSecret)
+            {
+                ModelState.AddModelError(nameof(model.ClientSecret), T["The client secret cannot be same password as the Distrib B2B user password."]);
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -128,7 +166,15 @@ namespace Orchard.Setup.Controllers
                 AdminEmail = model.Email,
                 AdminPassword = model.Password,
                 Errors = new Dictionary<string, string>(),
-                Recipe = selectedRecipe
+                Recipe = selectedRecipe,
+
+                DistribB2BUserName = model.DistribB2BUserName,
+                DistribB2BUserEmail = model.DistribB2BUserEmail,
+                DistribB2BUserPassword = model.DistribB2BUserPassword,
+                DistribB2BUserPasswordConfirmation = model.DistribB2BUserPasswordConfirmation,
+                OpenIDAppId = model.OpenIDAppId,
+                ClientSecret = model.ClientSecret,
+                ClientSecretConfirmation = model.ClientSecretConfirmation
             };
 
             if (!model.DatabaseProviderPreset)

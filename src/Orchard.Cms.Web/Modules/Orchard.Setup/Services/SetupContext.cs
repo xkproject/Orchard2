@@ -15,5 +15,13 @@ namespace Orchard.Setup.Services
         public IEnumerable<string> EnabledFeatures { get; set; }
         public RecipeDescriptor Recipe { get; set; }
         public IDictionary<string, string> Errors { get; set; }
+
+        public string DistribB2BUserName { get; set; }
+        public string DistribB2BUserEmail { get; set; }
+        public string DistribB2BUserPassword { get; set; }
+        public string DistribB2BUserPasswordConfirmation { get; set; }
+        public string OpenIDAppId { get; set; }
+        public string ClientSecret { get; set; }
+        public string ClientSecretConfirmation { get; set; }
     }
 }
