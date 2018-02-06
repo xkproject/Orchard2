@@ -46,6 +46,9 @@ namespace OrchardCore.OpenId.Recipes
             settings.AllowImplicitFlow = model.AllowImplicitFlow;
             settings.AllowHybridFlow = model.AllowHybridFlow;
             settings.UseRollingTokens = model.UseRollingTokens;
+            settings.CertificateStoreLocation = model.CertificateStoreLocation;
+            settings.CertificateStoreName = model.CertificateStoreName;
+            settings.CertificateThumbPrint = model.CertificateThumbPrint;
 
             await _openIdService.UpdateOpenIdSettingsAsync(settings);
         }
