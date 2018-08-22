@@ -6,7 +6,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Embedded;
-using OrchardCore.Modules.FileProviders;
+using OrchardCore.Modules.Manifest;
 
 namespace OrchardCore.Modules
 {
@@ -24,7 +24,7 @@ namespace OrchardCore.Modules
                 {
                     if (_application == null)
                     {
-                        _application = new Application(environment.ApplicationName);
+                        _application = new Application(environment);
                     }
                 }
             }
@@ -45,7 +45,7 @@ namespace OrchardCore.Modules
                 {
                     if (!_modules.TryGetValue(name, out module))
                     {
-                        _modules[name] = module = new Module(name);
+                        _modules[name] = module = new Module(name, name == environment.ApplicationName);
                     }
                 }
             }
@@ -57,57 +57,128 @@ namespace OrchardCore.Modules
     public class Application
     {
         public const string ModulesPath = ".Modules";
+        public const string ModuleName = "Application";
         public static string ModulesRoot = ModulesPath + "/";
-        private const string ModuleNamesMap = "module.names.map";
 
-        public Application(string application)
+        public Application(IHostingEnvironment environment)
         {
-            Name = application;
-            Assembly = Assembly.Load(new AssemblyName(application));
-            ModuleNames = new EmbeddedFileProvider(Assembly).GetFileInfo(ModuleNamesMap).ReadAllLines();
+            Name = environment.ApplicationName;
+            Path = environment.ContentRootPath;
+            Root = Path + '/';
+
+            Assembly = Assembly.Load(new AssemblyName(Name));
+
+            var moduleNames = Assembly.GetCustomAttributes<ModuleNameAttribute>()
+                .Select(m => m.Name).ToList();
+
+            moduleNames.Add(Name);
+            ModuleNames = moduleNames;
+
+            ModulePath = ModulesRoot + Name;
+            ModuleRoot = ModulePath + '/';
         }
 
         public string Name { get; }
+        public string Path { get; }
+        public string Root { get; }
         public Assembly Assembly { get; }
         public IEnumerable<string> ModuleNames { get; }
+        public string ModulePath { get; }
+        public string ModuleRoot { get; }
     }
 
     public class Module
     {
-        public const string ContentPath = "Content";
-        public static string ContentRoot = ContentPath + "/";
-        private const string ModuleAssetsMap = "module.assets.map";
+        public const string WebRootPath = "wwwroot";
+        public static string WebRoot = WebRootPath + "/";
 
         private readonly string _baseNamespace;
         private readonly DateTimeOffset _lastModified;
         private readonly IDictionary<string, IFileInfo> _fileInfos = new Dictionary<string, IFileInfo>();
 
-        public Module(string name)
+        public Module(string name, bool isApplication = false)
         {
             if (!string.IsNullOrWhiteSpace(name))
             {
                 Name = name;
-                Root = Application.ModulesRoot + Name + '/';
+                SubPath = Application.ModulesRoot + Name;
+                Root = SubPath + '/';
+
                 Assembly = Assembly.Load(new AssemblyName(name));
-                Assets = new EmbeddedFileProvider(Assembly).GetFileInfo(ModuleAssetsMap).ReadAllLines().Select(a => new Asset(a));
-                AssetPaths = Assets.Select(a => a.ModuleAssetPath);
+
+                Assets = Assembly.GetCustomAttributes<ModuleAssetAttribute>()
+                    .Select(a => new Asset(a.Asset)).ToArray();
+
+                AssetPaths = Assets.Select(a => a.ModuleAssetPath).ToArray();
+
+                var moduleInfos = Assembly.GetCustomAttributes<ModuleAttribute>();
+
+                ModuleInfo =
+                    moduleInfos.Where(f => !(f is ModuleMarkerAttribute)).FirstOrDefault() ??
+                    moduleInfos.Where(f => f is ModuleMarkerAttribute).FirstOrDefault() ??
+                    new ModuleAttribute { Name = Name };
+
+                var features = Assembly.GetCustomAttributes<Manifest.FeatureAttribute>()
+                    .Where(f => !(f is ModuleAttribute)).ToList();
+
+                ModuleInfo.Id = Name;
+
+                if (isApplication)
+                {
+                    ModuleInfo.Name = Application.ModuleName;
+                    ModuleInfo.Description = "Provides core features defined at the application level";
+                    ModuleInfo.Priority = int.MinValue.ToString();
+                    ModuleInfo.Category = "Application";
+                    ModuleInfo.DefaultTenantOnly = true;
+
+                    if (features.Any())
+                    {
+                        features.Insert(0, new Manifest.FeatureAttribute()
+                        {
+                            Id = ModuleInfo.Id,
+                            Name = ModuleInfo.Name,
+                            Description = ModuleInfo.Description,
+                            Priority = ModuleInfo.Priority,
+                            Category = ModuleInfo.Category
+                        });
+                    }
+                }
+
+                ModuleInfo.Features.AddRange(features);
             }
             else
             {
-                Name = Root = string.Empty;
+                Name = Root = SubPath = String.Empty;
                 Assets = Enumerable.Empty<Asset>();
                 AssetPaths = Enumerable.Empty<string>();
+                ModuleInfo = new ModuleAttribute();
             }
 
             _baseNamespace = Name + '.';
             _lastModified = DateTimeOffset.UtcNow;
+
+            if (!string.IsNullOrEmpty(Assembly?.Location))
+            {
+                try
+                {
+                    _lastModified = File.GetLastWriteTimeUtc(Assembly.Location);
+                }
+                catch (PathTooLongException)
+                {
+                }
+                catch (UnauthorizedAccessException)
+                {
+                }
+            }
         }
 
         public string Name { get; }
         public string Root { get; }
+        public string SubPath { get; }
         public Assembly Assembly { get; }
         public IEnumerable<Asset> Assets { get; }
         public IEnumerable<string> AssetPaths { get; }
+        public ModuleAttribute ModuleInfo { get; }
 
         public IFileInfo GetFileInfo(string subpath)
         {
@@ -149,7 +220,7 @@ namespace OrchardCore.Modules
 
             if (index == -1)
             {
-                ModuleAssetPath = asset;
+                ModuleAssetPath = string.Empty;
                 ProjectAssetPath = string.Empty;
             }
             else
@@ -159,7 +230,7 @@ namespace OrchardCore.Modules
             }
         }
 
-        public string ModuleAssetPath { get;  }
+        public string ModuleAssetPath { get; }
         public string ProjectAssetPath { get; }
     }
 }

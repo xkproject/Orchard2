@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Fluid;
 using OrchardCore.Alias.Models;
 using OrchardCore.Alias.Settings;
+using OrchardCore.ContentManagement;
 using OrchardCore.ContentManagement.Handlers;
 using OrchardCore.ContentManagement.Metadata;
 using OrchardCore.Environment.Cache;
@@ -47,6 +48,7 @@ namespace OrchardCore.Alias.Handlers
                 templateContext.SetValue("ContentItem", part.ContentItem);
 
                 part.Alias = await _liquidTemplateManager.RenderAsync(pattern, templateContext);
+                part.Apply();
             }
         }
 
@@ -64,20 +66,17 @@ namespace OrchardCore.Alias.Handlers
 
         public override Task PublishedAsync(PublishContentContext context, AliasPart instance)
         {
-            _tagCache.RemoveTag($"alias:{instance.Alias}");
-            return Task.CompletedTask;
+            return _tagCache.RemoveTagAsync($"alias:{instance.Alias}");
         }
 
         public override Task RemovedAsync(RemoveContentContext context, AliasPart instance)
         {
-            _tagCache.RemoveTag($"alias:{instance.Alias}");
-            return Task.CompletedTask;
+            return _tagCache.RemoveTagAsync($"alias:{instance.Alias}");
         }
 
         public override Task UnpublishedAsync(PublishContentContext context, AliasPart instance)
         {
-            _tagCache.RemoveTag($"alias:{instance.Alias}");
-            return Task.CompletedTask;
+            return _tagCache.RemoveTagAsync($"alias:{instance.Alias}");
         }
     }
 }
