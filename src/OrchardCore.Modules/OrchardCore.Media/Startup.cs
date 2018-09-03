@@ -24,14 +24,17 @@ using OrchardCore.Media.Processing;
 using OrchardCore.Media.Recipes;
 using OrchardCore.Media.Services;
 using OrchardCore.Media.Settings;
+using OrchardCore.Media.TagHelpers;
 using OrchardCore.Media.ViewModels;
 using OrchardCore.Modules;
+using OrchardCore.Mvc;
 using OrchardCore.Recipes;
 using OrchardCore.Security.Permissions;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.DependencyInjection;
+using SixLabors.ImageSharp.Web.Memory;
 using SixLabors.ImageSharp.Web.Processors;
 
 namespace OrchardCore.Media
@@ -88,6 +91,7 @@ namespace OrchardCore.Media
                         options.Configuration = Configuration.Default;
                         options.MaxBrowserCacheDays = 7;
                         options.MaxCacheDays = 365;
+                        options.CachedNameLength = 12;
                         options.OnValidate = validation =>
                         {
                             // Force some parameters to prevent disk filling.
@@ -142,9 +146,11 @@ namespace OrchardCore.Media
                         options.OnProcessed = _ => { };
                         options.OnPrepareResponse = _ => { };
                     })
-                    .SetUriParser<QueryCollectionUriParser>()
-                    .SetCache<PhysicalFileSystemCache>()
+                    .SetRequestParser<QueryCollectionRequestParser>()
+                    .SetBufferManager<PooledBufferManager>()
+                    .SetCacheHash<CacheHash>()
                     .SetAsyncKeyLock<AsyncKeyLock>()
+                    .SetCache<PhysicalFileSystemCache>()
                     .AddResolver<MediaFileSystemResolver>()
                     .AddProcessor<ResizeWebProcessor>();
 
@@ -157,6 +163,8 @@ namespace OrchardCore.Media
 
             // MIME types
             services.TryAddSingleton<IContentTypeProvider, FileExtensionContentTypeProvider>();
+
+            services.AddTagHelpers(typeof(ImageTagHelper).Assembly);
         }
 
         public override void Configure(IApplicationBuilder app, IRouteBuilder routes, IServiceProvider serviceProvider)

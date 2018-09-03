@@ -6,9 +6,9 @@ using OrchardCore.ContentManagement;
 using OrchardCore.ContentManagement.Display;
 using OrchardCore.ContentManagement.Display.ContentDisplay;
 using OrchardCore.ContentManagement.Handlers;
+using OrchardCore.Contents.Deployment;
 using OrchardCore.Contents.Drivers;
 using OrchardCore.Contents.Feeds.Builders;
-using OrchardCore.Contents.Filters;
 using OrchardCore.Contents.Handlers;
 using OrchardCore.Contents.Indexing;
 using OrchardCore.Contents.Liquid;
@@ -18,16 +18,17 @@ using OrchardCore.Contents.Services;
 using OrchardCore.Contents.TagHelpers;
 using OrchardCore.ContentTypes.Editors;
 using OrchardCore.Data.Migration;
+using OrchardCore.Deployment;
 using OrchardCore.DisplayManagement.Descriptors;
+using OrchardCore.DisplayManagement.Handlers;
+using OrchardCore.Entities;
 using OrchardCore.Environment.Navigation;
 using OrchardCore.Feeds;
 using OrchardCore.Indexing;
 using OrchardCore.Liquid;
 using OrchardCore.Lists.Settings;
 using OrchardCore.Modules;
-using OrchardCore.Mvc;
 using OrchardCore.Recipes;
-using OrchardCore.Scripting;
 using OrchardCore.Security.Permissions;
 
 namespace OrchardCore.Contents
@@ -50,7 +51,7 @@ namespace OrchardCore.Contents
             services.AddScoped<IContentAliasProvider, ContentItemIdAliasProvider>();
             services.AddScoped<IContentItemIndexHandler, ContentItemIndexCoordinator>();
 
-            services.AddSingleton<IGlobalMethodProvider, IdGeneratorMethod>();
+            services.AddIdGeneration();
             services.AddScoped<IDataMigration, Migrations>();
 
             // Common Part
@@ -63,18 +64,16 @@ namespace OrchardCore.Contents
             // TODO: Move to feature
             services.AddScoped<IFeedItemBuilder, CommonFeedItemBuilder>();
 
-            services.AddLiquidFilter<BuildDisplayFilter>("build_display");
+            services.AddTagHelpers(typeof(ContentLinkTagHelper).Assembly);
         }
 
         public override void Configure(IApplicationBuilder builder, IRouteBuilder routes, IServiceProvider serviceProvider)
         {
-            serviceProvider.AddTagHelpers(typeof(ContentLinkTagHelper).Assembly);
-
             routes.MapAreaRoute(
                 name: "DisplayContentItem",
                 areaName: "OrchardCore.Contents",
                 template: "Contents/ContentItems/{contentItemId}",
-                defaults: new {controller = "Item", action = "Display" }
+                defaults: new { controller = "Item", action = "Display" }
             );
 
             routes.MapAreaRoute(
@@ -119,8 +118,6 @@ namespace OrchardCore.Contents
                 template: "Admin/Contents/ContentItems",
                 defaults: new { controller = "Admin", action = "List" }
             );
-
-
         }
     }
 
@@ -129,7 +126,24 @@ namespace OrchardCore.Contents
     {
         public override void ConfigureServices(IServiceCollection services)
         {
-            services.AddLiquidFilter<ContentFilter>("content");
+            services.AddScoped<ILiquidTemplateEventHandler, ContentLiquidTemplateEventHandler>();
+
+            services.AddLiquidFilter<BuildDisplayFilter>("shape_build_display");
+        }
+    }
+
+    [RequireFeatures("OrchardCore.Deployment")]
+    public class DeploymentStartup : StartupBase
+    {
+        public override void ConfigureServices(IServiceCollection services)
+        {
+            services.AddTransient<IDeploymentSource, AllContentDeploymentSource>();
+            services.AddSingleton<IDeploymentStepFactory>(new DeploymentStepFactory<AllContentDeploymentStep>());
+            services.AddScoped<IDisplayDriver<DeploymentStep>, AllContentDeploymentStepDriver>();
+
+            services.AddTransient<IDeploymentSource, ContentDeploymentSource>();
+            services.AddSingleton<IDeploymentStepFactory>(new DeploymentStepFactory<ContentDeploymentStep>());
+            services.AddScoped<IDisplayDriver<DeploymentStep>, ContentDeploymentStepDriver>();
         }
     }
 }
