@@ -191,7 +191,7 @@ function compileManufacturingPlannerApplication() {
             console.log(stats);
         }
     );
-});
+}
 
 function getAssetGroups() {
     var assetManifestPaths = glob.sync("./src/OrchardCore.{Modules,Themes}/*/Assets.json", {});
@@ -199,8 +199,13 @@ function getAssetGroups() {
         "./src/OrchardCore.DistribWebAPI/Modules/*/Assets.json",
         {}
     );
+    var ownVendorsThemes = glob.sync(
+        "./src/OrchardCore.DistribWebAPI/Themes/*/Assets.json",
+        {}
+    );
 	
-	assetManifestPaths = assetManifestPaths.concat(ownVendors);
+    assetManifestPaths = assetManifestPaths.concat(ownVendors);
+    assetManifestPaths = assetManifestPaths.concat(ownVendorsThemes);
 
     var assetGroups = [];
     assetManifestPaths.forEach(function (assetManifestPath) {
