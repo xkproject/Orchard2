@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using OrchardCore.Modules;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Localization;
-using OrchardCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using OrchardCore.ContentManagement;
 using OrchardCore.ContentManagement.Display;
+using OrchardCore.ContentManagement.Metadata;
 using OrchardCore.ContentManagement.Metadata.Models;
 using OrchardCore.ContentManagement.Metadata.Settings;
-using OrchardCore.ContentManagement.Metadata;
 using OrchardCore.ContentManagement.Records;
 using OrchardCore.Contents.Services;
 using OrchardCore.Contents.ViewModels;
 using OrchardCore.DisplayManagement;
 using OrchardCore.DisplayManagement.ModelBinding;
 using OrchardCore.DisplayManagement.Notify;
+using OrchardCore.Modules;
+using OrchardCore.Mvc.ActionConstraints;
 using OrchardCore.Navigation;
 using OrchardCore.Settings;
 using YesSql;
@@ -71,13 +71,18 @@ namespace OrchardCore.Contents.Controllers
 
         public ILogger Logger { get; set; }
 
-        public async Task<IActionResult> List(ListContentsViewModel model, PagerParameters pagerParameters)
+        public async Task<IActionResult> List(ListContentsViewModel model, PagerParameters pagerParameters, string typeId = "")
         {
             var siteSettings = await _siteService.GetSiteSettingsAsync();
-            Pager pager = new Pager(pagerParameters, siteSettings.PageSize);
+            var pager = new Pager(pagerParameters, siteSettings.PageSize);
 
             var query = _session.Query<ContentItem, ContentItemIndex>();
 
+            if (!string.IsNullOrEmpty(model.DisplayText))
+            {
+                query = query.With<ContentItemIndex>(x => x.DisplayText.Contains(model.DisplayText));
+            }
+            
             switch (model.Options.ContentsStatus)
             {
                 case ContentsStatus.Published:
@@ -92,6 +97,11 @@ namespace OrchardCore.Contents.Controllers
                 default:
                     query = query.With<ContentItemIndex>(x => x.Latest);
                     break;
+            }
+
+            if (typeId != "")
+            {
+                model.Id = typeId;
             }
 
             if (!string.IsNullOrEmpty(model.TypeName))
@@ -126,6 +136,9 @@ namespace OrchardCore.Contents.Controllers
                 case ContentsOrder.Created:
                     query = query.OrderByDescending(cr => cr.CreatedUtc);
                     break;
+                case ContentsOrder.Title:
+                    query = query.OrderBy(cr => cr.DisplayText);
+                    break;
                 default:
                     query = query.OrderByDescending(cr => cr.ModifiedUtc);
                     break;
@@ -155,7 +168,10 @@ namespace OrchardCore.Contents.Controllers
             if (maxPagedCount > 0 && pager.PageSize > maxPagedCount)
                 pager.PageSize = maxPagedCount;
 
-            var pagerShape = (await New.Pager(pager)).TotalItemCount(maxPagedCount > 0 ? maxPagedCount : await query.CountAsync());
+            var routeData = new RouteData();
+            routeData.Values.Add("DisplayText", model.DisplayText);
+            
+            var pagerShape = (await New.Pager(pager)).TotalItemCount(maxPagedCount > 0 ? maxPagedCount : await query.CountAsync()).RouteData(routeData);
             var pageOfContentItems = await query.Skip(pager.GetStartIndex()).Take(pager.PageSize).ListAsync();
 
             var contentItemSummaries = new List<dynamic>();
@@ -168,7 +184,8 @@ namespace OrchardCore.Contents.Controllers
                 .ContentItems(contentItemSummaries)
                 .Pager(pagerShape)
                 .Options(model.Options)
-                .TypeDisplayName(model.TypeDisplayName ?? "");
+                .TypeDisplayName(model.TypeDisplayName ?? "")
+                .DisplayText(model.DisplayText ?? "");
 
             return View(viewModel);
         }
@@ -506,22 +523,11 @@ namespace OrchardCore.Contents.Controllers
                 return View("Edit", model);
             }
 
-            await conditionallyPublish(contentItem);
-
-            // The content item needs to be marked as saved (again) in case the drivers or the handlers have
-            // executed some query which would flush the saved entities. In this case the changes happening in handlers 
-            // would not be taken into account.
-
+            // The content item needs to be marked as saved in case the drivers or the handlers have
+            // executed some query which would flush the saved entities inside the above UpdateEditorAsync.            
             _session.Save(contentItem);
 
-            //if (!string.IsNullOrWhiteSpace(returnUrl)
-            //    && previousRoute != null
-            //    && !String.Equals(contentItem.As<IAliasAspect>().Path, previousRoute, StringComparison.OrdinalIgnoreCase))
-            //{
-            //    returnUrl = Url.ItemDisplayUrl(contentItem);
-            //}
-
-            var typeDefinition = _contentDefinitionManager.GetTypeDefinition(contentItem.ContentType);
+            await conditionallyPublish(contentItem);           
 
             if (returnUrl == null)
             {

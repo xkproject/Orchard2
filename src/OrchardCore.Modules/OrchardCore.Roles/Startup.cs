@@ -6,7 +6,7 @@ using OrchardCore.Modules;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using OrchardCore.Environment.Navigation;
+using OrchardCore.Navigation;
 using OrchardCore.Environment.Shell;
 using OrchardCore.Recipes;
 using OrchardCore.Roles.Recipes;
@@ -26,7 +26,7 @@ namespace OrchardCore.Roles
         {
             services.TryAddScoped<RoleManager<IRole>>();
             services.TryAddScoped<IRoleStore<IRole>, RoleStore>();
-            services.TryAddScoped<IRoleProvider, RoleStore>();
+            services.TryAddScoped<IRoleService, RoleService>();
             services.TryAddScoped<IRoleClaimStore<IRole>, RoleStore>();
             services.AddRecipeExecutionStep<RolesStep>();
 
