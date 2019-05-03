@@ -31,7 +31,6 @@ require("events").EventEmitter.prototype._maxListeners = 100;
 
 // Incremental build (each asset group is built only if one or more inputs are newer than the output).
 gulp.task("build", function () {
-	compileManufacturingPlannerApplication();
     var assetGroupTasks = getAssetGroups().map(function (assetGroup) {
         var doRebuild = false;
         return createAssetGroupTask(assetGroup, doRebuild);
@@ -79,128 +78,19 @@ gulp.task("watch", function () {
 ** ASSET GROUPS
 */
 
-function compileManufacturingPlannerApplication() {
-    var basePath =
-        __dirname +
-        "/src/OrchardCore.DistribWebAPI/Modules/PCCom.Distrib.WebAPI.ManufacturingPlanner";
-    console.log(
-        "awesome-typescript-loader?tsconfig=" +
-            path.join(basePath, "tsconfig.json")
-    );
-    webpack(
-        {
-            context: path.join(basePath, "/Assets/ManufacturingPlanner"),
-            resolve: {
-                extensions: [".js", ".ts", ".tsx"]
-            },
-             entry: ["./main.tsx", "./index.css", "./tables.css"],
-            output: {
-                path: path.join(basePath, "/Content/Scripts"),
-                filename: "ManufacturingPlanner.min.js"
-            },
-             devtool: "source-map",
-             /*devServer: {
-            contentBase: "./dist", // Content base
-            inline: true, // Enable watch and live reload
-            host: "localhost",
-            port: 8080,
-            stats: "errors-only"
-        },*/
-             module: {
-                rules: [
-                    {
-                        test: /\.(ts|tsx)$/,
-                        exclude: /node_modules/,
-                        use: {
-                            loader: "awesome-typescript-loader",
-                            options: {
-                                useBabel: true,
-                                configFileName: path.join(
-                                    basePath,
-                                    "tsconfig.json"
-                                )
-                            }
-                        }
-                    },
-                    {
-                        test: /\.css$/,
-                        include: /node_modules/,
-                        loader: ExtractTextPlugin.extract({
-                            fallback: "style-loader",
-                            use: {
-                                loader: "css-loader"
-                            }
-                        })
-                    },
-                    {
-                        // Transform our own .css files with PostCSS and CSS-modules
-                        test: /\.css$/,
-                        exclude: /node_modules/,
-                        use: ["style-loader", "css-loader"]
-                    },
-                    {
-                        // Do not transform vendor's CSS with CSS-modules
-                        // The point is that they remain in global scope.
-                        // Since we require these CSS files in our JS or CSS files,
-                        // they will be a part of our compilation either way.
-                        // So, no need for ExtractTextPlugin here.
-                        test: /\.css$/,
-                        include: /node_modules/,
-                        use: ["style-loader", "css-loader"]
-                    },
-                    {
-                        test: /\.scss$/,
-                        loaders: ["style-loader", "css-loader", "sass-loader"]
-                    },
-                     // Using here url-loader and file-loader
-                    {
-                        test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/,
-                        loader:
-                            "url-loader?limit=10000&mimetype=application/font-woff"
-                    },
-                    {
-                        test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-                        loader:
-                            "url-loader?limit=10000&mimetype=application/octet-stream"
-                    },
-                    {
-                        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-                        loader: "url-loader?limit=10000&mimetype=image/svg+xml"
-                    },
-                    {
-                        test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-                        loader: "file-loader"
-                    }
-                ]
-            },
-            plugins: [
-                // Generate index.html in /dist => https://github.com/ampedandwired/html-webpack-plugin
-                new HtmlWebpackPlugin({
-                    filename: "index.html", // Name of file in ./dist/
-                    template: "index.html", // Name of template in ./src
-                    hash: true
-                }),
-                new ExtractTextPlugin({
-                    filename: "[chunkhash].[name].css",
-                    disable: false,
-                    allChunks: true
-                })
-            ]
-        },
-        function(err, stats) {
-            console.log(stats);
-        }
-    );
-});
-
 function getAssetGroups() {
     var assetManifestPaths = glob.sync("./src/OrchardCore.{Modules,Themes}/*/Assets.json", {});
 	var ownVendors = glob.sync(
         "./src/OrchardCore.DistribWebAPI/Modules/*/Assets.json",
         {}
     );
+    var ownVendorsThemes = glob.sync(
+        "./src/OrchardCore.DistribWebAPI/Themes/*/Assets.json",
+        {}
+    );
 	
-	assetManifestPaths = assetManifestPaths.concat(ownVendors);
+    assetManifestPaths = assetManifestPaths.concat(ownVendors);
+    assetManifestPaths = assetManifestPaths.concat(ownVendorsThemes);
 
     var assetGroups = [];
     assetManifestPaths.forEach(function (assetManifestPath) {
