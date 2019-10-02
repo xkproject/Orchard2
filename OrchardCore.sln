@@ -398,7 +398,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PCCOM.Distrib.WebAPI.Stocks
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PCCOM.Distrib.WebAPI.Promotions", "src\OrchardCore.DistribWebAPI\Modules\PCCOM.Distrib.WebAPI.Promotions\PCCOM.Distrib.WebAPI.Promotions.csproj", "{34531486-0DFB-4B73-91CC-2452F02EC1DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCCOM.Distrib.WebAPI.Receipts", "src\OrchardCore.DistribWebAPI\Modules\PCCOM.Distrib.WebAPI.Receipts\PCCOM.Distrib.WebAPI.Receipts.csproj", "{D83EC676-3712-46AD-A316-28A2288BAC1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PCCOM.Distrib.WebAPI.Receipts", "src\OrchardCore.DistribWebAPI\Modules\PCCOM.Distrib.WebAPI.Receipts\PCCOM.Distrib.WebAPI.Receipts.csproj", "{D83EC676-3712-46AD-A316-28A2288BAC1B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PCCOM.Distrib.WebAPI.DevicesManagement", "src\OrchardCore.DistribWebAPI\Modules\PCCOM.Distrib.WebAPI.DevicesManagement\PCCOM.Distrib.WebAPI.DevicesManagement.csproj", "{775D185F-01F8-41F9-8C84-6886CB906446}"
 EndProject
