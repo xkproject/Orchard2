@@ -11,7 +11,8 @@ namespace OrchardCore.OpenId.YesSql.Migrations
         {
             SchemaBuilder.CreateMapIndexTable(nameof(OpenIdApplicationIndex), table => table
                 .Column<string>(nameof(OpenIdApplicationIndex.ApplicationId), column => column.WithLength(48))
-                .Column<string>(nameof(OpenIdApplicationIndex.ClientId), column => column.Unique()));
+                //To-Do: Remove temporal fix(withLength()) https://github.com/OrchardCMS/OrchardCore/pull/6362
+                .Column<string>(nameof(OpenIdApplicationIndex.ClientId), column => column.Unique().WithLength(100)));
 
             SchemaBuilder.CreateReduceIndexTable(nameof(OpenIdAppByLogoutUriIndex), table => table
                 .Column<string>(nameof(OpenIdAppByLogoutUriIndex.LogoutRedirectUri))
@@ -28,12 +29,16 @@ namespace OrchardCore.OpenId.YesSql.Migrations
             SchemaBuilder.CreateMapIndexTable(nameof(OpenIdAuthorizationIndex), table => table
                 .Column<string>(nameof(OpenIdAuthorizationIndex.AuthorizationId), column => column.WithLength(48))
                 .Column<string>(nameof(OpenIdAuthorizationIndex.ApplicationId), column => column.WithLength(48))
-                .Column<string>(nameof(OpenIdAuthorizationIndex.Status))
-                .Column<string>(nameof(OpenIdAuthorizationIndex.Subject))
-                .Column<string>(nameof(OpenIdAuthorizationIndex.Type)));
+                //To-Do: Remove temporal fix(withLength()) https://github.com/OrchardCMS/OrchardCore/pull/6362
+                .Column<string>(nameof(OpenIdAuthorizationIndex.Status), column => column.WithLength(25))
+                //To-Do: Remove temporal fix(withLength()) https://github.com/OrchardCMS/OrchardCore/pull/6362
+                .Column<string>(nameof(OpenIdAuthorizationIndex.Subject), column => column.WithLength(330))
+                //To-Do: Remove temporal fix(withLength()) https://github.com/OrchardCMS/OrchardCore/pull/6362
+                .Column<string>(nameof(OpenIdAuthorizationIndex.Type), column => column.WithLength(25)));
 
             SchemaBuilder.CreateMapIndexTable(nameof(OpenIdScopeIndex), table => table
-                .Column<string>(nameof(OpenIdScopeIndex.Name), column => column.Unique())
+                //To-Do: Remove temporal fix(withLength()) https://github.com/OrchardCMS/OrchardCore/pull/6362
+                .Column<string>(nameof(OpenIdScopeIndex.Name), column => column.Unique().WithLength(200))
                 .Column<string>(nameof(OpenIdScopeIndex.ScopeId), column => column.WithLength(48)));
 
             SchemaBuilder.CreateReduceIndexTable(nameof(OpenIdScopeByResourceIndex), table => table
@@ -46,9 +51,12 @@ namespace OrchardCore.OpenId.YesSql.Migrations
                 .Column<string>(nameof(OpenIdTokenIndex.AuthorizationId), column => column.WithLength(48))
                 .Column<DateTimeOffset>(nameof(OpenIdTokenIndex.ExpirationDate))
                 .Column<string>(nameof(OpenIdTokenIndex.ReferenceId))
-                .Column<string>(nameof(OpenIdTokenIndex.Status))
-                .Column<string>(nameof(OpenIdTokenIndex.Subject))
-                .Column<string>(nameof(OpenIdTokenIndex.Type)));
+                //To-Do: Remove temporal fix(withLength()) https://github.com/OrchardCMS/OrchardCore/pull/6362
+                .Column<string>(nameof(OpenIdTokenIndex.Status), column => column.WithLength(25))
+                //To-Do: Remove temporal fix(withLength()) https://github.com/OrchardCMS/OrchardCore/pull/6362
+                .Column<string>(nameof(OpenIdTokenIndex.Subject), column => column.WithLength(330))
+                //To-Do: Remove temporal fix(withLength()) https://github.com/OrchardCMS/OrchardCore/pull/6362
+                .Column<string>(nameof(OpenIdTokenIndex.Type), column => column.WithLength(25)));
 
             return 3;
         }
@@ -86,7 +94,6 @@ namespace OrchardCore.OpenId.YesSql.Migrations
         {
             SchemaBuilder.AlterTable(nameof(OpenIdApplicationIndex), table =>
             {
-                table.AlterColumn(nameof(OpenIdApplicationIndex.ClientId), column => column.WithType(DbType.String, 100));
                 table.CreateIndex($"IX_{nameof(OpenIdApplicationIndex)}_{nameof(OpenIdApplicationIndex.ApplicationId)}", nameof(OpenIdApplicationIndex.ApplicationId));
                 table.CreateIndex($"IX_{nameof(OpenIdApplicationIndex)}_{nameof(OpenIdApplicationIndex.ClientId)}", nameof(OpenIdApplicationIndex.ClientId));
             });
@@ -105,10 +112,6 @@ namespace OrchardCore.OpenId.YesSql.Migrations
 
             SchemaBuilder.AlterTable(nameof(OpenIdAuthorizationIndex), table =>
             {
-                table.AlterColumn(nameof(OpenIdAuthorizationIndex.Status), column => column.WithType(DbType.String, 25));
-                table.AlterColumn(nameof(OpenIdAuthorizationIndex.Subject), column => column.WithType(DbType.String, 330));
-                table.AlterColumn(nameof(OpenIdAuthorizationIndex.Type), column => column.WithType(DbType.String, 25));
-
                 table.CreateIndex($"IX_{nameof(OpenIdAuthorizationIndex)}_{nameof(OpenIdAuthorizationIndex.Subject)}", nameof(OpenIdAuthorizationIndex.Subject));
                 table.CreateIndex($"IX_{nameof(OpenIdAuthorizationIndex)}_{nameof(OpenIdAuthorizationIndex.AuthorizationId)}", nameof(OpenIdAuthorizationIndex.AuthorizationId));
                 table.CreateIndex($"IX_{nameof(OpenIdAuthorizationIndex)}_{nameof(OpenIdAuthorizationIndex.ApplicationId)}", nameof(OpenIdAuthorizationIndex.ApplicationId));
@@ -124,7 +127,6 @@ namespace OrchardCore.OpenId.YesSql.Migrations
 
             SchemaBuilder.AlterTable(nameof(OpenIdScopeIndex), table =>
             {
-                table.AlterColumn(nameof(OpenIdScopeIndex.Name), column => column.WithType(DbType.String, 200));
                 table.CreateIndex($"IX_{nameof(OpenIdScopeIndex)}_{nameof(OpenIdScopeIndex.ScopeId)}", nameof(OpenIdScopeIndex.ScopeId));
                 table.CreateIndex($"IX_{nameof(OpenIdScopeIndex)}_{nameof(OpenIdScopeIndex.Name)}", nameof(OpenIdScopeIndex.Name));
             });
@@ -134,10 +136,6 @@ namespace OrchardCore.OpenId.YesSql.Migrations
             });
             SchemaBuilder.AlterTable(nameof(OpenIdTokenIndex), table =>
             {
-                table.AlterColumn(nameof(OpenIdTokenIndex.Status), column => column.WithType(DbType.String, 25));
-                table.AlterColumn(nameof(OpenIdTokenIndex.Subject), column => column.WithType(DbType.String, 330));
-                table.AlterColumn(nameof(OpenIdTokenIndex.Type), column => column.WithType(DbType.String, 25));
-
                 table.CreateIndex($"IX_{nameof(OpenIdTokenIndex)}_{nameof(OpenIdTokenIndex.ApplicationId)}", nameof(OpenIdTokenIndex.ApplicationId));
                 table.CreateIndex($"IX_{nameof(OpenIdTokenIndex)}_{nameof(OpenIdTokenIndex.AuthorizationId)}", nameof(OpenIdTokenIndex.AuthorizationId));
                 table.CreateIndex($"IX_{nameof(OpenIdTokenIndex)}_{nameof(OpenIdTokenIndex.ReferenceId)}", nameof(OpenIdTokenIndex.ReferenceId));
