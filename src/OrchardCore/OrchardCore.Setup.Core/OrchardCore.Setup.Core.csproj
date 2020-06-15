@@ -14,7 +14,11 @@
     <ProjectReference Include="..\OrchardCore.Setup.Abstractions\OrchardCore.Setup.Abstractions.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(SolutionFileName)' == 'OrchardCore.sln'">
     <PackageReference Include="YesSql.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(SolutionFileName)' == 'OrchardCoreYesSql.sln'">
+    <ProjectReference Include="..\..\..\..\yessql\src\YesSql.Abstractions\YesSql.Abstractions.csproj" />
   </ItemGroup>
 </Project>

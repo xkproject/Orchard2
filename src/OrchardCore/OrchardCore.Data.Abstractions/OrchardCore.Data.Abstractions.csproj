@@ -8,9 +8,13 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
-
-  <ItemGroup>
+  
+  <ItemGroup Condition="'$(SolutionFileName)' == 'OrchardCore.sln'">
     <PackageReference Include="YesSql.Core" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(SolutionFileName)' == 'OrchardCoreYesSql.sln'">
+    <ProjectReference Include="..\..\..\..\yessql\src\YesSql.Core\YesSql.Core.csproj" />
   </ItemGroup>
 
 </Project>
