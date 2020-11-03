@@ -1,52 +1,32 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Primitives;
 using OrchardCore.AdminMenu.Models;
-using OrchardCore.Environment.Cache;
-using OrchardCore.Modules;
-using YesSql;
+using OrchardCore.Documents;
 
 namespace OrchardCore.AdminMenu
 {
     public class AdminMenuService : IAdminMenuService
     {
-        private readonly IMemoryCache _memoryCache;
-        private readonly ISignal _signal;
-        private readonly IServiceProvider _serviceProvider;
-        private readonly IClock _clock;
-        private const string AdminMenuCacheKey = "AdminMenuervice";
+        private readonly IDocumentManager<AdminMenuList> _documentManager;
 
-        public AdminMenuService(
-            ISignal signal,
-            IServiceProvider serviceProvider,
-            IMemoryCache memoryCache,
-            IClock clock)
-        {
-            _signal = signal;
-            _serviceProvider = serviceProvider;
-            _clock = clock;
-            _memoryCache = memoryCache;
-        }
+        public AdminMenuService(IDocumentManager<AdminMenuList> documentManager) => _documentManager = documentManager;
 
-        public IChangeToken ChangeToken => _signal.GetToken(AdminMenuCacheKey);
+        /// <summary>
+        /// Loads the admin menus from the store for updating and that should not be cached.
+        /// </summary>
+        public Task<AdminMenuList> LoadAdminMenuListAsync() => _documentManager.GetOrCreateMutableAsync();
 
-        public async Task<List<Models.AdminMenu>> GetAsync()
-        {
-            return (await GetAdminMenuList()).AdminMenu;
-        }
+        /// <summary>
+        /// Gets the admin menus from the cache for sharing and that should not be updated.
+        /// </summary>
+        public Task<AdminMenuList> GetAdminMenuListAsync() => _documentManager.GetOrCreateImmutableAsync();
 
         public async Task SaveAsync(Models.AdminMenu tree)
         {
-            var adminMenuList = await GetAdminMenuList();
-            var session = GetSession();
+            var adminMenuList = await LoadAdminMenuListAsync();
 
-
-            var preexisting = adminMenuList.AdminMenu.Where(x => x.Id == tree.Id).FirstOrDefault();
+            var preexisting = adminMenuList.AdminMenu.FirstOrDefault(x => String.Equals(x.Id, tree.Id, StringComparison.OrdinalIgnoreCase));
 
             // it's new? add it
             if (preexisting == null)
@@ -59,73 +39,23 @@ namespace OrchardCore.AdminMenu
                 adminMenuList.AdminMenu[index] = tree;
             }
 
-            session.Save(adminMenuList);
-
-            _memoryCache.Set(AdminMenuCacheKey, adminMenuList);
-            _signal.SignalToken(AdminMenuCacheKey);
+            await _documentManager.UpdateAsync(adminMenuList);
         }
 
-        public async Task<Models.AdminMenu> GetByIdAsync(string id)
+        public Models.AdminMenu GetAdminMenuById(AdminMenuList adminMenuList, string id)
         {
-            return (await GetAdminMenuList())
-                .AdminMenu
-                .Where(x => String.Equals(x.Id, id, StringComparison.OrdinalIgnoreCase))
-                .FirstOrDefault();
+            return adminMenuList.AdminMenu.FirstOrDefault(x => String.Equals(x.Id, id, StringComparison.OrdinalIgnoreCase));
         }
-
 
         public async Task<int> DeleteAsync(Models.AdminMenu tree)
         {
-            var adminMenuList = await GetAdminMenuList();
-            var session = GetSession();
+            var adminMenuList = await LoadAdminMenuListAsync();
 
-            var count = adminMenuList.AdminMenu.RemoveAll(x => String.Equals(x.Id, tree.Id));
+            var count = adminMenuList.AdminMenu.RemoveAll(x => String.Equals(x.Id, tree.Id, StringComparison.OrdinalIgnoreCase));
 
-            session.Save(adminMenuList);
-
-            _memoryCache.Set(AdminMenuCacheKey, adminMenuList);
-            _signal.SignalToken(AdminMenuCacheKey);
+            await _documentManager.UpdateAsync(adminMenuList);
 
             return count;
-        }
-
-        private async Task<AdminMenuList> GetAdminMenuList()
-        {
-            AdminMenuList treeList;
-
-            if (!_memoryCache.TryGetValue(AdminMenuCacheKey, out treeList))
-            {
-                var session = GetSession();
-
-                treeList = await session.Query<AdminMenuList>().FirstOrDefaultAsync();
-
-                if (treeList == null)
-                {
-                    lock (_memoryCache)
-                    {
-                        if (!_memoryCache.TryGetValue(AdminMenuCacheKey, out treeList))
-                        {
-                            treeList = new AdminMenuList();
-                            session.Save(treeList);
-                            _memoryCache.Set(AdminMenuCacheKey, treeList);
-                            _signal.SignalToken(AdminMenuCacheKey);
-                        }
-                    }
-                }
-                else
-                {
-                    _memoryCache.Set(AdminMenuCacheKey, treeList);
-                    _signal.SignalToken(AdminMenuCacheKey);
-                }
-            }
-
-            return treeList;
-        }
-
-        private YesSql.ISession GetSession()
-        {
-            var httpContextAccessor = _serviceProvider.GetService<IHttpContextAccessor>();
-            return httpContextAccessor.HttpContext.RequestServices.GetService<YesSql.ISession>();
         }
     }
 }

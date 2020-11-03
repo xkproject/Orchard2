@@ -1,11 +1,10 @@
 using System.Collections.Generic;
+using OrchardCore.Data.Documents;
 
 namespace OrchardCore.BackgroundTasks.Models
 {
-    public class BackgroundTaskDocument
+    public class BackgroundTaskDocument : Document
     {
-        public int Id { get; set; } // An identifier so that updates don't create new documents
-
         public Dictionary<string, BackgroundTaskSettings> Settings { get; } = new Dictionary<string, BackgroundTaskSettings>();
     }
 }

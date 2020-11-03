@@ -1,10 +1,10 @@
+using System;
 using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Primitives;
 using OrchardCore.Apis.GraphQL;
 using OrchardCore.ContentManagement.GraphQL.Queries.Types;
 
@@ -13,29 +13,30 @@ namespace OrchardCore.ContentManagement.GraphQL.Queries
     public class ContentItemQuery : ISchemaBuilder
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IStringLocalizer S;
 
         public ContentItemQuery(IHttpContextAccessor httpContextAccessor,
             IStringLocalizer<ContentItemQuery> localizer)
         {
             _httpContextAccessor = httpContextAccessor;
 
-            T = localizer;
+            S = localizer;
         }
 
-        public IStringLocalizer T { get; set; }
+        public Task<string> GetIdentifierAsync() => Task.FromResult(String.Empty);
 
-        public Task<IChangeToken> BuildAsync(ISchema schema)
+        public Task BuildAsync(ISchema schema)
         {
             var field = new FieldType
             {
                 Name = "ContentItem",
-                Description = T["Content items are instances of content types, just like objects are instances of classes."],
+                Description = S["Content items are instances of content types, just like objects are instances of classes."],
                 Type = typeof(ContentItemInterface),
                 Arguments = new QueryArguments(
                     new QueryArgument<NonNullGraphType<StringGraphType>>
                     {
                         Name = "contentItemId",
-                        Description = T["Content item id"]
+                        Description = S["Content item id"]
                     }
                 ),
                 Resolver = new AsyncFieldResolver<ContentItem>(ResolveAsync)
@@ -43,7 +44,7 @@ namespace OrchardCore.ContentManagement.GraphQL.Queries
 
             schema.Query.AddField(field);
 
-            return Task.FromResult<IChangeToken>(null);
+            return Task.CompletedTask;
         }
 
         private Task<ContentItem> ResolveAsync(ResolveFieldContext context)

@@ -6,7 +6,7 @@
 @{
     var allContentTypes = ContentDefinitionManager.ListTypeDefinitions();
 
-    var selectedContentTypes = Model.Value.ContentTypes ?? new ContentTypeEntry[] { } ;
+    var selectedContentTypes = Model.Value.ContentTypes;
 
     var selectedDisplayNames = allContentTypes
         .Where(x => isSelected(x, selectedContentTypes))
@@ -39,5 +39,5 @@
             <span class="badge badge-warning">@T["Nothing here!"]</span>
         }
     }
-    <span class="text-muted">- @T["Content Types"]</span>
+    <span class="text-muted dashed">@T["Content Types"]</span>
 </div>

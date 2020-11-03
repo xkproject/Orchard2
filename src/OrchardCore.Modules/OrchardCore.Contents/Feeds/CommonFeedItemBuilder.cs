@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -46,16 +47,17 @@ namespace OrchardCore.Contents.Feeds.Builders
 
                     feedItem.Element.SetElementValue("title", contentItem.DisplayText);
                     feedItem.Element.Add(link);
-                    feedItem.Element.SetElementValue("description", bodyAspect.Body?.ToString());
+
+                    feedItem.Element.Add(new XElement("description", new XCData(bodyAspect.Body?.ToString() ?? String.Empty)));
 
                     if (contentItem.PublishedUtc != null)
                     {
-                        // RFC833 
-                        // The "R" or "r" standard format specifier represents a custom date and time format string that is defined by 
-                        // the DateTimeFormatInfo.RFC1123Pattern property. The pattern reflects a defined standard, and the property  
-                        // is read-only. Therefore, it is always the same, regardless of the culture used or the format provider supplied.  
-                        // The custom format string is "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'". When this standard format specifier is used,  
-                        // the formatting or parsing operation always uses the invariant culture. 
+                        // RFC833
+                        // The "R" or "r" standard format specifier represents a custom date and time format string that is defined by
+                        // the DateTimeFormatInfo.RFC1123Pattern property. The pattern reflects a defined standard, and the property
+                        // is read-only. Therefore, it is always the same, regardless of the culture used or the format provider supplied.
+                        // The custom format string is "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'". When this standard format specifier is used,
+                        // the formatting or parsing operation always uses the invariant culture.
                         feedItem.Element.SetElementValue("pubDate", contentItem.PublishedUtc.Value.ToString("r"));
                     }
 
@@ -72,7 +74,7 @@ namespace OrchardCore.Contents.Feeds.Builders
                     });
 
                     context.Builder.AddProperty(context, feedItem, "title", contentItem.DisplayText);
-                    context.Builder.AddProperty(context, feedItem, "description", bodyAspect.Body.ToString());
+                    context.Builder.AddProperty(context, feedItem, new XElement("description", new XCData(bodyAspect.Body?.ToString() ?? String.Empty)));
 
                     if (contentItem.PublishedUtc != null)
                     {

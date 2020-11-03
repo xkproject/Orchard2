@@ -1,22 +1,17 @@
 using System;
 using System.IO;
-using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.TagHelpers.Cache;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
-using OrchardCore.DynamicCache.Services;
+using Microsoft.Extensions.Options;
+using OrchardCore.DisplayManagement;
 using OrchardCore.Environment.Cache;
-using OrchardCore.Modules;
 
 namespace OrchardCore.DynamicCache.TagHelpers
 {
-    [HtmlTargetElement("cache", Attributes = CacheIdAttributeName)]
+    [HtmlTargetElement("dynamic-cache", Attributes = CacheIdAttributeName)]
     public class DynamicCacheTagHelper : TagHelper
     {
         private const string CacheIdAttributeName = "cache-id";
@@ -40,13 +35,6 @@ namespace OrchardCore.DynamicCache.TagHelpers
         /// Gets the <see cref="System.Text.Encodings.Web.HtmlEncoder"/> which encodes the content to be cached.
         /// </summary>
         protected HtmlEncoder HtmlEncoder { get; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="ViewContext"/> for the current executing View.
-        /// </summary>
-        [HtmlAttributeNotBound]
-        [ViewContext]
-        public ViewContext ViewContext { get; set; }
 
         /// <summary>
         /// Gets or sets a <see cref="string" /> identifying this cache entry.
@@ -91,43 +79,28 @@ namespace OrchardCore.DynamicCache.TagHelpers
         public bool Enabled { get; set; } = true;
 
         /// <summary>
-        /// Prefix used by <see cref="CacheTagHelper"/> instances when creating entries in <see cref="IDynamicCacheService"/>.
+        /// Prefix used by <see cref="DynamicCacheTagHelper"/> instances when creating entries in <see cref="IDynamicCacheService"/>.
         /// </summary>
         public static readonly string CacheKeyPrefix = nameof(DynamicCacheTagHelper);
-        private const string CachePriorityAttributeName = "priority";
-        private readonly IClock _clock;
+
         private readonly IDynamicCacheService _dynamicCacheService;
         private readonly ICacheScopeManager _cacheScopeManager;
-        private readonly ILogger<DynamicCacheTagHelper> _logger;
         private readonly DynamicCacheTagHelperService _dynamicCacheTagHelperService;
+        private readonly CacheOptions _cacheOptions;
 
         public DynamicCacheTagHelper(
-            IClock clock,
             IDynamicCacheService dynamicCacheService,
             ICacheScopeManager cacheScopeManager,
-            ILogger<DynamicCacheTagHelper> logger,
             HtmlEncoder htmlEncoder,
-            DynamicCacheTagHelperService dynamicCacheTagHelperService)
-            
+            DynamicCacheTagHelperService dynamicCacheTagHelperService,
+            IOptions<CacheOptions> cacheOptions)
         {
-            _clock = clock;
             _dynamicCacheService = dynamicCacheService;
             _cacheScopeManager = cacheScopeManager;
-            _logger = logger;
             HtmlEncoder = htmlEncoder;
             _dynamicCacheTagHelperService = dynamicCacheTagHelperService;
+            _cacheOptions = cacheOptions.Value;
         }
-
-        /// <summary>
-        /// Gets the <see cref="IMemoryCache"/> instance used to cache entries.
-        /// </summary>
-        protected IMemoryCache MemoryCache { get; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="CacheItemPriority"/> policy for the cache entry.
-        /// </summary>
-        [HtmlAttributeName(CachePriorityAttributeName)]
-        public CacheItemPriority? Priority { get; set; }
 
         /// <inheritdoc />
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
@@ -187,14 +160,12 @@ namespace OrchardCore.DynamicCache.TagHelpers
 
                 try
                 {
-                    content = await output.GetChildContentAsync();
+                    content = await ProcessContentAsync(output, cacheContext);
                 }
                 finally
                 {
                     _cacheScopeManager.ExitScope();
                 }
-
-                content = await ProcessContentAsync(output, cacheContext);
             }
             else
             {
@@ -209,7 +180,6 @@ namespace OrchardCore.DynamicCache.TagHelpers
 
         public async Task<IHtmlContent> ProcessContentAsync(TagHelperOutput output, CacheContext cacheContext)
         {
-
             IHtmlContent content = null;
 
             while (content == null)
@@ -235,20 +205,48 @@ namespace OrchardCore.DynamicCache.TagHelpers
                             // The value is not cached, we need to render the tag helper output
                             var processedContent = await output.GetChildContentAsync();
 
-                            var stringBuilder = new StringBuilder();
-                            using (var writer = new StringWriter(stringBuilder))
+                            using (var sb = StringBuilderPool.GetInstance())
                             {
-                                processedContent.WriteTo(writer, HtmlEncoder);
+                                using (var writer = new StringWriter(sb.Builder))
+                                {
+                                    // Write the start of a cache debug block.
+                                    if (_cacheOptions.DebugMode)
+                                    {
+                                        // No need to optimize this code as it will be used for debugging purpose.
+                                        writer.WriteLine();
+                                        writer.WriteLine($"<!-- CACHE BLOCK: {cacheContext.CacheId} ({Guid.NewGuid()})");
+                                        writer.WriteLine($"         VARY BY: {String.Join(", ", cacheContext.Contexts)}");
+                                        writer.WriteLine($"    DEPENDENCIES: {String.Join(", ", cacheContext.Tags)}");
+                                        writer.WriteLine($"      EXPIRES ON: {cacheContext.ExpiresOn}");
+                                        writer.WriteLine($"   EXPIRES AFTER: {cacheContext.ExpiresAfter}");
+                                        writer.WriteLine($" EXPIRES SLIDING: {cacheContext.ExpiresSliding}");
+                                        writer.WriteLine("-->");
+                                    }
+
+                                    // Always write the content regardless of debug mode.
+                                    processedContent.WriteTo(writer, HtmlEncoder);
+
+                                    // Write the end of a cache debug block.
+                                    if (_cacheOptions.DebugMode)
+                                    {
+                                        writer.WriteLine();
+                                        writer.WriteLine($"<!-- END CACHE BLOCK: {cacheContext.CacheId} -->");
+                                    }
+
+                                    await writer.FlushAsync();
+                                }
+
+                                var html = sb.Builder.ToString();
+
+                                var formattingContext = new DistributedCacheTagHelperFormattingContext
+                                {
+                                    Html = new HtmlString(html)
+                                };
+
+                                await _dynamicCacheService.SetCachedValueAsync(cacheContext, html);
+
+                                content = formattingContext.Html;
                             }
-
-                            var formattingContext = new DistributedCacheTagHelperFormattingContext
-                            {
-                                Html = new HtmlString(stringBuilder.ToString())
-                            };
-
-                            await _dynamicCacheService.SetCachedValueAsync(cacheContext, formattingContext.Html.ToString());
-
-                            content = formattingContext.Html;
                         }
                         else
                         {

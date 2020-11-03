@@ -1,11 +1,11 @@
-using OrchardCore.Modules.Manifest;
 using OrchardCore.Facebook;
+using OrchardCore.Modules.Manifest;
 
 [assembly: Module(
     Name = "Facebook",
-    Author = "The Orchard Team",
-    Website = "https://orchardproject.net",
-    Version = "2.0.0",
+    Author = ManifestConstants.OrchardCoreTeam,
+    Website = ManifestConstants.OrchardCoreWebsite,
+    Version = ManifestConstants.OrchardCoreVersion,
     Category = "Facebook"
 )]
 
@@ -20,6 +20,14 @@ using OrchardCore.Facebook;
     Id = FacebookConstants.Features.Login,
     Name = "Facebook Login",
     Category = "Facebook",
-    Description = "Auhenticates users from facebook.",
+    Description = "Authenticates users from facebook.",
     Dependencies = new[] { FacebookConstants.Features.Core }
+)]
+
+[assembly: Feature(
+    Id = FacebookConstants.Features.Widgets,
+    Name = "Facebook Social Plugins Widgets",
+    Category = "Facebook",
+    Description = "Integrates Facebook Social Plugins as predefined widgets",
+    Dependencies = new[] { FacebookConstants.Features.Core, "OrchardCore.Widgets" }
 )]

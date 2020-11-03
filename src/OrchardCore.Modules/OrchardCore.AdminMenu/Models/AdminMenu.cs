@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using OrchardCore.Navigation;
 
 namespace OrchardCore.AdminMenu.Models
 {
@@ -10,7 +9,6 @@ namespace OrchardCore.AdminMenu.Models
         public string Name { get; set; }
         public bool Enabled { get; set; } = true;
         public List<AdminNode> MenuItems { get; } = new List<AdminNode>();
-
 
         public AdminNode GetMenuItemById(string id)
         {
@@ -42,7 +40,7 @@ namespace OrchardCore.AdminMenu.Models
                     {
                         return true; // success
                     }
-                }                
+                }
             }
 
             return false; // failure
@@ -69,10 +67,9 @@ namespace OrchardCore.AdminMenu.Models
                     {
                         return true; // success
                     }
-                }                
+                }
             }
             return false; // failure
         }
-
     }
 }
