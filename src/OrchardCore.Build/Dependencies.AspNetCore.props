@@ -4,6 +4,7 @@
     <AspNetCoreTargetFramework>netcoreapp3.1</AspNetCoreTargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <PackageManagement Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
     <PackageManagement Include="Microsoft.AspNetCore.Authentication.AzureAD.UI" Version="$(AspNetCoreVersion)" />
     <PackageManagement Include="Microsoft.AspNetCore.Authentication.Facebook" Version="$(AspNetCoreVersion)" />
     <PackageManagement Include="Microsoft.AspNetCore.Authentication.Google" Version="$(AspNetCoreVersion)" />
