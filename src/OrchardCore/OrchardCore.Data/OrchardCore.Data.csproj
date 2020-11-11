@@ -9,15 +9,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Users\Julian\Desktop\yessql-master\src\YesSql.Provider.SqlServer\YesSql.Provider.SqlServer.csproj" />
     <ProjectReference Include="..\OrchardCore.Data.Abstractions\OrchardCore.Data.Abstractions.csproj" />
     <ProjectReference Include="..\OrchardCore.Abstractions\OrchardCore.Abstractions.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="YesSql.Provider.SqlServer" />
-    <PackageReference Include="YesSql.Provider.MySql" />
-    <PackageReference Include="YesSql.Provider.SqLite" />
-    <PackageReference Include="YesSql.Provider.PostgreSql" />
   </ItemGroup>
 
 </Project>

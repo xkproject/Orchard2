@@ -10,13 +10,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Users\Julian\Desktop\yessql-master\src\YesSql.Abstractions\YesSql.Abstractions.csproj" />
     <ProjectReference Include="..\..\OrchardCore\OrchardCore.Admin.Abstractions\OrchardCore.Admin.Abstractions.csproj" />
     <ProjectReference Include="..\..\OrchardCore\OrchardCore.DisplayManagement\OrchardCore.DisplayManagement.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MiniProfiler.AspNetCore.Mvc" />
-    <PackageReference Include="YesSql.Abstractions" />
   </ItemGroup>
 
 </Project>

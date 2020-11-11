@@ -9,12 +9,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Users\Julian\Desktop\yessql-master\src\YesSql.Core\YesSql.Core.csproj" />
     <ProjectReference Include="..\OrchardCore.Abstractions\OrchardCore.Abstractions.csproj" />
     <ProjectReference Include="..\OrchardCore.Recipes.Abstractions\OrchardCore.Recipes.Abstractions.csproj" />
     <ProjectReference Include="..\OrchardCore.Setup.Abstractions\OrchardCore.Setup.Abstractions.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="YesSql.Abstractions" />
   </ItemGroup>
 </Project>

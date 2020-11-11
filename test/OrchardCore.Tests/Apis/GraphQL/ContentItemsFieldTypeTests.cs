@@ -18,7 +18,7 @@ using OrchardCore.Environment.Shell;
 using Xunit;
 using YesSql;
 using YesSql.Indexes;
-using YesSql.Provider.Sqlite;
+
 using YesSql.Sql;
 
 namespace OrchardCore.Tests.Apis.GraphQL
@@ -38,13 +38,13 @@ namespace OrchardCore.Tests.Apis.GraphQL
 
         private async Task InitializeAsync()
         {
-            var connectionStringTemplate = @"Data Source={0};Cache=Shared";
+           // var connectionStringTemplate = @"Data Source={0};Cache=Shared";
 
             _tempFilename = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            _store = await StoreFactory.CreateAsync(new Configuration().UseSqLite(String.Format(connectionStringTemplate, _tempFilename)));
+           // _store = await StoreFactory.CreateAndInitializeAsync(new Configuration().UseSqLite(String.Format(connectionStringTemplate, _tempFilename)));
 
             _prefix = "tp";
-            _prefixedStore = await StoreFactory.CreateAsync(new Configuration().UseSqLite(String.Format(connectionStringTemplate, _tempFilename + _prefix)).SetTablePrefix(_prefix + "_"));
+           // _prefixedStore = await StoreFactory.CreateAndInitializeAsync(new Configuration().UseSqLite(String.Format(connectionStringTemplate, _tempFilename + _prefix)).SetTablePrefix(_prefix + "_"));
 
             await CreateTablesAsync(_store);
             await CreateTablesAsync(_prefixedStore);

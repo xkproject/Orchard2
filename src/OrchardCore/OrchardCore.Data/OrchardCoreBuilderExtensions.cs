@@ -12,9 +12,7 @@ using OrchardCore.Environment.Shell.Scope;
 using OrchardCore.Modules;
 using YesSql;
 using YesSql.Indexes;
-using YesSql.Provider.MySql;
-using YesSql.Provider.PostgreSql;
-using YesSql.Provider.Sqlite;
+
 using YesSql.Provider.SqlServer;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -62,7 +60,7 @@ namespace Microsoft.Extensions.DependencyInjection
                                 .UseSqlServer(shellSettings["ConnectionString"], IsolationLevel.ReadUncommitted)
                                 .UseBlockIdGenerator();
                             break;
-                        case "Sqlite":
+                       /* case "Sqlite":
                             var shellOptions = sp.GetService<IOptions<ShellOptions>>();
                             var option = shellOptions.Value;
                             var databaseFolder = Path.Combine(option.ShellsApplicationDataPath, option.ShellsContainerName, shellSettings.Name);
@@ -81,7 +79,7 @@ namespace Microsoft.Extensions.DependencyInjection
                             storeConfiguration
                                 .UsePostgreSql(shellSettings["ConnectionString"], IsolationLevel.ReadUncommitted)
                                 .UseBlockIdGenerator();
-                            break;
+                            break;*/
                         default:
                             throw new ArgumentException("Unknown database provider: " + shellSettings["DatabaseProvider"]);
                     }
@@ -91,7 +89,7 @@ namespace Microsoft.Extensions.DependencyInjection
                         storeConfiguration = storeConfiguration.SetTablePrefix(shellSettings["TablePrefix"] + "_");
                     }
 
-                    var store = StoreFactory.CreateAsync(storeConfiguration).GetAwaiter().GetResult();
+                    var store = StoreFactory.CreateAndInitializeAsync(storeConfiguration).GetAwaiter().GetResult();
                     var indexes = sp.GetServices<IIndexProvider>();
 
                     store.RegisterIndexes(indexes);
