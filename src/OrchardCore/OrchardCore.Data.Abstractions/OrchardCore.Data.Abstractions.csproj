@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Users\Julian\Desktop\yessql-master\src\YesSql.Core\YesSql.Core.csproj" />
+    <ProjectReference Include="..\..\YesSQL\YesSql.Core\YesSql.Core.csproj" />
   </ItemGroup>
 
 </Project>

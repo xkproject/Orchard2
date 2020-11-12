@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Users\Julian\Desktop\yessql-master\src\YesSql.Provider.SqlServer\YesSql.Provider.SqlServer.csproj" />
+    <ProjectReference Include="..\..\YesSQL\YesSql.Provider.SqlServer\YesSql.Provider.SqlServer.csproj" />
     <ProjectReference Include="..\OrchardCore.Data.Abstractions\OrchardCore.Data.Abstractions.csproj" />
     <ProjectReference Include="..\OrchardCore.Abstractions\OrchardCore.Abstractions.csproj" />
   </ItemGroup>
