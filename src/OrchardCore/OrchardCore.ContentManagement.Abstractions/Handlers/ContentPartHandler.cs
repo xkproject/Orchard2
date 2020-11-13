@@ -60,6 +60,19 @@ namespace OrchardCore.ContentManagement.Handlers
                 : Task.CompletedTask;
         }
 
+        Task IContentPartHandler.ImportingAsync(ImportContentContext context, ContentPart part)
+        {
+            return part is TPart tpart
+                ? ImportingAsync(context, tpart)
+                : Task.CompletedTask;
+        }
+
+        Task IContentPartHandler.ImportedAsync(ImportContentContext context, ContentPart part)
+        {
+            return part is TPart tpart
+                ? ImportedAsync(context, tpart)
+                : Task.CompletedTask;
+        }
         Task IContentPartHandler.UpdatingAsync(UpdateContentContext context, ContentPart part)
         {
             return part is TPart tpart
@@ -74,9 +87,23 @@ namespace OrchardCore.ContentManagement.Handlers
                 : Task.CompletedTask;
         }
 
+        Task IContentPartHandler.ValidatingAsync(ValidateContentContext context, ContentPart part)
+        {
+            return part is TPart tpart
+                ? ValidatingAsync(context, tpart)
+                : Task.CompletedTask;
+        }
+
+        Task IContentPartHandler.ValidatedAsync(ValidateContentContext context, ContentPart part)
+        {
+            return part is TPart tpart
+                ? ValidatedAsync(context, tpart)
+                : Task.CompletedTask;
+        }
+
         Task IContentPartHandler.VersioningAsync(VersionContentContext context, ContentPart existing, ContentPart building)
         {
-            return existing is TPart texisting && building is TPart tbuilding 
+            return existing is TPart texisting && building is TPart tbuilding
                 ? VersioningAsync(context, texisting, tbuilding)
                 : Task.CompletedTask;
         }
@@ -85,6 +112,20 @@ namespace OrchardCore.ContentManagement.Handlers
         {
             return existing is TPart texisting && building is TPart tbuilding
                 ? VersionedAsync(context, texisting, tbuilding)
+                : Task.CompletedTask;
+        }
+
+        Task IContentPartHandler.DraftSavingAsync(SaveDraftContentContext context, ContentPart part)
+        {
+            return part is TPart tpart
+                ? DraftSavingAsync(context, tpart)
+                : Task.CompletedTask;
+        }
+
+        Task IContentPartHandler.DraftSavedAsync(SaveDraftContentContext context, ContentPart part)
+        {
+            return part is TPart tpart
+                ? DraftSavedAsync(context, tpart)
                 : Task.CompletedTask;
         }
 
@@ -136,6 +177,21 @@ namespace OrchardCore.ContentManagement.Handlers
                 ? GetContentItemAspectAsync(context, tpart)
                 : Task.CompletedTask;
         }
+        async Task IContentPartHandler.CloningAsync(CloneContentContext context, ContentPart part)
+        {
+            if (part is TPart tpart)
+            {
+                await CloningAsync(context, tpart);
+            }
+        }
+
+        async Task IContentPartHandler.ClonedAsync(CloneContentContext context, ContentPart part)
+        {
+            if (part is TPart tpart)
+            {
+                await ClonedAsync(context, tpart);
+            }
+        }
 
         public virtual Task ActivatedAsync(ActivatedContentContext context, TPart instance) => Task.CompletedTask;
         public virtual Task ActivatingAsync(ActivatingContentContext context, TPart instance) => Task.CompletedTask;
@@ -145,10 +201,16 @@ namespace OrchardCore.ContentManagement.Handlers
         public virtual Task CreatedAsync(CreateContentContext context, TPart instance) => Task.CompletedTask;
         public virtual Task LoadingAsync(LoadContentContext context, TPart instance) => Task.CompletedTask;
         public virtual Task LoadedAsync(LoadContentContext context, TPart instance) => Task.CompletedTask;
+        public virtual Task ImportingAsync(ImportContentContext context, TPart instance) => Task.CompletedTask;
+        public virtual Task ImportedAsync(ImportContentContext context, TPart instance) => Task.CompletedTask;
         public virtual Task UpdatingAsync(UpdateContentContext context, TPart instance) => Task.CompletedTask;
         public virtual Task UpdatedAsync(UpdateContentContext context, TPart instance) => Task.CompletedTask;
+        public virtual Task ValidatingAsync(ValidateContentContext context, TPart instance) => Task.CompletedTask;
+        public virtual Task ValidatedAsync(ValidateContentContext context, TPart instance) => Task.CompletedTask;
         public virtual Task VersioningAsync(VersionContentContext context, TPart existing, TPart building) => Task.CompletedTask;
         public virtual Task VersionedAsync(VersionContentContext context, TPart existing, TPart building) => Task.CompletedTask;
+        public virtual Task DraftSavingAsync(SaveDraftContentContext context, TPart instance) => Task.CompletedTask;
+        public virtual Task DraftSavedAsync(SaveDraftContentContext context, TPart instance) => Task.CompletedTask;
         public virtual Task PublishingAsync(PublishContentContext context, TPart instance) => Task.CompletedTask;
         public virtual Task PublishedAsync(PublishContentContext context, TPart instance) => Task.CompletedTask;
         public virtual Task UnpublishingAsync(PublishContentContext context, TPart instance) => Task.CompletedTask;
@@ -156,5 +218,7 @@ namespace OrchardCore.ContentManagement.Handlers
         public virtual Task RemovingAsync(RemoveContentContext context, TPart instance) => Task.CompletedTask;
         public virtual Task RemovedAsync(RemoveContentContext context, TPart instance) => Task.CompletedTask;
         public virtual Task GetContentItemAspectAsync(ContentItemAspectContext context, TPart part) => Task.CompletedTask;
+        public virtual Task CloningAsync(CloneContentContext context, TPart part) => Task.CompletedTask;
+        public virtual Task ClonedAsync(CloneContentContext context, TPart part) => Task.CompletedTask;
     }
 }

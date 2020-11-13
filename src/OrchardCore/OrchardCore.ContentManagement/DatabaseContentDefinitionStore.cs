@@ -1,38 +1,25 @@
 using System.Threading.Tasks;
 using OrchardCore.ContentManagement.Metadata.Records;
-using YesSql;
+using OrchardCore.Documents;
 
 namespace OrchardCore.ContentManagement
 {
     public class DatabaseContentDefinitionStore : IContentDefinitionStore
     {
-        private readonly ISession _session;
+        private readonly IDocumentManager<ContentDefinitionRecord> _documentManager;
 
-        public DatabaseContentDefinitionStore(ISession session)
+        public DatabaseContentDefinitionStore(IDocumentManager<ContentDefinitionRecord> documentManager)
         {
-            _session = session;
+            _documentManager = documentManager;
         }
 
-        public async Task<ContentDefinitionRecord> LoadContentDefinitionAsync()
-        {
-            var contentDefinitionRecord = await _session
-                .Query<ContentDefinitionRecord>()
-                .FirstOrDefaultAsync();
+        /// <inheritdoc />
+        public Task<ContentDefinitionRecord> LoadContentDefinitionAsync() => _documentManager.GetOrCreateMutableAsync();
 
-            if (contentDefinitionRecord == null)
-            {
-                contentDefinitionRecord = new ContentDefinitionRecord();
-                await SaveContentDefinitionAsync(contentDefinitionRecord);
-            }
+        /// <inheritdoc />
+        public Task<ContentDefinitionRecord> GetContentDefinitionAsync() => _documentManager.GetOrCreateImmutableAsync();
 
-            return contentDefinitionRecord;
-        }
-
-        public Task SaveContentDefinitionAsync(ContentDefinitionRecord contentDefinitionRecord)
-        {
-            _session.Save(contentDefinitionRecord);
-
-            return Task.CompletedTask;
-        }
+        /// <inheritdoc />
+        public Task SaveContentDefinitionAsync(ContentDefinitionRecord contentDefinitionRecord) => _documentManager.UpdateAsync(contentDefinitionRecord);
     }
 }

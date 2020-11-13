@@ -24,38 +24,33 @@ namespace OrchardCore.Roles.Deployment
 
         public async Task ProcessDeploymentStepAsync(DeploymentStep step, DeploymentPlanResult result)
         {
-            var allRolesState = step as AllRolesDeploymentStep;
+            var allRolesStep = step as AllRolesDeploymentStep;
 
-            if (allRolesState == null)
+            if (allRolesStep == null)
             {
                 return;
             }
 
             // Get all roles
-            var allRoleNames = await _roleService.GetRoleNamesAsync();
+            var allRoles = await _roleService.GetRolesAsync();
             var permissions = new JArray();
             var tasks = new List<Task>();
 
-            foreach (var roleName in allRoleNames)
+            foreach (var role in allRoles)
             {
-                var task = _roleManager.FindByNameAsync(_roleManager.NormalizeKey(roleName)).ContinueWith(async roleTask =>
+                var currentRole = (Role)await _roleManager.FindByNameAsync(_roleManager.NormalizeKey(role.RoleName));
+
+                if (currentRole != null)
                 {
-                    var role = (Role)await roleTask;
-                    if (role != null)
-                    {
-                        permissions.Add(JObject.FromObject(
-                            new RolesStepRoleModel
-                            {
-                                Name = role.NormalizedRoleName,
-                                Permissions = role.RoleClaims.Where(x => x.ClaimType == Permission.ClaimType).Select(x => x.ClaimValue).ToArray()
-                            }));
-                    }
-                });
-
-                tasks.Add(task);
+                    permissions.Add(JObject.FromObject(
+                        new RolesStepRoleModel
+                        {
+                            Name = currentRole.RoleName,
+                            Description = currentRole.RoleDescription,
+                            Permissions = currentRole.RoleClaims.Where(x => x.ClaimType == Permission.ClaimType).Select(x => x.ClaimValue).ToArray()
+                        }));
+                }
             }
-
-            await Task.WhenAll(tasks);
 
             result.Steps.Add(new JObject(
                 new JProperty("name", "Roles"),

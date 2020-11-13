@@ -15,22 +15,17 @@ namespace OrchardCore.Settings.Deployment
 
         public async Task ProcessDeploymentStepAsync(DeploymentStep step, DeploymentPlanResult result)
         {
-            var settingsState = step as SiteSettingsDeploymentStep;
-            if (settingsState == null)
+            var settingsStep = step as SiteSettingsDeploymentStep;
+            if (settingsStep == null)
             {
                 return;
             }
 
             var site = await _siteService.GetSiteSettingsAsync();
 
-            if (settingsState == null)
-            {
-                return;
-            }
-
             var data = new JObject(new JProperty("name", "Settings"));
 
-            foreach (var settingName in settingsState.Settings)
+            foreach (var settingName in settingsStep.Settings)
             {
                 switch (settingName)
                 {
@@ -40,14 +35,6 @@ namespace OrchardCore.Settings.Deployment
 
                     case "Calendar":
                         data.Add(new JProperty(nameof(ISite.Calendar), site.Calendar));
-                        break;
-
-                    case "Culture":
-                        data.Add(new JProperty(nameof(ISite.Culture), site.Culture));
-                        break;
-
-                    case "SupportedCultures":
-                        data.Add(new JProperty(nameof(ISite.SupportedCultures), site.SupportedCultures));
                         break;
 
                     case "MaxPagedCount":
@@ -70,6 +57,10 @@ namespace OrchardCore.Settings.Deployment
                         data.Add(new JProperty(nameof(ISite.SiteName), site.SiteName));
                         break;
 
+                    case "PageTitleFormat":
+                        data.Add(new JProperty(nameof(ISite.PageTitleFormat), site.PageTitleFormat));
+                        break;
+
                     case "SiteSalt":
                         data.Add(new JProperty(nameof(ISite.SiteSalt), site.SiteSalt));
                         break;
@@ -86,8 +77,20 @@ namespace OrchardCore.Settings.Deployment
                         data.Add(new JProperty(nameof(ISite.UseCdn), site.UseCdn));
                         break;
 
+                    case "CdnBaseUrl":
+                        data.Add(new JProperty(nameof(ISite.CdnBaseUrl), site.CdnBaseUrl));
+                        break;
+
+                    case "AppendVersion":
+                        data.Add(new JProperty(nameof(ISite.AppendVersion), site.AppendVersion));
+                        break;
+
                     case "HomeRoute":
                         data.Add(new JProperty(nameof(ISite.HomeRoute), JObject.FromObject(site.HomeRoute)));
+                        break;
+
+                    case "CacheMode":
+                        data.Add(new JProperty(nameof(ISite.CacheMode), site.CacheMode));
                         break;
 
                     default:

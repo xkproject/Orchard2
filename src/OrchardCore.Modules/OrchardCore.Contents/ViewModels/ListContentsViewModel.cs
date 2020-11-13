@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using OrchardCore.ContentManagement;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace OrchardCore.Contents.ViewModels
 {
@@ -7,72 +7,20 @@ namespace OrchardCore.Contents.ViewModels
     {
         public ListContentsViewModel()
         {
-            Options = new ContentOptions();
+            Options = new ContentOptionsViewModel();
         }
 
-        public string Id { get; set; }
-
-        public string TypeName
-        {
-            get { return Id; }
-        }
-
-        public string DisplayText { get; set; }
-        public string TypeDisplayName { get; set; }
         public int? Page { get; set; }
-        public IList<Entry> Entries { get; set; }
-        public ContentOptions Options { get; set; }
 
-        #region Nested type: Entry
+        public ContentOptionsViewModel Options { get; set; }
 
-        public class Entry
-        {
-            public ContentItem ContentItem { get; set; }
-            public ContentItemMetadata ContentItemMetadata { get; set; }
-        }
+        [BindNever]
+        public dynamic Header { get; set; }
 
-        #endregion
-    }
+        [BindNever]
+        public List<dynamic> ContentItems { get; set; }
 
-    public class ContentOptions
-    {
-        public ContentOptions()
-        {
-            OrderBy = ContentsOrder.Modified;
-            BulkAction = ContentsBulkAction.None;
-            ContentsStatus = ContentsStatus.Latest;
-        }
-        public string SelectedFilter { get; set; }
-        public string SelectedCulture { get; set; }
-        public IEnumerable<KeyValuePair<string, string>> FilterOptions { get; set; }
-        public ContentsOrder OrderBy { get; set; }
-        public ContentsStatus ContentsStatus { get; set; }
-        public ContentsBulkAction BulkAction { get; set; }
-        public IEnumerable<string> Cultures { get; set; }
-    }
-
-    public enum ContentsOrder
-    {
-        Modified,
-        Published,
-        Created,
-        Title,
-    }
-
-    public enum ContentsStatus
-    {
-        Draft,
-        Published,
-        AllVersions,
-        Latest,
-        Owner
-    }
-
-    public enum ContentsBulkAction
-    {
-        None,
-        PublishNow,
-        Unpublish,
-        Remove
+        [BindNever]
+        public dynamic Pager { get; set; }
     }
 }

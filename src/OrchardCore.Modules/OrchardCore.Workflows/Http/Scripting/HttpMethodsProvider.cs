@@ -78,8 +78,8 @@ namespace OrchardCore.Workflows.Http.Scripting
                 Name = "absoluteUrl",
                 Method = serviceProvider => (Func<string, string>)(relativePath =>
                 {
-                    var urlHelperّFactory = serviceProvider.GetRequiredService<IUrlHelperFactory>();
-                    var urlHelper = urlHelperّFactory.GetUrlHelper(new ActionContext(httpContextAccessor.HttpContext, new RouteData(), new ActionDescriptor()));
+                    var urlHelperFactory = serviceProvider.GetRequiredService<IUrlHelperFactory>();
+                    var urlHelper = urlHelperFactory.GetUrlHelper(new ActionContext(httpContextAccessor.HttpContext, new RouteData(), new ActionDescriptor()));
                     return urlHelper.ToAbsoluteUrl(relativePath);
                 })
             };
@@ -89,16 +89,18 @@ namespace OrchardCore.Workflows.Http.Scripting
                 Name = "readBody",
                 Method = serviceProvider => (Func<string>)(() =>
                 {
-                    var stream = httpContextAccessor.HttpContext.Request.Body;
-                    var body = new StreamReader(stream).ReadToEnd();
-                    return body;
+                    using (var sr = new StreamReader(httpContextAccessor.HttpContext.Request.Body))
+                    {
+                        // Async read of the request body is mandatory.
+                        return sr.ReadToEndAsync().GetAwaiter().GetResult();
+                    }
                 })
             };
 
             _requestFormMethod = new GlobalMethod
             {
                 Name = "requestForm",
-                Method = serviceProvider => (Func<string, object>) (field =>
+                Method = serviceProvider => (Func<string, object>)(field =>
                 {
                     object result;
                     if (httpContextAccessor.HttpContext.Request.Form.TryGetValue(field, out var values))

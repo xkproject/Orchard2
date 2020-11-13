@@ -23,6 +23,22 @@ public static class QueryOrchardRazorHelperExtensions
             return null;
         }
 
-        return (IEnumerable)await queryManager.ExecuteQueryAsync(query, parameters);
+        var result = await queryManager.ExecuteQueryAsync(query, parameters);
+        return result.Items;
+    }
+
+    public static async Task<IQueryResults> QueryResultsAsync(this IOrchardHelper orchardHelper, string queryName, IDictionary<string, object> parameters)
+    {
+        var queryManager = orchardHelper.HttpContext.RequestServices.GetService<IQueryManager>();
+
+        var query = await queryManager.GetQueryAsync(queryName);
+
+        if (query == null)
+        {
+            return null;
+        }
+
+        var result = await queryManager.ExecuteQueryAsync(query, parameters);
+        return result;
     }
 }
