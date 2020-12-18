@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>MiniProfiler.Shared</id>
+    <version>4.0.133</version>
+    <title>MiniProfiler.Shared</title>
+    <authors>Marc Gravell, Jarrod Dixon, Yaakov Ellis, Nick Craver</authors>
+    <owners>Marc Gravell, Jarrod Dixon, Yaakov Ellis, Nick Craver</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/MiniProfiler/dotnet/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://miniprofiler.com/</projectUrl>
+    <description>You shouldn't reference this - MiniProfiler's shared library for all frameworks</description>
+    <releaseNotes>See https://miniprofiler.com/dotnet/Releases for more info</releaseNotes>
+    <repository type="git" url="https://github.com/MiniProfiler/dotnet.git" branch="master" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.1">
+        <dependency id="Microsoft.Extensions.DependencyInjection.Abstractions" version="2.0.0" exclude="Build,Analyzers" />
+        <dependency id="Newtonsoft.Json" version="10.0.3" exclude="Build,Analyzers" />
+        <dependency id="System.Diagnostics.DiagnosticSource" version="4.4.1" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard1.5">
+        <dependency id="Microsoft.Extensions.DependencyInjection.Abstractions" version="1.1.1" exclude="Build,Analyzers" />
+        <dependency id="NETStandard.Library" version="1.6.1" exclude="Build,Analyzers" />
+        <dependency id="Newtonsoft.Json" version="10.0.3" exclude="Build,Analyzers" />
+        <dependency id="System.ComponentModel.Primitives" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Data.Common" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Diagnostics.DiagnosticSource" version="4.4.1" exclude="Build,Analyzers" />
+        <dependency id="System.Diagnostics.StackTrace" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Dynamic.Runtime" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Reflection.Emit.Lightweight" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Runtime.Extensions" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Runtime.Serialization.Primitives" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Threading.Tasks.Parallel" version="4.3.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.Extensions.DependencyInjection.Abstractions" version="2.0.0" exclude="Build,Analyzers" />
+        <dependency id="Newtonsoft.Json" version="10.0.3" exclude="Build,Analyzers" />
+        <dependency id="System.ComponentModel.Primitives" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Data.Common" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Diagnostics.DiagnosticSource" version="4.4.1" exclude="Build,Analyzers" />
+        <dependency id="System.Diagnostics.StackTrace" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Dynamic.Runtime" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Reflection.Emit.Lightweight" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Runtime.Extensions" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Runtime.Serialization.Primitives" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Threading.Tasks.Parallel" version="4.3.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Configuration" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Data" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Data.Linq" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Runtime.Caching" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Runtime.Serialization" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Transactions" targetFramework=".NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Xml" targetFramework=".NETFramework4.6.1" />
+    </frameworkAssemblies>
+  </metadata>
+</package>

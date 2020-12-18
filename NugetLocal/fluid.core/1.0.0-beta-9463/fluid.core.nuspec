@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Fluid.Core</id>
+    <version>1.0.0-beta-9463</version>
+    <title>Fluid Template Engine</title>
+    <authors>Sebastien Ros</authors>
+    <owners>Sebastien Ros</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/sebastienros/fluid/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/sebastienros/fluid</projectUrl>
+    <description>Fluid is a template engine based on the Liquid markup, with focus on performance and .NET programming patterns.</description>
+    <copyright>Sebastien Ros</copyright>
+    <tags>fluid liquid template view engine</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.6">
+        <dependency id="Irony.Core" version="1.0.7" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.FileProviders.Abstractions" version="1.1.1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Primitives" version="1.1.1" exclude="Build,Analyzers" />
+        <dependency id="System.Text.Encodings.Web" version="4.3.1" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard1.6">
+        <dependency id="Irony.Core" version="1.0.7" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.FileProviders.Abstractions" version="1.1.1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Primitives" version="1.1.1" exclude="Build,Analyzers" />
+        <dependency id="NETStandard.Library" version="1.6.1" exclude="Build,Analyzers" />
+        <dependency id="System.Text.Encodings.Web" version="4.3.1" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

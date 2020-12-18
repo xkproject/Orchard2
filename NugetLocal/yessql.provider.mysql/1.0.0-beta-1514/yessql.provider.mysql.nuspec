@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>YesSql.Provider.MySql</id>
+    <version>1.0.0-beta-1514</version>
+    <authors>Sebastien Ros</authors>
+    <owners>Sebastien Ros</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/sebastienros/yessql/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/sebastienros/yessql</projectUrl>
+    <description>Package Description</description>
+    <copyright>Sebastien Ros</copyright>
+    <repository type="git" url="https://github.com/sebastienros/yessql.git" commit="e72607d66ef0655894933e7c7f7b056be1835d80" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.1">
+        <dependency id="YesSql.Core" version="2.0.0-beta-1514" exclude="Build,Analyzers" />
+        <dependency id="YesSql.Provider.Common" version="1.0.0-beta-1514" exclude="Build,Analyzers" />
+        <dependency id="MySqlConnector" version="0.66.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="YesSql.Core" version="2.0.0-beta-1514" exclude="Build,Analyzers" />
+        <dependency id="YesSql.Provider.Common" version="1.0.0-beta-1514" exclude="Build,Analyzers" />
+        <dependency id="MySqlConnector" version="0.66.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

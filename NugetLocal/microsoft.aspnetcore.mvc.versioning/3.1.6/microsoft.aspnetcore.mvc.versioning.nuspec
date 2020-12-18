@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata minClientVersion="2.5">
+    <id>Microsoft.AspNetCore.Mvc.Versioning</id>
+    <version>3.1.6</version>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <projectUrl>https://github.com/Microsoft/aspnet-api-versioning/wiki</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288890</iconUrl>
+    <description>A service API versioning library for Microsoft ASP.NET Core.</description>
+    <releaseNotes>Update Authenticode signature to use SHA256</releaseNotes>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>Microsoft AspNet AspNetCore Versioning</tags>
+    <repository type="git" url="https://github.com/Microsoft/aspnet-api-versioning" commit="1e3f2fba06a6179f6a037c2b4009322f64a72d6e" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.AspNetCore.Mvc.Core" version="[2.2.0, 3.0.0)" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

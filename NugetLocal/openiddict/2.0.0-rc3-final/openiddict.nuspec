@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>OpenIddict</id>
+    <version>2.0.0-rc3-final</version>
+    <authors>Kévin Chalet</authors>
+    <owners>Kévin Chalet</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
+    <projectUrl>https://github.com/openiddict/openiddict-core</projectUrl>
+    <iconUrl>https://avatars3.githubusercontent.com/u/13908567?s=64</iconUrl>
+    <description>Easy-to-use OpenID Connect server for ASP.NET Core.</description>
+    <tags>aspnetcore authentication jwt openidconnect openiddict security</tags>
+    <repository type="git" url="git://github.com/openiddict/openiddict-core" commit="313b275d4ffd923e6a0ddc5e2cf0c330da863077" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="OpenIddict.Core" version="2.0.0-rc3-final" exclude="Build,Analyzers" />
+        <dependency id="OpenIddict.Mvc" version="2.0.0-rc3-final" exclude="Build,Analyzers" />
+        <dependency id="OpenIddict.Server" version="2.0.0-rc3-final" exclude="Build,Analyzers" />
+        <dependency id="OpenIddict.Validation" version="2.0.0-rc3-final" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

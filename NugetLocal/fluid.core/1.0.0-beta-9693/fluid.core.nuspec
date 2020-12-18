@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Fluid.Core</id>
+    <version>1.0.0-beta-9693</version>
+    <title>Fluid Template Engine</title>
+    <authors>Sebastien Ros</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <projectUrl>https://github.com/sebastienros/fluid</projectUrl>
+    <description>Fluid is a template engine based on the Liquid markup, with focus on performance and .NET programming patterns.</description>
+    <copyright>Sebastien Ros</copyright>
+    <tags>fluid liquid template view engine</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.1">
+        <dependency id="Irony.Core" version="1.0.7" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.CSharp" version="4.7.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.FileProviders.Abstractions" version="1.1.1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Primitives" version="1.1.1" exclude="Build,Analyzers" />
+        <dependency id="System.Text.Encodings.Web" version="4.7.1" exclude="Build,Analyzers" />
+        <dependency id="System.Text.Json" version="4.7.2" exclude="Build,Analyzers" />
+        <dependency id="System.Threading.Tasks.Extensions" version="4.5.4" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Irony.Core" version="1.0.7" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.CSharp" version="4.7.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.FileProviders.Abstractions" version="1.1.1" exclude="Build,Analyzers" />
+        <dependency id="System.Text.Encodings.Web" version="4.7.1" exclude="Build,Analyzers" />
+        <dependency id="System.Text.Json" version="4.7.2" exclude="Build,Analyzers" />
+        <dependency id="System.Threading.Tasks.Extensions" version="4.5.4" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.1">
+        <dependency id="Irony.Core" version="1.0.7" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.CSharp" version="4.7.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.FileProviders.Abstractions" version="1.1.1" exclude="Build,Analyzers" />
+        <dependency id="System.Text.Encodings.Web" version="4.7.1" exclude="Build,Analyzers" />
+        <dependency id="System.Text.Json" version="4.7.2" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

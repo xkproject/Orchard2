@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Markdig</id>
+    <version>0.22.0</version>
+    <authors>Alexandre Mutel</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">BSD-2-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-2-Clause</licenseUrl>
+    <projectUrl>https://github.com/lunet-io/markdig</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/lunet-io/markdig/master/img/markdig.png</iconUrl>
+    <description>A fast, powerful, CommonMark compliant, extensible Markdown processor for .NET with 20+ builtin extensions (pipetables, footnotes, definition lists... etc.)</description>
+    <releaseNotes>https://github.com/lunet-io/markdig/blob/master/changelog.md</releaseNotes>
+    <copyright>Alexandre Mutel</copyright>
+    <tags>Markdown CommonMark md html md2html</tags>
+    <repository type="git" url="https://github.com/lunet-io/markdig" commit="751c79fce4e92857f861d8af0854a8eff0b29071" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.5.2">
+        <dependency id="System.Memory" version="4.5.4" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETCoreApp2.1" />
+      <group targetFramework=".NETCoreApp3.1" />
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="System.Memory" version="4.5.4" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.1" />
+    </dependencies>
+  </metadata>
+</package>

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.OpenApi</id>
+    <version>1.1.1</version>
+    <title>Microsoft.OpenApi</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>https://raw.githubusercontent.com/Microsoft/OpenAPI.NET/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/Microsoft/OpenAPI.NET</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288890</iconUrl>
+    <description>.NET models with JSON and YAML writers for OpenAPI specification</description>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>OpenAPI .NET</tags>
+    <repository type="git" commit="7ada65a5aef6362cf7cf2f69a9d3e5056a30c890" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.6" />
+      <group targetFramework=".NETStandard2.0" />
+    </dependencies>
+  </metadata>
+</package>

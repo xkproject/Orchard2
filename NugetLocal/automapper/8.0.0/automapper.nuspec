@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>AutoMapper</id>
+    <version>8.0.0</version>
+    <authors>Jimmy Bogard</authors>
+    <owners>Jimmy Bogard</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/AutoMapper/AutoMapper/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>http://automapper.org/</projectUrl>
+    <iconUrl>https://s3.amazonaws.com/automapper/icon.png</iconUrl>
+    <description>A convention-based object-object mapper.</description>
+    <repository type="git" url="https://github.com/AutoMapper/AutoMapper" commit="af60a492aba1d8d24ef807450b904cfa30282dee" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.1">
+        <dependency id="System.ValueTuple" version="4.5.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.CSharp" version="4.5.0" exclude="Build,Analyzers" />
+        <dependency id="System.Reflection.Emit" version="4.3.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework=".NETFramework4.6.1" />
+    </frameworkAssemblies>
+  </metadata>
+</package>

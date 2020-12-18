@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Gherkin</id>
+    <version>6.0.0</version>
+    <title>Gherkin Parser</title>
+    <authors>Cucumber Ltd, Gaspar Nagy</authors>
+    <owners>Cucumber Ltd, Gaspar Nagy</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/cucumber/cucumber/blob/master/gherkin/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/cucumber/cucumber/tree/master/gherkin</projectUrl>
+    <iconUrl>https://cucumber.io/images/cucumber-mark-32x32.png</iconUrl>
+    <description>Cross-platform parser for the Gherkin language, used by Cucumber, SpecFlow and other Cucumber-based tools to parse feature files.</description>
+    <copyright>Copyright © Cucumber Ltd, Gaspar Nagy</copyright>
+    <tags>specflow gherkin cucumber</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.5">
+        <dependency id="Utf8Json" version="1.3.7" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Utf8Json" version="1.3.7" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

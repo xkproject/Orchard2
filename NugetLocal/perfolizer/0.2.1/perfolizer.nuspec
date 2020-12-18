@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Perfolizer</id>
+    <version>0.2.1</version>
+    <authors>Andrey Akinshin</authors>
+    <owners>Andrey Akinshin</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <icon>dino.png</icon>
+    <projectUrl>https://github.com/AndreyAkinshin/perfolizer</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/AndreyAkinshin/perfolizer/master/docs/logo/dino.png</iconUrl>
+    <description>Performance analysis toolkit</description>
+    <copyright>Copyright (C) 2020 Andrey Akinshin</copyright>
+    <tags>analysis performance tool</tags>
+    <repository type="git" url="https://github.com/AndreyAkinshin/perfolizer" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="System.Memory" version="4.5.3" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

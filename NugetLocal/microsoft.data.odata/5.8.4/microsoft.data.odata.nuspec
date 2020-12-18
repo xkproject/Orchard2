@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.Data.OData</id>
+    <version>5.8.4</version>
+    <title>ODataLib</title>
+    <authors>Microsoft Corporation</authors>
+    <owners>Microsoft Corporation</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>http://go.microsoft.com/fwlink/?linkid=833178</licenseUrl>
+    <projectUrl>http://odata.github.io/</projectUrl>
+    <iconUrl>http://static.tumblr.com/hgchgxz/9ualgdf98/icon.png</iconUrl>
+    <description>This version of the library supports earlier versions of the Microsoft OData (V1-V3) protocol only and is not under active development. OData V1-V3 has been superseded by OData V4, which is an industry standard published by OASIS and ratified by ISO. OData V4 is supported through the OData V4 compliant core libraries available at: https://www.nuget.org/packages/Microsoft.OData.Core/ with support documentation available at: https://odata.github.io/odata.net. Note that Asp.Net developers can build OData V4 services using the higher-level OData V4 WebAPI libraries available at: https://www.nuget.org/packages/Microsoft.AspNet.OData/ with support documentation available at: https://odata.github.io/WebApi/.
+
+	 Classes to serialize, deserialize and validate OData payloads. Enables construction of OData producers and consumers. Targets .NET 4.0, Silverlight 4.0 or .NET Portable Lib with support for .NET 4.0, SL 5.0, Win Phone 8, Win Phone 8.1, and Win 8. Localized for CHS, CHT, DEU, ESN, FRA, ITA, JPN, KOR and RUS.</description>
+    <summary>Classes to serialize, deserialize and validate OData JSON payloads.</summary>
+    <tags>wcf data services odata odatalib edmlib spatial ado.net ef entity framework open protocol wcfds wcfdataservices dataservices</tags>
+    <dependencies>
+      <dependency id="System.Spatial" version="[5.8.4]" />
+      <dependency id="Microsoft.Data.Edm" version="[5.8.4]" />
+    </dependencies>
+  </metadata>
+</package>

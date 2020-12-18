@@ -1,0 +1,900 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OpenIddict.Server.AspNetCore</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder">
+            <summary>
+            Exposes the necessary methods required to configure
+            the OpenIddict server ASP.NET Core integration.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder"/>.
+            </summary>
+            <param name="services">The services collection.</param>
+        </member>
+        <member name="P:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.Services">
+            <summary>
+            Gets the services collection.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.Configure(System.Action{OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreOptions})">
+            <summary>
+            Amends the default OpenIddict server ASP.NET Core configuration.
+            </summary>
+            <param name="configuration">The delegate used to configure the OpenIddict options.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.DisableTransportSecurityRequirement">
+            <summary>
+            Disables the transport security requirement (HTTPS).
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.EnableAuthorizationEndpointPassthrough">
+            <summary>
+            Enables the pass-through mode for the OpenID Connect authorization endpoint.
+            When the pass-through mode is used, OpenID Connect requests are initially handled by OpenIddict.
+            Once validated, the rest of the request processing pipeline is invoked, so that OpenID Connect requests
+            can be handled at a later stage (in a custom middleware or in a MVC controller, for instance).
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.EnableErrorPassthrough">
+            <summary>
+            Enables error pass-through support, so that the rest of the request processing pipeline is
+            automatically invoked when returning an error from the interactive authorization and logout endpoints.
+            When this option is enabled, special logic must be added to these actions to handle errors, that can be
+            retrieved using <see cref="M:Microsoft.AspNetCore.OpenIddictServerAspNetCoreHelpers.GetOpenIddictServerResponse(Microsoft.AspNetCore.Http.HttpContext)"/>.
+            </summary>
+            <remarks>
+            Important: the error pass-through mode cannot be used when the status code pages integration is enabled.
+            </remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.EnableLogoutEndpointPassthrough">
+            <summary>
+            Enables the pass-through mode for the OpenID Connect logout endpoint.
+            When the pass-through mode is used, OpenID Connect requests are initially handled by OpenIddict.
+            Once validated, the rest of the request processing pipeline is invoked, so that OpenID Connect requests
+            can be handled at a later stage (in a custom middleware or in a MVC controller, for instance).
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.EnableTokenEndpointPassthrough">
+            <summary>
+            Enables the pass-through mode for the OpenID Connect token endpoint.
+            When the pass-through mode is used, OpenID Connect requests are initially handled by OpenIddict.
+            Once validated, the rest of the request processing pipeline is invoked, so that OpenID Connect requests
+            can be handled at a later stage (in a custom middleware or in a MVC controller, for instance).
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.EnableUserinfoEndpointPassthrough">
+            <summary>
+            Enables the pass-through mode for the OpenID Connect userinfo endpoint.
+            When the pass-through mode is used, OpenID Connect requests are initially handled by OpenIddict.
+            Once validated, the rest of the request processing pipeline is invoked, so that OpenID Connect requests
+            can be handled at a later stage (in a custom middleware or in a MVC controller, for instance).
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.EnableVerificationEndpointPassthrough">
+            <summary>
+            Enables the pass-through mode for the OpenID Connect user verification endpoint.
+            When the pass-through mode is used, OpenID Connect requests are initially handled by OpenIddict.
+            Once validated, the rest of the request processing pipeline is invoked, so that OpenID Connect requests
+            can be handled at a later stage (in a custom middleware or in a MVC controller, for instance).
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.EnableAuthorizationRequestCaching">
+            <summary>
+            Enables authorization request caching, so that authorization requests
+            are automatically stored in the distributed cache, which allows flowing
+            large payloads across requests. Enabling this option is recommended
+            when using external authentication providers or when large GET or POST
+            OpenID Connect authorization requests support is required.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.EnableLogoutRequestCaching">
+            <summary>
+            Enables logout request caching, so that logout requests
+            are automatically stored in the distributed cache.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.EnableStatusCodePagesIntegration">
+            <summary>
+            Enables status code pages integration support. Once enabled, errors
+            generated by the interactive endpoints can be handled by ASP.NET Core.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.SetRealm(System.String)">
+            <summary>
+            Sets the realm returned to the caller as part of the WWW-Authenticate header.
+            </summary>
+            <param name="realm">The issuer address.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.SetAuthorizationRequestCachingPolicy(Microsoft.Extensions.Caching.Distributed.DistributedCacheEntryOptions)">
+            <summary>
+            Sets the caching policy used by the authorization endpoint.
+            Note: the specified policy is only used when caching is explicitly enabled.
+            </summary>
+            <param name="policy">The caching policy.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.SetLogoutRequestCachingPolicy(Microsoft.Extensions.Caching.Distributed.DistributedCacheEntryOptions)">
+            <summary>
+            Sets the caching policy used by the logout endpoint.
+            Note: the specified policy is only used when caching is explicitly enabled.
+            </summary>
+            <param name="policy">The caching policy.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreExtensions">
+            <summary>
+            Exposes extensions allowing to register the OpenIddict server services.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreExtensions.UseAspNetCore(Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder)">
+            <summary>
+            Registers the OpenIddict server services for ASP.NET Core in the DI container.
+            </summary>
+            <param name="builder">The services builder used by OpenIddict to register new services.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreExtensions.UseAspNetCore(Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder,System.Action{Microsoft.Extensions.DependencyInjection.OpenIddictServerAspNetCoreBuilder})">
+            <summary>
+            Registers the OpenIddict server services for ASP.NET Core in the DI container.
+            </summary>
+            <param name="builder">The services builder used by OpenIddict to register new services.</param>
+            <param name="configuration">The configuration delegate used to configure the server services.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OpenIddictServerAspNetCoreHelpers">
+            <summary>
+            Exposes companion extensions for the OpenIddict/ASP.NET Core integration.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenIddictServerAspNetCoreHelpers.GetHttpRequest(OpenIddict.Server.OpenIddictServerTransaction)">
+            <summary>
+            Retrieves the <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance stored in the <see cref="T:OpenIddict.Server.OpenIddictServerTransaction"/> properties.
+            </summary>
+            <param name="transaction">The transaction instance.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance or <c>null</c> if it couldn't be found.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenIddictServerAspNetCoreHelpers.GetOpenIddictServerEndpointType(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Retrieves the <see cref="T:OpenIddict.Server.OpenIddictServerEndpointType"/> instance stored in <see cref="T:OpenIddict.Server.OpenIddictServerEvents.BaseContext"/>.
+            </summary>
+            <param name="context">The context instance.</param>
+            <returns>The <see cref="T:OpenIddict.Server.OpenIddictServerEndpointType"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenIddictServerAspNetCoreHelpers.GetOpenIddictServerRequest(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Retrieves the <see cref="T:OpenIddict.Abstractions.OpenIddictRequest"/> instance stored in <see cref="T:OpenIddict.Server.OpenIddictServerEvents.BaseContext"/>.
+            </summary>
+            <param name="context">The context instance.</param>
+            <returns>The <see cref="T:OpenIddict.Abstractions.OpenIddictRequest"/> instance or <c>null</c> if it couldn't be found.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenIddictServerAspNetCoreHelpers.GetOpenIddictServerResponse(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Retrieves the <see cref="T:OpenIddict.Abstractions.OpenIddictResponse"/> instance stored in <see cref="T:OpenIddict.Server.OpenIddictServerEvents.BaseContext"/>.
+            </summary>
+            <param name="context">The context instance.</param>
+            <returns>The <see cref="T:OpenIddict.Abstractions.OpenIddictResponse"/> instance or <c>null</c> if it couldn't be found.</returns>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreConfiguration">
+            <summary>
+            Contains the methods required to ensure that the OpenIddict server configuration is valid.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreConfiguration.Configure(Microsoft.AspNetCore.Authentication.AuthenticationOptions)">
+            <summary>
+            Registers the OpenIddict server handler in the global authentication options.
+            </summary>
+            <param name="options">The options instance to initialize.</param>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreConfiguration.PostConfigure(System.String,Microsoft.AspNetCore.Authentication.AuthenticationOptions)">
+            <summary>
+            Ensures that the authentication configuration is in a consistent and valid state.
+            </summary>
+            <param name="name">The name of the options instance to configure, if applicable.</param>
+            <param name="options">The options instance to initialize.</param>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreConfiguration.PostConfigure(System.String,OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreOptions)">
+            <summary>
+            Populates the default OpenIddict server ASP.NET Core options and
+            ensures that the configuration is in a consistent and valid state.
+            </summary>
+            <param name="name">The name of the options instance to configure, if applicable.</param>
+            <param name="options">The options instance to initialize.</param>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreConstants">
+            <summary>
+            Exposes common constants used by the OpenIddict ASP.NET Core host.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreDefaults">
+            <summary>
+            Exposes the default values used by the OpenIddict server handler.
+            </summary>
+        </member>
+        <member name="F:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreDefaults.AuthenticationScheme">
+            <summary>
+            Default value for <see cref="P:Microsoft.AspNetCore.Authentication.AuthenticationScheme.Name"/>.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreFeature">
+            <summary>
+            Exposes the current server transaction to the ASP.NET Core host.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreFeature.Transaction">
+            <summary>
+            Gets or sets the server transaction that encapsulates all specific
+            information about an individual OpenID Connect server request.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandler">
+            <summary>
+            Provides the logic necessary to extract, validate and handle OpenID Connect requests.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandler.#ctor(OpenIddict.Server.IOpenIddictServerDispatcher,OpenIddict.Server.IOpenIddictServerFactory,Microsoft.Extensions.Options.IOptionsMonitor{OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreOptions},Microsoft.Extensions.Logging.ILoggerFactory,System.Text.Encodings.Web.UrlEncoder,Microsoft.AspNetCore.Authentication.ISystemClock)">
+            <summary>
+            Creates a new instance of the <see cref="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandler"/> class.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandler.HandleRequestAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandler.HandleAuthenticateAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandler.HandleChallengeAsync(Microsoft.AspNetCore.Authentication.AuthenticationProperties)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandler.HandleForbiddenAsync(Microsoft.AspNetCore.Authentication.AuthenticationProperties)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandler.SignInAsync(System.Security.Claims.ClaimsPrincipal,Microsoft.AspNetCore.Authentication.AuthenticationProperties)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandler.SignOutAsync(Microsoft.AspNetCore.Authentication.AuthenticationProperties)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlerFilters">
+            <summary>
+            Contains a collection of event handler filters commonly used by the ASP.NET Core handlers.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlerFilters.RequireAuthorizationRequestCachingEnabled">
+            <summary>
+            Represents a filter that excludes the associated handlers if authorization request caching was not enabled.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlerFilters.RequireAuthorizationEndpointPassthroughEnabled">
+            <summary>
+            Represents a filter that excludes the associated handlers if the
+            pass-through mode was not enabled for the authorization endpoint.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlerFilters.RequireErrorPassthroughEnabled">
+            <summary>
+            Represents a filter that excludes the associated handlers if error pass-through was not enabled.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlerFilters.RequireHttpRequest">
+            <summary>
+            Represents a filter that excludes the associated handlers if no ASP.NET Core request can be found.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlerFilters.RequireLogoutRequestCachingEnabled">
+            <summary>
+            Represents a filter that excludes the associated handlers if logout request caching was not enabled.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlerFilters.RequireLogoutEndpointPassthroughEnabled">
+            <summary>
+            Represents a filter that excludes the associated handlers if the
+            pass-through mode was not enabled for the logout endpoint.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlerFilters.RequireTransportSecurityRequirementEnabled">
+            <summary>
+            Represents a filter that excludes the associated handlers if the HTTPS requirement was disabled.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlerFilters.RequireStatusCodePagesIntegrationEnabled">
+            <summary>
+            Represents a filter that excludes the associated handlers if status code pages support was not enabled.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlerFilters.RequireTokenEndpointPassthroughEnabled">
+            <summary>
+            Represents a filter that excludes the associated handlers if the
+            pass-through mode was not enabled for the authorization endpoint.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlerFilters.RequireUserinfoEndpointPassthroughEnabled">
+            <summary>
+            Represents a filter that excludes the associated handlers if the
+            pass-through mode was not enabled for the userinfo endpoint.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlerFilters.RequireVerificationEndpointPassthroughEnabled">
+            <summary>
+            Represents a filter that excludes the associated handlers if the
+            pass-through mode was not enabled for the verification endpoint.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.RestoreCachedRequestParameters">
+            <summary>
+            Contains the logic responsible of restoring cached requests from the request_id, if specified.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.RestoreCachedRequestParameters.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.RestoreCachedRequestParameters.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ExtractAuthorizationRequestContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.CacheRequestParameters">
+            <summary>
+            Contains the logic responsible of caching authorization requests, if applicable.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.CacheRequestParameters.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.CacheRequestParameters.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ExtractAuthorizationRequestContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.RemoveCachedRequest">
+            <summary>
+            Contains the logic responsible of removing cached authorization requests from the distributed cache.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.RemoveCachedRequest.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.RemoveCachedRequest.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ApplyAuthorizationResponseContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.ProcessFormPostResponse">
+            <summary>
+            Contains the logic responsible of processing authorization responses using the form_post response mode.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.ProcessFormPostResponse.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.ProcessFormPostResponse.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ApplyAuthorizationResponseContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.ProcessQueryResponse">
+            <summary>
+            Contains the logic responsible of processing authorization responses using the query response mode.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.ProcessQueryResponse.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.ProcessQueryResponse.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ApplyAuthorizationResponseContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.ProcessFragmentResponse">
+            <summary>
+            Contains the logic responsible of processing authorization responses using the fragment response mode.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.ProcessFragmentResponse.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Authentication.ProcessFragmentResponse.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ApplyAuthorizationResponseContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.InferEndpointType">
+            <summary>
+            Contains the logic responsible of inferring the endpoint type from the request address.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.InferEndpointType.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.InferEndpointType.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ProcessRequestContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.InferIssuerFromHost">
+            <summary>
+            Contains the logic responsible of infering the issuer URL from the HTTP request host and validating it.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.InferIssuerFromHost.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.InferIssuerFromHost.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ProcessRequestContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ValidateTransportSecurityRequirement">
+            <summary>
+            Contains the logic responsible of rejecting OpenID Connect requests that don't use transport security.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ValidateTransportSecurityRequirement.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ValidateTransportSecurityRequirement.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ProcessRequestContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.AttachHostChallengeError">
+            <summary>
+            Contains the logic responsible of attaching the error details using the ASP.NET Core authentication properties.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.AttachHostChallengeError.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.AttachHostChallengeError.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ProcessChallengeContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.AttachHostParameters`1">
+            <summary>
+            Contains the logic responsible of attaching custom parameters stored in the ASP.NET Core authentication properties.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.AttachHostParameters`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.AttachHostParameters`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractGetRequest`1">
+            <summary>
+            Contains the logic responsible of extracting OpenID Connect requests from GET HTTP requests.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractGetRequest`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractGetRequest`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractGetOrPostRequest`1">
+            <summary>
+            Contains the logic responsible of extracting OpenID Connect requests from GET or POST HTTP requests.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractGetOrPostRequest`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractGetOrPostRequest`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractPostRequest`1">
+            <summary>
+            Contains the logic responsible of extracting OpenID Connect requests from POST HTTP requests.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractPostRequest`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractPostRequest`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractBasicAuthenticationCredentials`1">
+            <summary>
+            Contains the logic responsible of extracting client credentials from the standard HTTP Authorization header.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractBasicAuthenticationCredentials`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractBasicAuthenticationCredentials`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractAccessToken`1">
+            <summary>
+            Contains the logic responsible of extracting an access token from the standard HTTP Authorization header.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractAccessToken`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ExtractAccessToken`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.EnablePassthroughMode`2">
+            <summary>
+            Contains the logic responsible of enabling the pass-through mode for the received request.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.EnablePassthroughMode`2.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.EnablePassthroughMode`2.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.AttachHttpResponseCode`1">
+            <summary>
+            Contains the logic responsible of attaching an appropriate HTTP status code.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.AttachHttpResponseCode`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.AttachHttpResponseCode`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.AttachCacheControlHeader`1">
+            <summary>
+            Contains the logic responsible of attaching the appropriate HTTP response cache headers.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.AttachCacheControlHeader`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.AttachCacheControlHeader`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.AttachWwwAuthenticateHeader`1">
+            <summary>
+            Contains the logic responsible of attaching errors details to the WWW-Authenticate header.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.AttachWwwAuthenticateHeader`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.AttachWwwAuthenticateHeader`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessChallengeErrorResponse`1">
+            <summary>
+            Contains the logic responsible of processing challenge responses that contain a WWW-Authenticate header.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessChallengeErrorResponse`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessChallengeErrorResponse`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessJsonResponse`1">
+            <summary>
+            Contains the logic responsible of processing OpenID Connect responses that must be returned as JSON.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessJsonResponse`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessJsonResponse`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessPassthroughErrorResponse`2">
+            <summary>
+            Contains the logic responsible of processing OpenID Connect responses that must be handled by another
+            middleware in the pipeline at a later stage (e.g an ASP.NET Core MVC action or a NancyFX module).
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessPassthroughErrorResponse`2.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessPassthroughErrorResponse`2.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessStatusCodePagesErrorResponse`1">
+            <summary>
+            Contains the logic responsible of processing OpenID Connect responses handled by the status code pages middleware.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessStatusCodePagesErrorResponse`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessStatusCodePagesErrorResponse`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessLocalErrorResponse`1">
+            <summary>
+            Contains the logic responsible of processing context responses that must be returned as plain-text.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessLocalErrorResponse`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessLocalErrorResponse`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessEmptyResponse`1">
+            <summary>
+            Contains the logic responsible of processing OpenID Connect responses that don't specify any parameter.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessEmptyResponse`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessEmptyResponse`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessHostRedirectionResponse">
+            <summary>
+            Contains the logic responsible of processing verification responses that should trigger a host redirection.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessHostRedirectionResponse.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.ProcessHostRedirectionResponse.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ApplyVerificationResponseContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Session.RestoreCachedRequestParameters">
+            <summary>
+            Contains the logic responsible of restoring cached requests from the request_id, if specified.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Session.RestoreCachedRequestParameters.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Session.RestoreCachedRequestParameters.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ExtractLogoutRequestContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Session.CacheRequestParameters">
+            <summary>
+            Contains the logic responsible of caching logout requests, if applicable.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Session.CacheRequestParameters.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Session.CacheRequestParameters.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ExtractLogoutRequestContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Session.RemoveCachedRequest">
+            <summary>
+            Contains the logic responsible of removing cached logout requests from the distributed cache.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Session.RemoveCachedRequest.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Session.RemoveCachedRequest.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ApplyLogoutResponseContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Session.ProcessQueryResponse">
+            <summary>
+            Contains the logic responsible of processing logout responses.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Session.ProcessQueryResponse.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Session.ProcessQueryResponse.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ApplyLogoutResponseContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Session.ProcessHostRedirectionResponse">
+            <summary>
+            Contains the logic responsible of processing logout responses that should trigger a host redirection.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Session.ProcessHostRedirectionResponse.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers.Session.ProcessHostRedirectionResponse.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ApplyLogoutResponseContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreOptions">
+            <summary>
+            Provides various settings needed to configure the OpenIddict ASP.NET Core server integration.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreOptions.DisableTransportSecurityRequirement">
+            <summary>
+            Gets or sets a boolean indicating whether incoming requests arriving on insecure endpoints should be rejected.
+            By default, this property is set to <c>false</c> to help mitigate man-in-the-middle attacks.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreOptions.EnableAuthorizationEndpointPassthrough">
+            <summary>
+            Gets or sets a boolean indicating whether the pass-through mode is enabled for the authorization endpoint.
+            When the pass-through mode is used, OpenID Connect requests are initially handled by OpenIddict.
+            Once validated, the rest of the request processing pipeline is invoked, so that OpenID Connect requests
+            can be handled at a later stage (in a custom middleware or in a MVC controller, for instance).
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreOptions.EnableErrorPassthrough">
+            <summary>
+            Gets or sets a boolean indicating whether OpenIddict should allow the rest of the request processing pipeline
+            to be invoked when returning an error from the interactive authorization and logout endpoints.
+            When this option is enabled, special logic must be added to these actions to handle errors, that can be
+            retrieved using <see cref="M:Microsoft.AspNetCore.OpenIddictServerAspNetCoreHelpers.GetOpenIddictServerResponse(Microsoft.AspNetCore.Http.HttpContext)"/>.
+            </summary>
+            <remarks>
+            Important: the error pass-through mode cannot be used when the status code pages integration is enabled.
+            </remarks>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreOptions.EnableLogoutEndpointPassthrough">
+            <summary>
+            Gets or sets a boolean indicating whether the pass-through mode is enabled for the logout endpoint.
+            When the pass-through mode is used, OpenID Connect requests are initially handled by OpenIddict.
+            Once validated, the rest of the request processing pipeline is invoked, so that OpenID Connect requests
+            can be handled at a later stage (in a custom middleware or in a MVC controller, for instance).
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreOptions.EnableTokenEndpointPassthrough">
+            <summary>
+            Gets or sets a boolean indicating whether the pass-through mode is enabled for the token endpoint.
+            When the pass-through mode is used, OpenID Connect requests are initially handled by OpenIddict.
+            Once validated, the rest of the request processing pipeline is invoked, so that OpenID Connect requests
+            can be handled at a later stage (in a custom middleware or in a MVC controller, for instance).
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreOptions.EnableUserinfoEndpointPassthrough">
+            <summary>
+            Gets or sets a boolean indicating whether the pass-through mode is enabled for the userinfo endpoint.
+            When the pass-through mode is used, OpenID Connect requests are initially handled by OpenIddict.
+            Once validated, the rest of the request processing pipeline is invoked, so that OpenID Connect requests
+            can be handled at a later stage (in a custom middleware or in a MVC controller, for instance).
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreOptions.EnableVerificationEndpointPassthrough">
+            <summary>
+            Gets or sets a boolean indicating whether the pass-through mode is enabled for the user verification endpoint.
+            When the pass-through mode is used, OpenID Connect requests are initially handled by OpenIddict.
+            Once validated, the rest of the request processing pipeline is invoked, so that OpenID Connect requests
+            can be handled at a later stage (in a custom middleware or in a MVC controller, for instance).
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreOptions.EnableAuthorizationRequestCaching">
+            <summary>
+            Gets or sets a boolean indicating whether requests received by the authorization endpoint
+            should be cached. When enabled, authorization requests are automatically stored
+            in the distributed cache, which allows flowing large payloads across requests.
+            Enabling this option is recommended when using external authentication providers
+            or when large GET or POST OpenID Connect authorization requests support is required.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreOptions.EnableLogoutRequestCaching">
+            <summary>
+            Gets or sets a boolean indicating whether requests received by the logout endpoint should be cached.
+            When enabled, authorization requests are automatically stored in the distributed cache.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreOptions.EnableStatusCodePagesIntegration">
+            <summary>
+            Gets or sets a boolean indicating whether integration with the status code pages
+            middleware should be enabled or not. Once enabled, errors generated by the OpenIddict
+            interactive endpoints (e.g authorization or logout) can be handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreOptions.Realm">
+            <summary>
+            Gets or sets the optional "realm" value returned to the caller as part of the WWW-Authenticate header.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreOptions.AuthorizationRequestCachingPolicy">
+            <summary>
+            Gets or sets the caching policy used by the authorization endpoint.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreOptions.LogoutRequestCachingPolicy">
+            <summary>
+            Gets or sets the caching policy used by the logout endpoint.
+            </summary>
+        </member>
+    </members>
+</doc>

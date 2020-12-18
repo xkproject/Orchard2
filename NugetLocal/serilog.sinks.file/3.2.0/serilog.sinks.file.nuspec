@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Serilog.Sinks.File</id>
+    <version>3.2.0</version>
+    <authors>Serilog Contributors</authors>
+    <owners>Serilog Contributors</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>http://serilog.net/</projectUrl>
+    <iconUrl>http://serilog.net/images/serilog-sink-nuget.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Write Serilog events to a text file in plain or JSON format.</description>
+    <tags>serilog,file,io</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.5">
+        <dependency id="Serilog" version="[2.3.0, )" />
+      </group>
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="System.IO" version="[4.1.0, )" />
+        <dependency id="System.IO.FileSystem" version="[4.0.1, )" />
+        <dependency id="System.IO.FileSystem.Primitives" version="[4.0.1, )" />
+        <dependency id="System.Text.Encoding.Extensions" version="[4.0.11, )" />
+        <dependency id="System.Threading.Timer" version="[4.0.1, )" />
+        <dependency id="System.Threading" version="[4.0.11, )" />
+        <dependency id="Serilog" version="[2.3.0, )" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

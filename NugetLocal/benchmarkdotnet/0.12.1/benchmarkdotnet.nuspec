@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>BenchmarkDotNet</id>
+    <version>0.12.1</version>
+    <authors>.NET Foundation and contributors</authors>
+    <owners>.NET Foundation and contributors</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <projectUrl>https://github.com/dotnet/BenchmarkDotNet</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/dotnet/BenchmarkDotNet/master/docs/guide/logo.png</iconUrl>
+    <description>Powerful .NET library for benchmarking</description>
+    <copyright>.NET Foundation and contributors</copyright>
+    <tags>benchmark benchmarking performance</tags>
+    <repository type="git" url="https://github.com/dotnet/BenchmarkDotNet" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="BenchmarkDotNet.Annotations" version="0.12.1" exclude="Build,Analyzers" />
+        <dependency id="CommandLineParser" version="2.4.3" exclude="Build,Analyzers" />
+        <dependency id="Iced" version="1.4.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.CodeAnalysis.CSharp" version="2.10.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Diagnostics.NETCore.Client" version="0.2.61701" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Diagnostics.Runtime" version="1.1.57604" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Diagnostics.Tracing.TraceEvent" version="2.0.49" exclude="Analyzers" />
+        <dependency id="Microsoft.DotNet.PlatformAbstractions" version="2.1.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Win32.Registry" version="4.5.0" exclude="Build,Analyzers" />
+        <dependency id="Perfolizer" version="0.2.1" exclude="Build,Analyzers" />
+        <dependency id="System.Management" version="4.5.0" exclude="Build,Analyzers" />
+        <dependency id="System.Reflection.Emit" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Reflection.Emit.Lightweight" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Threading.Tasks.Extensions" version="4.5.2" exclude="Build,Analyzers" />
+        <dependency id="System.ValueTuple" version="4.5.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/01/nuspec.xsd">
+  <metadata minClientVersion="2.12">
+    <id>System.Reactive.Core</id>
+    <version>3.1.1</version>
+    <title>Reactive Extensions - Core Library</title>
+    <authors>.NET Foundation and Contributors</authors>
+    <owners>Microsoft,RxTeam</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>http://go.microsoft.com/fwlink/?LinkID=261272</licenseUrl>
+    <projectUrl>http://go.microsoft.com/fwlink/?LinkId=261273</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkId=261274</iconUrl>
+    <description>Reactive Extensions (Rx) Core Library containing base classes and scheduler infrastructure.</description>
+    <copyright>Copyright (c) .NET Foundation and Contributors.</copyright>
+    <language>en-US</language>
+    <tags>Rx Reactive Extensions Observable LINQ Events</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.5">
+        <dependency id="System.Reactive.Interfaces" version="3.1.1" />
+      </group>
+      <group targetFramework=".NETStandard1.0">
+        <dependency id="System.Reactive.Interfaces" version="3.1.1" />
+        <dependency id="System.ComponentModel" version="4.0.1" />
+        <dependency id="System.Diagnostics.Contracts" version="4.0.1" />
+        <dependency id="System.Dynamic.Runtime" version="4.0.11" />
+      </group>
+      <group targetFramework=".NETCoreApp1.0">
+        <dependency id="System.Reactive.Interfaces" version="3.1.1" />
+        <dependency id="System.ComponentModel" version="4.0.1" />
+        <dependency id="System.Diagnostics.Contracts" version="4.0.1" />
+        <dependency id="System.Dynamic.Runtime" version="4.0.11" />
+        <dependency id="System.Threading.Thread" version="4.0.0" />
+        <dependency id="System.Threading.ThreadPool" version="4.0.10" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
