@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>MiniProfiler.AspNetCore.Mvc</id>
+    <version>4.0.133</version>
+    <title>MiniProfiler for ASP.NET Core MVC</title>
+    <authors>Nick Craver</authors>
+    <owners>Nick Craver</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/MiniProfiler/dotnet/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://miniprofiler.com/</projectUrl>
+    <description>Lightweight mini-profiler, designed for ASP.NET Core MVC (*not* System.Web) websites</description>
+    <releaseNotes>See https://miniprofiler.com/dotnet/Releases for more info</releaseNotes>
+    <tags>ASP.NET Core MVC MVC Core Profiler Performance Profiling Timing</tags>
+    <repository type="git" url="https://github.com/MiniProfiler/dotnet.git" branch="master" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.1">
+        <dependency id="MiniProfiler.AspNetCore" version="4.0.133" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.AspNetCore.Mvc.Core" version="2.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.AspNetCore.Mvc.Razor" version="2.0.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard1.6">
+        <dependency id="MiniProfiler.AspNetCore" version="4.0.133" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.AspNetCore.Mvc.Core" version="1.1.2" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.AspNetCore.Mvc.Razor" version="1.1.2" exclude="Build,Analyzers" />
+        <dependency id="NETStandard.Library" version="1.6.1" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="MiniProfiler.AspNetCore" version="4.0.133" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.AspNetCore.Mvc.Core" version="2.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.AspNetCore.Mvc.Razor" version="2.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

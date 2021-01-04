@@ -1,0 +1,208 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.AspNetCore.Authentication.AzureAD.UI</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.AspNetCore.Authentication.AzureAD.UI.Internal.AccessDeniedModel">
+            <summary>
+            This API supports infrastructure and is not intended to be used
+            directly from your code.This API may change or be removed in future releases
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Authentication.AzureAD.UI.Internal.AccessDeniedModel.OnGet">
+            <summary>
+            This API supports infrastructure and is not intended to be used
+            directly from your code.This API may change or be removed in future releases
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Authentication.AzureAD.UI.Internal.ErrorModel">
+            <summary>
+            This API supports infrastructure and is not intended to be used
+            directly from your code.This API may change or be removed in future releases
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.AzureAD.UI.Internal.ErrorModel.RequestId">
+            <summary>
+            This API supports infrastructure and is not intended to be used
+            directly from your code.This API may change or be removed in future releases
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.AzureAD.UI.Internal.ErrorModel.ShowRequestId">
+            <summary>
+            This API supports infrastructure and is not intended to be used
+            directly from your code.This API may change or be removed in future releases
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Authentication.AzureAD.UI.Internal.ErrorModel.OnGet">
+            <summary>
+            This API supports infrastructure and is not intended to be used
+            directly from your code.This API may change or be removed in future releases
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Authentication.AzureAD.UI.Internal.SignedOutModel">
+            <summary>
+            This API supports infrastructure and is not intended to be used
+            directly from your code.This API may change or be removed in future releases
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Authentication.AzureAD.UI.Internal.SignedOutModel.OnGet">
+            <summary>
+            This API supports infrastructure and is not intended to be used
+            directly from your code.This API may change or be removed in future releases
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADDefaults">
+            <summary>
+            Constants for different Azure Active Directory authentication components.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADDefaults.OpenIdScheme">
+            <summary>
+            The scheme name for Open ID Connect when using
+            <see cref="M:Microsoft.AspNetCore.Authentication.AzureADAuthenticationBuilderExtensions.AddAzureAD(Microsoft.AspNetCore.Authentication.AuthenticationBuilder,System.Action{Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions})"/>.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADDefaults.CookieScheme">
+            <summary>
+            The scheme name for cookies when using
+            <see cref="M:Microsoft.AspNetCore.Authentication.AzureADAuthenticationBuilderExtensions.AddAzureAD(Microsoft.AspNetCore.Authentication.AuthenticationBuilder,System.Action{Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions})"/>.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADDefaults.BearerAuthenticationScheme">
+            <summary>
+            The default scheme for Azure Active Directory Bearer.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADDefaults.JwtBearerAuthenticationScheme">
+            <summary>
+            The scheme name for JWT Bearer when using
+            <see cref="M:Microsoft.AspNetCore.Authentication.AzureADAuthenticationBuilderExtensions.AddAzureADBearer(Microsoft.AspNetCore.Authentication.AuthenticationBuilder,System.Action{Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions})"/>.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADDefaults.AuthenticationScheme">
+            <summary>
+            The default scheme for Azure Active Directory.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADDefaults.DisplayName">
+            <summary>
+            The display name for Azure Active Directory.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions">
+            <summary>
+            Options for configuring authentication using Azure Active Directory.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions.OpenIdConnectSchemeName">
+            <summary>
+            Gets or sets the OpenID Connect authentication scheme to use for authentication with this instance
+            of Azure Active Directory authentication.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions.CookieSchemeName">
+            <summary>
+            Gets or sets the Cookie authentication scheme to use for sign in with this instance of
+            Azure Active Directory authentication.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions.JwtBearerSchemeName">
+            <summary>
+            Gets or sets the Jwt bearer authentication scheme to use for validating access tokens for this
+            instance of Azure Active Directory Bearer authentication.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions.ClientId">
+            <summary>
+            Gets or sets the client Id.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions.ClientSecret">
+            <summary>
+            Gets or sets the client secret.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions.TenantId">
+            <summary>
+            Gets or sets the tenant Id.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions.Instance">
+            <summary>
+            Gets or sets the Azure Active Directory instance.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions.Domain">
+            <summary>
+            Gets or sets the domain of the Azure Active Directory tenant.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions.CallbackPath">
+            <summary>
+            Gets or sets the sign in callback path.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions.SignedOutCallbackPath">
+            <summary>
+            Gets or sets the sign out callback path.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions.AllSchemes">
+            <summary>
+            Gets all the underlying authentication schemes.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Authentication.AzureADAuthenticationBuilderExtensions">
+            <summary>
+            Extension methods to add Azure Active Directory Authentication to your application.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Authentication.AzureADAuthenticationBuilderExtensions.AddAzureADBearer(Microsoft.AspNetCore.Authentication.AuthenticationBuilder,System.Action{Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions})">
+            <summary>
+            Adds JWT Bearer authentication to your app for Azure Active Directory Applications.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Authentication.AuthenticationBuilder"/>.</param>
+            <param name="configureOptions">The <see cref="T:System.Action`1"/> to configure the
+            <see cref="T:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions"/>.
+            </param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Authentication.AuthenticationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Authentication.AzureADAuthenticationBuilderExtensions.AddAzureADBearer(Microsoft.AspNetCore.Authentication.AuthenticationBuilder,System.String,System.String,System.Action{Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions})">
+            <summary>
+            Adds JWT Bearer authentication to your app for Azure Active Directory Applications.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Authentication.AuthenticationBuilder"/>.</param>
+            <param name="scheme">The identifier for the virtual scheme.</param>
+            <param name="jwtBearerScheme">The identifier for the underlying JWT Bearer scheme.</param>
+            <param name="configureOptions">The <see cref="T:System.Action`1"/> to configure the
+            <see cref="T:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions"/>.
+            </param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Authentication.AuthenticationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Authentication.AzureADAuthenticationBuilderExtensions.AddAzureAD(Microsoft.AspNetCore.Authentication.AuthenticationBuilder,System.Action{Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions})">
+            <summary>
+            Adds Azure Active Directory Authentication to your application.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Authentication.AuthenticationBuilder"/>.</param>
+            <param name="configureOptions">The <see cref="T:System.Action`1"/> to configure the
+            <see cref="T:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions"/>
+            </param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Authentication.AuthenticationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Authentication.AzureADAuthenticationBuilderExtensions.AddAzureAD(Microsoft.AspNetCore.Authentication.AuthenticationBuilder,System.String,System.String,System.String,System.String,System.Action{Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions})">
+            <summary>
+            Adds Azure Active Directory Authentication to your application.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Authentication.AuthenticationBuilder"/>.</param>
+            <param name="scheme">The identifier for the virtual scheme.</param>
+            <param name="openIdConnectScheme">The identifier for the underlying Open ID Connect scheme.</param>
+            <param name="cookieScheme">The identifier for the underlying cookie scheme.</param>
+            <param name="displayName">The display name for the scheme.</param>
+            <param name="configureOptions">The <see cref="T:System.Action`1"/> to configure the
+            <see cref="T:Microsoft.AspNetCore.Authentication.AzureAD.UI.AzureADOptions"/>
+            </param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Authentication.AuthenticationBuilder"/>.</returns>
+        </member>
+    </members>
+</doc>

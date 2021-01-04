@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Lucene.Net.Analysis.Common</id>
+    <version>4.8.0-beta00005</version>
+    <authors>The Apache Software Foundation</authors>
+    <owners>The Apache Software Foundation</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/apache/lucenenet/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>http://lucenenet.apache.org/</projectUrl>
+    <iconUrl>https://github.com/apache/lucenenet/blob/master/branding/logo/lucene-net-icon-128x128.png?raw=true</iconUrl>
+    <description>Analyzers for indexing content in different languages and domains for the Lucene.Net full-text search engine library from The Apache Software Foundation.</description>
+    <copyright>Copyright © 2006 - 2017 The Apache Software Foundation</copyright>
+    <tags>lucene.net core text search information retrieval lucene apache analysis index query</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.5">
+        <dependency id="Lucene.Net" version="4.8.0-beta00005" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard1.6">
+        <dependency id="Lucene.Net" version="4.8.0-beta00005" exclude="Build,Analyzers" />
+        <dependency id="NETStandard.Library" version="1.6.1" exclude="Build,Analyzers" />
+        <dependency id="System.ComponentModel.Primitives" version="4.3.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Lucene.Net" version="4.8.0-beta00005" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework=".NETFramework4.5" />
+      <frameworkAssembly assemblyName="System" targetFramework=".NETFramework4.5" />
+      <frameworkAssembly assemblyName="System.Xml" targetFramework=".NETFramework4.5" />
+    </frameworkAssemblies>
+    <repository url="https://github.com/apache/lucenenet" />
+  </metadata>
+</package>

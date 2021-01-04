@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?><span>
+<doc>
+  <assembly>
+    <name>System.Net.Http.WinHttpHandler</name>
+  </assembly>
+  <members>
+    <member name="T:System.Net.Http.CookieUsePolicy">
+      
+    </member>
+    <member name="F:System.Net.Http.CookieUsePolicy.IgnoreCookies">
+      <returns></returns>
+    </member>
+    <member name="F:System.Net.Http.CookieUsePolicy.UseInternalCookieStoreOnly">
+      <returns></returns>
+    </member>
+    <member name="F:System.Net.Http.CookieUsePolicy.UseSpecifiedCookieContainer">
+      <returns></returns>
+    </member>
+    <member name="T:System.Net.Http.WindowsProxyUsePolicy">
+      
+    </member>
+    <member name="F:System.Net.Http.WindowsProxyUsePolicy.DoNotUseProxy">
+      <returns></returns>
+    </member>
+    <member name="F:System.Net.Http.WindowsProxyUsePolicy.UseCustomProxy">
+      <returns></returns>
+    </member>
+    <member name="F:System.Net.Http.WindowsProxyUsePolicy.UseWinHttpProxy">
+      <returns></returns>
+    </member>
+    <member name="F:System.Net.Http.WindowsProxyUsePolicy.UseWinInetProxy">
+      <returns></returns>
+    </member>
+    <member name="T:System.Net.Http.WinHttpHandler">
+      
+    </member>
+    <member name="M:System.Net.Http.WinHttpHandler.#ctor">
+      
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.AutomaticDecompression">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.AutomaticRedirection">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.CheckCertificateRevocationList">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.ClientCertificateOption">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.ClientCertificates">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.CookieContainer">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.CookieUsePolicy">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.DefaultProxyCredentials">
+      <returns></returns>
+    </member>
+    <member name="M:System.Net.Http.WinHttpHandler.Dispose(System.Boolean)">
+      <param name="disposing"></param>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.MaxAutomaticRedirections">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.MaxConnectionsPerServer">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.MaxResponseDrainSize">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.MaxResponseHeadersLength">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.PreAuthenticate">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.Properties">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.Proxy">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.ReceiveDataTimeout">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.ReceiveHeadersTimeout">
+      <returns></returns>
+    </member>
+    <member name="M:System.Net.Http.WinHttpHandler.SendAsync(System.Net.Http.HttpRequestMessage,System.Threading.CancellationToken)">
+      <param name="request"></param>
+      <param name="cancellationToken"></param>
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.SendTimeout">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.ServerCertificateValidationCallback">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.ServerCredentials">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.SslProtocols">
+      <returns></returns>
+    </member>
+    <member name="P:System.Net.Http.WinHttpHandler.WindowsProxyUsePolicy">
+      <returns></returns>
+    </member>
+  </members>
+</doc></span>

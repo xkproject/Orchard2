@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using OrchardCore.Modules;
 using OrchardCore.OpenId.Services;
 using OrchardCore.OpenId.Settings;
@@ -22,7 +21,7 @@ namespace OrchardCore.OpenId.Configuration
     {
         private readonly IOpenIdClientService _clientService;
         private readonly IDataProtectionProvider _dataProtectionProvider;
-        private readonly ILogger<OpenIdClientConfiguration> _logger;
+        private readonly ILogger _logger;
 
         public OpenIdClientConfiguration(
             IOpenIdClientService clientService,
@@ -43,17 +42,13 @@ namespace OrchardCore.OpenId.Configuration
             }
 
             // Register the OpenID Connect client handler in the authentication handlers collection.
-            options.AddScheme(OpenIdConnectDefaults.AuthenticationScheme, builder =>
-            {
-                builder.DisplayName = settings.DisplayName;
-                builder.HandlerType = typeof(OpenIdConnectHandler);
-            });
+            options.AddScheme<OpenIdConnectHandler>(OpenIdConnectDefaults.AuthenticationScheme, settings.DisplayName);
         }
 
         public void Configure(string name, OpenIdConnectOptions options)
         {
             // Ignore OpenID Connect client handler instances that don't correspond to the instance managed by the OpenID module.
-            if (!string.Equals(name, OpenIdConnectDefaults.AuthenticationScheme, StringComparison.Ordinal))
+            if (!string.Equals(name, OpenIdConnectDefaults.AuthenticationScheme))
             {
                 return;
             }
@@ -64,14 +59,15 @@ namespace OrchardCore.OpenId.Configuration
                 return;
             }
 
-            options.Authority = settings.Authority;
+            options.Authority = settings.Authority.AbsoluteUri;
             options.ClientId = settings.ClientId;
             options.SignedOutRedirectUri = settings.SignedOutRedirectUri ?? options.SignedOutRedirectUri;
             options.SignedOutCallbackPath = settings.SignedOutCallbackPath ?? options.SignedOutCallbackPath;
-            options.RequireHttpsMetadata = settings.Authority.StartsWith(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase);
+            options.RequireHttpsMetadata = string.Equals(settings.Authority.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase);
             options.GetClaimsFromUserInfoEndpoint = true;
             options.ResponseMode = settings.ResponseMode;
             options.ResponseType = settings.ResponseType;
+            options.SaveTokens = settings.StoreExternalTokens;
 
             options.CallbackPath = settings.CallbackPath ?? options.CallbackPath;
 
@@ -83,7 +79,7 @@ namespace OrchardCore.OpenId.Configuration
                 }
             }
 
-            if (settings.ResponseType.Contains(OpenIdConnectResponseType.Code) && !string.IsNullOrEmpty(settings.ClientSecret))
+            if (!string.IsNullOrEmpty(settings.ClientSecret))
             {
                 var protector = _dataProtectionProvider.CreateProtector(nameof(OpenIdClientConfiguration));
 

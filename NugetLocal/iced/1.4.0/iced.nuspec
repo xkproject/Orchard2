@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Iced</id>
+    <version>1.4.0</version>
+    <title>x86/x64 instruction decoder, encoder, disassembler</title>
+    <authors>0xd4d</authors>
+    <owners>0xd4d</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <icon>logo.png</icon>
+    <projectUrl>https://github.com/0xd4d/iced</projectUrl>
+    <description>High performance x86 (16/32/64-bit) instruction decoder, encoder and disassembler.
+It can be used for static analysis of x86/x64 binaries, to rewrite code (eg. remove garbage instructions), to relocate code or as a disassembler.
+
+- Supports all Intel and AMD instructions
+- The decoder doesn't allocate any memory and is 2x-5x+ faster than other similar libraries written in C or C#
+- Small decoded instructions, only 32 bytes
+- The formatter supports masm, nasm, gas (AT&amp;T), Intel (XED) and there are many options to customize the output
+- The encoder can be used to re-encode decoded instructions at any address
+- The block encoder encodes a list of instructions and optimizes branches to short, near or 'long' (64-bit: 1 or more instructions)
+- API to get instruction info, eg. read/written registers, memory and rflags bits; CPUID feature flag, flow control info, etc
+- All instructions are tested (decode, encode, format, instruction info)
+
+License: MIT</description>
+    <copyright>Copyright (C) 2018-2019 de4dot@gmail.com</copyright>
+    <tags>x86 x64 encoder decoder formatter disassembler</tags>
+    <repository type="git" url="https://github.com/0xd4d/iced" commit="42418401a6c4b60a2e6d32b5951b0e69977488a5" />
+    <dependencies>
+      <group targetFramework=".NETFramework3.5" />
+      <group targetFramework=".NETFramework4.5" />
+      <group targetFramework=".NETStandard2.0" />
+    </dependencies>
+  </metadata>
+</package>

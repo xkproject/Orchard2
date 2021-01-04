@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.AspNetCore.Authentication.Google</name>
+    </assembly>
+    <members>
+        <member name="F:Microsoft.AspNetCore.Authentication.Google.GoogleChallengeProperties.AccessTypeKey">
+            <summary>
+            The parameter key for the "access_type" argument being used for a challenge request.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.Authentication.Google.GoogleChallengeProperties.ApprovalPromptKey">
+            <summary>
+            The parameter key for the "approval_prompt" argument being used for a challenge request.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.Authentication.Google.GoogleChallengeProperties.IncludeGrantedScopesKey">
+            <summary>
+            The parameter key for the "include_granted_scopes" argument being used for a challenge request.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.Authentication.Google.GoogleChallengeProperties.LoginHintKey">
+            <summary>
+            The parameter key for the "login_hint" argument being used for a challenge request.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.Authentication.Google.GoogleChallengeProperties.PromptParameterKey">
+            <summary>
+            The parameter key for the "prompt" argument being used for a challenge request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.Google.GoogleChallengeProperties.AccessType">
+            <summary>
+            The "access_type" parameter value being used for a challenge request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.Google.GoogleChallengeProperties.ApprovalPrompt">
+            <summary>
+            The "approval_prompt" parameter value being used for a challenge request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.Google.GoogleChallengeProperties.IncludeGrantedScopes">
+            <summary>
+            The "include_granted_scopes" parameter value being used for a challenge request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.Google.GoogleChallengeProperties.LoginHint">
+            <summary>
+            The "login_hint" parameter value being used for a challenge request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.Google.GoogleChallengeProperties.Prompt">
+            <summary>
+            The "prompt" parameter value being used for a challenge request.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Authentication.Google.GoogleDefaults">
+            <summary>
+            Default values for Google authentication
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Authentication.Google.GoogleOptions">
+            <summary>
+            Configuration options for <see cref="T:Microsoft.AspNetCore.Authentication.Google.GoogleHandler"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Authentication.Google.GoogleOptions.#ctor">
+            <summary>
+            Initializes a new <see cref="T:Microsoft.AspNetCore.Authentication.Google.GoogleOptions"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.Google.GoogleOptions.AccessType">
+            <summary>
+            access_type. Set to 'offline' to request a refresh token.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.Google.Resources.Exception_OptionMustBeProvided">
+            <summary>The '{0}' option must be provided.</summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Authentication.Google.Resources.FormatException_OptionMustBeProvided(System.Object)">
+            <summary>The '{0}' option must be provided.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.Google.Resources.Exception_ValidatorHandlerMismatch">
+            <summary>An ICertificateValidator cannot be specified at the same time as an HttpMessageHandler unless it is a WebRequestHandler.</summary>
+        </member>
+    </members>
+</doc>

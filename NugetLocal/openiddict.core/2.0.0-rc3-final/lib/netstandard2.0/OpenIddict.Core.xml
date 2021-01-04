@@ -1,0 +1,2039 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OpenIddict.Core</name>
+    </assembly>
+    <members>
+        <member name="T:OpenIddict.Core.OpenIddictApplicationManager`1">
+            <summary>
+            Provides methods allowing to manage the applications stored in the store.
+            </summary>
+            <typeparam name="TApplication">The type of the Application entity.</typeparam>
+        </member>
+        <member name="P:OpenIddict.Core.OpenIddictApplicationManager`1.Logger">
+            <summary>
+            Gets the logger associated with the current manager.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Core.OpenIddictApplicationManager`1.Options">
+            <summary>
+            Gets the options associated with the current manager.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Core.OpenIddictApplicationManager`1.Store">
+            <summary>
+            Gets the store associated with the current manager.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.CountAsync(System.Threading.CancellationToken)">
+            <summary>
+            Determines the number of applications that exist in the database.
+            </summary>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the number of applications in the database.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.CountAsync``1(System.Func{System.Linq.IQueryable{`0},System.Linq.IQueryable{``0}},System.Threading.CancellationToken)">
+            <summary>
+            Determines the number of applications that match the specified query.
+            </summary>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the number of applications that match the specified query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.CreateAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new application.
+            </summary>
+            <param name="application">The application to create.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.CreateAsync(`0,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new application.
+            Note: the default implementation automatically hashes the client
+            secret before storing it in the database, for security reasons.
+            </summary>
+            <param name="application">The application to create.</param>
+            <param name="secret">The client secret associated with the application, if applicable.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.CreateAsync(OpenIddict.Abstractions.OpenIddictApplicationDescriptor,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new application based on the specified descriptor.
+            Note: the default implementation automatically hashes the client
+            secret before storing it in the database, for security reasons.
+            </summary>
+            <param name="descriptor">The application descriptor.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the unique identifier associated with the application.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.DeleteAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Removes an existing application.
+            </summary>
+            <param name="application">The application to delete.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.FindByIdAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves an application using its unique identifier.
+            </summary>
+            <param name="identifier">The unique identifier associated with the application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the client application corresponding to the identifier.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.FindByClientIdAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves an application using its client identifier.
+            </summary>
+            <param name="identifier">The client identifier associated with the application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the client application corresponding to the identifier.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.FindByPostLogoutRedirectUriAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves all the applications associated with the specified post_logout_redirect_uri.
+            </summary>
+            <param name="address">The post_logout_redirect_uri associated with the applications.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation, whose result
+            returns the client applications corresponding to the specified post_logout_redirect_uri.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.FindByRedirectUriAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves all the applications associated with the specified redirect_uri.
+            </summary>
+            <param name="address">The redirect_uri associated with the applications.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation, whose result
+            returns the client applications corresponding to the specified redirect_uri.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.GetAsync``1(System.Func{System.Linq.IQueryable{`0},System.Linq.IQueryable{``0}},System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns the first element.
+            </summary>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the first element returned when executing the query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.GetAsync``2(System.Func{System.Linq.IQueryable{`0},``0,System.Linq.IQueryable{``1}},``0,System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns the first element.
+            </summary>
+            <typeparam name="TState">The state type.</typeparam>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="state">The optional state.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the first element returned when executing the query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.GetClientIdAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the client identifier associated with an application.
+            </summary>
+            <param name="application">The application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the client identifier associated with the application.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.GetClientTypeAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the client type associated with an application.
+            </summary>
+            <param name="application">The application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the client type of the application (by default, "public").
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.GetConsentTypeAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the consent type associated with an application.
+            </summary>
+            <param name="application">The application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the consent type of the application (by default, "explicit").
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.GetDisplayNameAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the display name associated with an application.
+            </summary>
+            <param name="application">The application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the display name associated with the application.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.GetIdAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the unique identifier associated with an application.
+            </summary>
+            <param name="application">The application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the unique identifier associated with the application.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.GetPermissionsAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the permissions associated with an application.
+            </summary>
+            <param name="application">The application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns all the permissions associated with the application.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.GetPostLogoutRedirectUrisAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the logout callback addresses associated with an application.
+            </summary>
+            <param name="application">The application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns all the post_logout_redirect_uri associated with the application.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.GetRedirectUrisAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the callback addresses associated with an application.
+            </summary>
+            <param name="application">The application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns all the redirect_uri associated with the application.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.HasPermissionAsync(`0,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Determines whether the specified permission has been granted to the application.
+            </summary>
+            <param name="application">The application.</param>
+            <param name="permission">The permission.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns><c>true</c> if the application has been granted the specified permission, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.IsConfidentialAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Determines whether an application is a confidential client.
+            </summary>
+            <param name="application">The application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns><c>true</c> if the application is a confidential client, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.IsHybridAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Determines whether an application is a hybrid client.
+            </summary>
+            <param name="application">The application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns><c>true</c> if the application is a hybrid client, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.IsPublicAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Determines whether an application is a public client.
+            </summary>
+            <param name="application">The application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns><c>true</c> if the application is a public client, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.ListAsync(System.Nullable{System.Int32},System.Nullable{System.Int32},System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns all the corresponding elements.
+            </summary>
+            <param name="count">The number of results to return.</param>
+            <param name="offset">The number of results to skip.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns all the elements returned when executing the specified query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.ListAsync``1(System.Func{System.Linq.IQueryable{`0},System.Linq.IQueryable{``0}},System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns all the corresponding elements.
+            </summary>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns all the elements returned when executing the specified query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.ListAsync``2(System.Func{System.Linq.IQueryable{`0},``0,System.Linq.IQueryable{``1}},``0,System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns all the corresponding elements.
+            </summary>
+            <typeparam name="TState">The state type.</typeparam>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="state">The optional state.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns all the elements returned when executing the specified query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.PopulateAsync(`0,OpenIddict.Abstractions.OpenIddictApplicationDescriptor,System.Threading.CancellationToken)">
+            <summary>
+            Populates the application using the specified descriptor.
+            </summary>
+            <param name="application">The application.</param>
+            <param name="descriptor">The descriptor.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.PopulateAsync(OpenIddict.Abstractions.OpenIddictApplicationDescriptor,`0,System.Threading.CancellationToken)">
+            <summary>
+            Populates the specified descriptor using the properties exposed by the application.
+            </summary>
+            <param name="descriptor">The descriptor.</param>
+            <param name="application">The application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.UpdateAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Updates an existing application.
+            </summary>
+            <param name="application">The application to update.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.UpdateAsync(`0,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Updates an existing application and replaces the existing secret.
+            Note: the default implementation automatically hashes the client
+            secret before storing it in the database, for security reasons.
+            </summary>
+            <param name="application">The application to update.</param>
+            <param name="secret">The client secret associated with the application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.UpdateAsync(`0,OpenIddict.Abstractions.OpenIddictApplicationDescriptor,System.Threading.CancellationToken)">
+            <summary>
+            Updates an existing application.
+            </summary>
+            <param name="application">The application to update.</param>
+            <param name="descriptor">The descriptor used to update the application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.ValidateAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Validates the application to ensure it's in a consistent state.
+            </summary>
+            <param name="application">The application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the validation error encountered when validating the application.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.ValidateClientSecretAsync(`0,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Validates the client_secret associated with an application.
+            </summary>
+            <param name="application">The application.</param>
+            <param name="secret">The secret that should be compared to the client_secret stored in the database.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.</returns>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns a boolean indicating whether the client secret was valid.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.ValidateRedirectUriAsync(`0,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Validates the redirect_uri to ensure it's associated with an application.
+            </summary>
+            <param name="application">The application.</param>
+            <param name="address">The address that should be compared to one of the redirect_uri stored in the database.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns a boolean indicating whether the redirect_uri was valid.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.ObfuscateClientSecretAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Obfuscates the specified client secret so it can be safely stored in a database.
+            By default, this method returns a complex hashed representation computed using PBKDF2.
+            </summary>
+            <param name="secret">The client secret.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationManager`1.ValidateClientSecretAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Validates the specified value to ensure it corresponds to the client secret.
+            Note: when overriding this method, using a time-constant comparer is strongly recommended.
+            </summary>
+            <param name="secret">The client secret to compare to the value stored in the database.</param>
+            <param name="comparand">The value stored in the database, which is usually a hashed representation of the secret.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns a boolean indicating whether the specified value was valid.
+            </returns>
+        </member>
+        <member name="T:OpenIddict.Core.OpenIddictAuthorizationManager`1">
+            <summary>
+            Provides methods allowing to manage the authorizations stored in the store.
+            </summary>
+            <typeparam name="TAuthorization">The type of the Authorization entity.</typeparam>
+        </member>
+        <member name="P:OpenIddict.Core.OpenIddictAuthorizationManager`1.Logger">
+            <summary>
+            Gets the logger associated with the current manager.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Core.OpenIddictAuthorizationManager`1.Options">
+            <summary>
+            Gets the options associated with the current manager.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Core.OpenIddictAuthorizationManager`1.Store">
+            <summary>
+            Gets the store associated with the current manager.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.CountAsync(System.Threading.CancellationToken)">
+            <summary>
+            Determines the number of authorizations that exist in the database.
+            </summary>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the number of authorizations in the database.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.CountAsync``1(System.Func{System.Linq.IQueryable{`0},System.Linq.IQueryable{``0}},System.Threading.CancellationToken)">
+            <summary>
+            Determines the number of authorizations that match the specified query.
+            </summary>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the number of authorizations that match the specified query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.CreateAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new authorization.
+            </summary>
+            <param name="authorization">The application to create.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.CreateAsync(OpenIddict.Abstractions.OpenIddictAuthorizationDescriptor,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new authorization based on the specified descriptor.
+            </summary>
+            <param name="descriptor">The authorization descriptor.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation, whose result returns the authorization.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.CreateAsync(System.Security.Claims.ClaimsPrincipal,System.String,System.String,System.String,System.Collections.Immutable.ImmutableArray{System.String},System.Collections.Immutable.ImmutableDictionary{System.String,System.String},System.Threading.CancellationToken)">
+            <summary>
+            Creates a new permanent authorization based on the specified parameters.
+            </summary>
+            <param name="principal">The principal associated with the authorization.</param>
+            <param name="subject">The subject associated with the authorization.</param>
+            <param name="client">The client associated with the authorization.</param>
+            <param name="type">The authorization type.</param>
+            <param name="scopes">The minimal scopes associated with the authorization.</param>
+            <param name="properties">The authentication properties associated with the authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation, whose result returns the authorization.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.DeleteAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Removes an existing authorization.
+            </summary>
+            <param name="authorization">The authorization to delete.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.FindAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the authorizations corresponding to the specified
+            subject and associated with the application identifier.
+            </summary>
+            <param name="subject">The subject associated with the authorization.</param>
+            <param name="client">The client associated with the authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the authorizations corresponding to the subject/client.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.FindAsync(System.String,System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the authorizations matching the specified parameters.
+            </summary>
+            <param name="subject">The subject associated with the authorization.</param>
+            <param name="client">The client associated with the authorization.</param>
+            <param name="status">The authorization status.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the authorizations corresponding to the criteria.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.FindAsync(System.String,System.String,System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the authorizations matching the specified parameters.
+            </summary>
+            <param name="subject">The subject associated with the authorization.</param>
+            <param name="client">The client associated with the authorization.</param>
+            <param name="status">The authorization status.</param>
+            <param name="type">The authorization type.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the authorizations corresponding to the criteria.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.FindAsync(System.String,System.String,System.String,System.String,System.Collections.Immutable.ImmutableArray{System.String},System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the authorizations matching the specified parameters.
+            </summary>
+            <param name="subject">The subject associated with the authorization.</param>
+            <param name="client">The client associated with the authorization.</param>
+            <param name="status">The authorization status.</param>
+            <param name="type">The authorization type.</param>
+            <param name="scopes">The minimal scopes associated with the authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the authorizations corresponding to the criteria.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.FindByIdAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves an authorization using its unique identifier.
+            </summary>
+            <param name="identifier">The unique identifier associated with the authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the authorization corresponding to the identifier.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.FindBySubjectAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves all the authorizations corresponding to the specified subject.
+            </summary>
+            <param name="subject">The subject associated with the authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the authorizations corresponding to the specified subject.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.GetApplicationIdAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the optional application identifier associated with an authorization.
+            </summary>
+            <param name="authorization">The authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the application identifier associated with the authorization.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.GetAsync``1(System.Func{System.Linq.IQueryable{`0},System.Linq.IQueryable{``0}},System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns the first element.
+            </summary>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the first element returned when executing the query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.GetAsync``2(System.Func{System.Linq.IQueryable{`0},``0,System.Linq.IQueryable{``1}},``0,System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns the first element.
+            </summary>
+            <typeparam name="TState">The state type.</typeparam>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="state">The optional state.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the first element returned when executing the query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.GetIdAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the unique identifier associated with an authorization.
+            </summary>
+            <param name="authorization">The authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the unique identifier associated with the authorization.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.GetScopesAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the scopes associated with an authorization.
+            </summary>
+            <param name="authorization">The authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the scopes associated with the specified authorization.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.GetStatusAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the status associated with an authorization.
+            </summary>
+            <param name="authorization">The authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the status associated with the specified authorization.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.GetSubjectAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the subject associated with an authorization.
+            </summary>
+            <param name="authorization">The authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the subject associated with the specified authorization.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.GetTypeAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the type associated with an authorization.
+            </summary>
+            <param name="authorization">The authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the type associated with the specified authorization.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.HasScopesAsync(`0,System.Collections.Immutable.ImmutableArray{System.String},System.Threading.CancellationToken)">
+            <summary>
+            Determines whether the specified scopes are included in the authorization.
+            </summary>
+            <param name="authorization">The authorization.</param>
+            <param name="scopes">The scopes.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns><c>true</c> if the scopes are included in the authorization, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.IsAdHocAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Determines whether a given authorization is ad hoc.
+            </summary>
+            <param name="authorization">The authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns><c>true</c> if the authorization is ad hoc, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.IsPermanentAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Determines whether a given authorization is permanent.
+            </summary>
+            <param name="authorization">The authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns><c>true</c> if the authorization is permanent, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.IsRevokedAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Determines whether a given authorization has been revoked.
+            </summary>
+            <param name="authorization">The authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns><c>true</c> if the authorization has been revoked, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.IsValidAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Determines whether a given authorization is valid.
+            </summary>
+            <param name="authorization">The authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns><c>true</c> if the authorization is valid, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.ListAsync(System.Nullable{System.Int32},System.Nullable{System.Int32},System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns all the corresponding elements.
+            </summary>
+            <param name="count">The number of results to return.</param>
+            <param name="offset">The number of results to skip.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns all the elements returned when executing the specified query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.ListAsync``1(System.Func{System.Linq.IQueryable{`0},System.Linq.IQueryable{``0}},System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns all the corresponding elements.
+            </summary>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns all the elements returned when executing the specified query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.ListAsync``2(System.Func{System.Linq.IQueryable{`0},``0,System.Linq.IQueryable{``1}},``0,System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns all the corresponding elements.
+            </summary>
+            <typeparam name="TState">The state type.</typeparam>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="state">The optional state.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns all the elements returned when executing the specified query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.PopulateAsync(`0,OpenIddict.Abstractions.OpenIddictAuthorizationDescriptor,System.Threading.CancellationToken)">
+            <summary>
+            Populates the authorization using the specified descriptor.
+            </summary>
+            <param name="authorization">The authorization.</param>
+            <param name="descriptor">The descriptor.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.PopulateAsync(OpenIddict.Abstractions.OpenIddictAuthorizationDescriptor,`0,System.Threading.CancellationToken)">
+            <summary>
+            Populates the specified descriptor using the properties exposed by the authorization.
+            </summary>
+            <param name="descriptor">The descriptor.</param>
+            <param name="authorization">The authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.PruneAsync(System.Threading.CancellationToken)">
+            <summary>
+            Removes the ad-hoc authorizations that are marked as invalid or have no valid token attached.
+            </summary>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.RevokeAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Revokes an authorization.
+            </summary>
+            <param name="authorization">The authorization to revoke.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.</returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.SetApplicationIdAsync(`0,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Sets the application identifier associated with an authorization.
+            </summary>
+            <param name="authorization">The authorization.</param>
+            <param name="identifier">The unique identifier associated with the client application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.UpdateAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Updates an existing authorization.
+            </summary>
+            <param name="authorization">The authorization to update.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.UpdateAsync(`0,OpenIddict.Abstractions.OpenIddictAuthorizationDescriptor,System.Threading.CancellationToken)">
+            <summary>
+            Updates an existing authorization.
+            </summary>
+            <param name="authorization">The authorization to update.</param>
+            <param name="descriptor">The descriptor used to update the authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationManager`1.ValidateAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Validates the authorization to ensure it's in a consistent state.
+            </summary>
+            <param name="authorization">The authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the validation error encountered when validating the authorization.
+            </returns>
+        </member>
+        <member name="T:OpenIddict.Core.OpenIddictScopeManager`1">
+            <summary>
+            Provides methods allowing to manage the scopes stored in the store.
+            </summary>
+            <typeparam name="TScope">The type of the Scope entity.</typeparam>
+        </member>
+        <member name="P:OpenIddict.Core.OpenIddictScopeManager`1.Logger">
+            <summary>
+            Gets the logger associated with the current manager.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Core.OpenIddictScopeManager`1.Options">
+            <summary>
+            Gets the options associated with the current manager.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Core.OpenIddictScopeManager`1.Store">
+            <summary>
+            Gets the store associated with the current manager.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.CountAsync(System.Threading.CancellationToken)">
+            <summary>
+            Determines the number of scopes that exist in the database.
+            </summary>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the number of scopes in the database.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.CountAsync``1(System.Func{System.Linq.IQueryable{`0},System.Linq.IQueryable{``0}},System.Threading.CancellationToken)">
+            <summary>
+            Determines the number of scopes that match the specified query.
+            </summary>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the number of scopes that match the specified query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.CreateAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new scope.
+            </summary>
+            <param name="scope">The scope to create.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.CreateAsync(OpenIddict.Abstractions.OpenIddictScopeDescriptor,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new scope based on the specified descriptor.
+            </summary>
+            <param name="descriptor">The scope descriptor.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation, whose result returns the scope.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.DeleteAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Removes an existing scope.
+            </summary>
+            <param name="scope">The scope to delete.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.FindByIdAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves a scope using its unique identifier.
+            </summary>
+            <param name="identifier">The unique identifier associated with the scope.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the scope corresponding to the identifier.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.FindByNameAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves a scope using its name.
+            </summary>
+            <param name="name">The name associated with the scope.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the scope corresponding to the specified name.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.FindByNamesAsync(System.Collections.Immutable.ImmutableArray{System.String},System.Threading.CancellationToken)">
+            <summary>
+            Retrieves a list of scopes using their name.
+            </summary>
+            <param name="names">The names associated with the scopes.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the scopes corresponding to the specified names.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.FindByResourceAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves all the scopes that contain the specified resource.
+            </summary>
+            <param name="resource">The resource associated with the scopes.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the scopes associated with the specified resource.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.GetAsync``1(System.Func{System.Linq.IQueryable{`0},System.Linq.IQueryable{``0}},System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns the first element.
+            </summary>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the first element returned when executing the query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.GetAsync``2(System.Func{System.Linq.IQueryable{`0},``0,System.Linq.IQueryable{``1}},``0,System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns the first element.
+            </summary>
+            <typeparam name="TState">The state type.</typeparam>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="state">The optional state.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the first element returned when executing the query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.GetDescriptionAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the description associated with a scope.
+            </summary>
+            <param name="scope">The scope.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the description associated with the specified scope.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.GetDisplayNameAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the display name associated with a scope.
+            </summary>
+            <param name="scope">The scope.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the display name associated with the scope.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.GetIdAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the unique identifier associated with a scope.
+            </summary>
+            <param name="scope">The scope.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the unique identifier associated with the scope.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.GetNameAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the name associated with a scope.
+            </summary>
+            <param name="scope">The scope.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the name associated with the specified scope.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.GetResourcesAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the resources associated with a scope.
+            </summary>
+            <param name="scope">The scope.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns all the resources associated with the scope.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.ListAsync(System.Nullable{System.Int32},System.Nullable{System.Int32},System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns all the corresponding elements.
+            </summary>
+            <param name="count">The number of results to return.</param>
+            <param name="offset">The number of results to skip.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns all the elements returned when executing the specified query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.ListAsync``1(System.Func{System.Linq.IQueryable{`0},System.Linq.IQueryable{``0}},System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns all the corresponding elements.
+            </summary>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns all the elements returned when executing the specified query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.ListAsync``2(System.Func{System.Linq.IQueryable{`0},``0,System.Linq.IQueryable{``1}},``0,System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns all the corresponding elements.
+            </summary>
+            <typeparam name="TState">The state type.</typeparam>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="state">The optional state.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns all the elements returned when executing the specified query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.ListResourcesAsync(System.Collections.Immutable.ImmutableArray{System.String},System.Threading.CancellationToken)">
+            <summary>
+            Lists all the resources associated with the specified scopes.
+            </summary>
+            <param name="scopes">The scopes.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns all the resources associated with the specified scopes.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.PopulateAsync(`0,OpenIddict.Abstractions.OpenIddictScopeDescriptor,System.Threading.CancellationToken)">
+            <summary>
+            Populates the scope using the specified descriptor.
+            </summary>
+            <param name="scope">The scope.</param>
+            <param name="descriptor">The descriptor.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.PopulateAsync(OpenIddict.Abstractions.OpenIddictScopeDescriptor,`0,System.Threading.CancellationToken)">
+            <summary>
+            Populates the specified descriptor using the properties exposed by the scope.
+            </summary>
+            <param name="descriptor">The descriptor.</param>
+            <param name="scope">The scope.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.UpdateAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Updates an existing scope.
+            </summary>
+            <param name="scope">The scope to update.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.UpdateAsync(`0,OpenIddict.Abstractions.OpenIddictScopeDescriptor,System.Threading.CancellationToken)">
+            <summary>
+            Updates an existing scope.
+            </summary>
+            <param name="scope">The scope to update.</param>
+            <param name="descriptor">The descriptor used to update the scope.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeManager`1.ValidateAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Validates the scope to ensure it's in a consistent state.
+            </summary>
+            <param name="scope">The scope.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the validation error encountered when validating the scope.
+            </returns>
+        </member>
+        <member name="T:OpenIddict.Core.OpenIddictTokenManager`1">
+            <summary>
+            Provides methods allowing to manage the tokens stored in the store.
+            </summary>
+            <typeparam name="TToken">The type of the Token entity.</typeparam>
+        </member>
+        <member name="P:OpenIddict.Core.OpenIddictTokenManager`1.Logger">
+            <summary>
+            Gets the logger associated with the current manager.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Core.OpenIddictTokenManager`1.Options">
+            <summary>
+            Gets the options associated with the current manager.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Core.OpenIddictTokenManager`1.Store">
+            <summary>
+            Gets the store associated with the current manager.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.CountAsync(System.Threading.CancellationToken)">
+            <summary>
+            Determines the number of tokens that exist in the database.
+            </summary>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the number of tokens in the database.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.CountAsync``1(System.Func{System.Linq.IQueryable{`0},System.Linq.IQueryable{``0}},System.Threading.CancellationToken)">
+            <summary>
+            Determines the number of tokens that match the specified query.
+            </summary>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the number of tokens that match the specified query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.CreateAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new token.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.CreateAsync(OpenIddict.Abstractions.OpenIddictTokenDescriptor,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new token based on the specified descriptor.
+            </summary>
+            <param name="descriptor">The token descriptor.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation, whose result returns the token.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.DeleteAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Removes an existing token.
+            </summary>
+            <param name="token">The token to delete.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.ExtendAsync(`0,System.Nullable{System.DateTimeOffset},System.Threading.CancellationToken)">
+            <summary>
+            Extends the specified token by replacing its expiration date.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="date">The date on which the token will no longer be considered valid.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.FindByApplicationIdAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the list of tokens corresponding to the specified application identifier.
+            </summary>
+            <param name="identifier">The application identifier associated with the tokens.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the tokens corresponding to the specified application.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.FindByAuthorizationIdAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the list of tokens corresponding to the specified authorization identifier.
+            </summary>
+            <param name="identifier">The authorization identifier associated with the tokens.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the tokens corresponding to the specified authorization.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.FindByReferenceIdAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the list of tokens corresponding to the specified reference identifier.
+            Note: the reference identifier may be hashed or encrypted for security reasons.
+            </summary>
+            <param name="identifier">The reference identifier associated with the tokens.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the tokens corresponding to the specified reference identifier.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.FindByIdAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves a token using its unique identifier.
+            </summary>
+            <param name="identifier">The unique identifier associated with the token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the token corresponding to the unique identifier.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.FindBySubjectAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the list of tokens corresponding to the specified subject.
+            </summary>
+            <param name="subject">The subject associated with the tokens.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the tokens corresponding to the specified subject.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.GetApplicationIdAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the optional application identifier associated with a token.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the application identifier associated with the token.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.GetAsync``1(System.Func{System.Linq.IQueryable{`0},System.Linq.IQueryable{``0}},System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns the first element.
+            </summary>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the first element returned when executing the query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.GetAsync``2(System.Func{System.Linq.IQueryable{`0},``0,System.Linq.IQueryable{``1}},``0,System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns the first element.
+            </summary>
+            <typeparam name="TState">The state type.</typeparam>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="state">The optional state.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the first element returned when executing the query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.GetAuthorizationIdAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the optional authorization identifier associated with a token.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the authorization identifier associated with the token.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.GetCreationDateAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the creation date associated with a token.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the creation date associated with the specified token.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.GetExpirationDateAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the expiration date associated with a token.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the expiration date associated with the specified token.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.GetIdAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the unique identifier associated with a token.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the unique identifier associated with the token.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.GetPayloadAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the payload associated with a token.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the payload associated with the specified token.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.GetReferenceIdAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the reference identifier associated with a token.
+            Note: depending on the manager used to create the token,
+            the reference identifier may be hashed for security reasons.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the reference identifier associated with the specified token.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.GetStatusAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the status associated with a token.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the status associated with the specified token.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.GetSubjectAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the subject associated with a token.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the subject associated with the specified token.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.GetTokenTypeAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the token type associated with a token.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.ValueTask`1"/> that can be used to monitor the asynchronous operation,
+            whose result returns the token type associated with the specified token.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.IsRedeemedAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Determines whether a given token has already been redemeed.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns><c>true</c> if the token has already been redemeed, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.IsRevokedAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Determines whether a given token has been revoked.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns><c>true</c> if the token has been revoked, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.IsValidAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Determines whether a given token is valid.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns><c>true</c> if the token is valid, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.ListAsync(System.Nullable{System.Int32},System.Nullable{System.Int32},System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns all the corresponding elements.
+            </summary>
+            <param name="count">The number of results to return.</param>
+            <param name="offset">The number of results to skip.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns all the elements returned when executing the specified query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.ListAsync``1(System.Func{System.Linq.IQueryable{`0},System.Linq.IQueryable{``0}},System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns all the corresponding elements.
+            </summary>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns all the elements returned when executing the specified query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.ListAsync``2(System.Func{System.Linq.IQueryable{`0},``0,System.Linq.IQueryable{``1}},``0,System.Threading.CancellationToken)">
+            <summary>
+            Executes the specified query and returns all the corresponding elements.
+            </summary>
+            <typeparam name="TState">The state type.</typeparam>
+            <typeparam name="TResult">The result type.</typeparam>
+            <param name="query">The query to execute.</param>
+            <param name="state">The optional state.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns all the elements returned when executing the specified query.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.ObfuscateReferenceIdAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Obfuscates the specified reference identifier so it can be safely stored in a database.
+            By default, this method returns a simple hashed representation computed using SHA256.
+            </summary>
+            <param name="identifier">The client identifier.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.PopulateAsync(`0,OpenIddict.Abstractions.OpenIddictTokenDescriptor,System.Threading.CancellationToken)">
+            <summary>
+            Populates the token using the specified descriptor.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="descriptor">The descriptor.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.PopulateAsync(OpenIddict.Abstractions.OpenIddictTokenDescriptor,`0,System.Threading.CancellationToken)">
+            <summary>
+            Populates the specified descriptor using the properties exposed by the token.
+            </summary>
+            <param name="descriptor">The descriptor.</param>
+            <param name="token">The token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.PruneAsync(System.Threading.CancellationToken)">
+            <summary>
+            Removes the tokens that are marked as expired or invalid.
+            </summary>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.RedeemAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Redeems a token.
+            </summary>
+            <param name="token">The token to redeem.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.</returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.RevokeAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Revokes a token.
+            </summary>
+            <param name="token">The token to revoke.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.</returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.SetApplicationIdAsync(`0,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Sets the application identifier associated with a token.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="identifier">The unique identifier associated with the client application.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.SetAuthorizationIdAsync(`0,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Sets the authorization identifier associated with a token.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="identifier">The unique identifier associated with the authorization.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.UpdateAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Updates an existing token.
+            </summary>
+            <param name="token">The token to update.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.UpdateAsync(`0,OpenIddict.Abstractions.OpenIddictTokenDescriptor,System.Threading.CancellationToken)">
+            <summary>
+            Updates an existing token.
+            </summary>
+            <param name="token">The token to update.</param>
+            <param name="descriptor">The descriptor used to update the token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenManager`1.ValidateAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Validates the token to ensure it's in a consistent state.
+            </summary>
+            <param name="token">The token.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation,
+            whose result returns the validation error encountered when validating the token.
+            </returns>
+        </member>
+        <member name="T:OpenIddict.Core.OpenIddictCoreHelpers">
+            <summary>
+            Exposes common helpers used by the OpenIddict assemblies.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictCoreHelpers.FindGenericBaseType(System.Type,System.Type)">
+            <summary>
+            Finds the base type that matches the specified generic type definition.
+            </summary>
+            <param name="type">The type to introspect.</param>
+            <param name="definition">The generic type definition.</param>
+            <returns>A <see cref="T:System.Type"/> instance if the base type was found, <c>null</c> otherwise.</returns>
+        </member>
+        <member name="T:OpenIddict.Core.OpenIddictCoreOptions">
+            <summary>
+            Provides various settings needed to configure the OpenIddict core services.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Core.OpenIddictCoreOptions.DefaultApplicationType">
+            <summary>
+            Gets or sets the type corresponding to the default Application entity,
+            used by the non-generic application manager and the server/validation services.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Core.OpenIddictCoreOptions.DefaultAuthorizationType">
+            <summary>
+            Gets or sets the type corresponding to the default Authorization entity,
+            used by the non-generic authorization manager and the server/validation services.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Core.OpenIddictCoreOptions.DefaultScopeType">
+            <summary>
+            Gets or sets the type corresponding to the default Scope entity,
+            used by the non-generic scope manager and the server/validation services.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Core.OpenIddictCoreOptions.DefaultTokenType">
+            <summary>
+            Gets or sets the type corresponding to the default Token entity,
+            used by the non-generic token manager and the server/validation services.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Core.OpenIddictApplicationStoreResolver">
+            <summary>
+            Exposes a method allowing to resolve an application store.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictApplicationStoreResolver.Get``1">
+            <summary>
+            Returns an application store compatible with the specified application type or throws an
+            <see cref="T:System.InvalidOperationException"/> if no store can be built using the specified type.
+            </summary>
+            <typeparam name="TApplication">The type of the Application entity.</typeparam>
+            <returns>An <see cref="T:OpenIddict.Abstractions.IOpenIddictApplicationStore`1"/>.</returns>
+        </member>
+        <member name="T:OpenIddict.Core.OpenIddictAuthorizationStoreResolver">
+            <summary>
+            Exposes a method allowing to resolve an authorization store.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictAuthorizationStoreResolver.Get``1">
+            <summary>
+            Returns an authorization store compatible with the specified authorization type or throws an
+            <see cref="T:System.InvalidOperationException"/> if no store can be built using the specified type.
+            </summary>
+            <typeparam name="TAuthorization">The type of the Authorization entity.</typeparam>
+            <returns>An <see cref="T:OpenIddict.Abstractions.IOpenIddictAuthorizationStore`1"/>.</returns>
+        </member>
+        <member name="T:OpenIddict.Core.OpenIddictScopeStoreResolver">
+            <summary>
+            Exposes a method allowing to resolve a scope store.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictScopeStoreResolver.Get``1">
+            <summary>
+            Returns a scope store compatible with the specified scope type or throws an
+            <see cref="T:System.InvalidOperationException"/> if no store can be built using the specified type.
+            </summary>
+            <typeparam name="TScope">The type of the Scope entity.</typeparam>
+            <returns>An <see cref="T:OpenIddict.Abstractions.IOpenIddictScopeStore`1"/>.</returns>
+        </member>
+        <member name="T:OpenIddict.Core.OpenIddictTokenStoreResolver">
+            <summary>
+            Exposes a method allowing to resolve a token store.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Core.OpenIddictTokenStoreResolver.Get``1">
+            <summary>
+            Returns a token store compatible with the specified token type or throws an
+            <see cref="T:System.InvalidOperationException"/> if no store can be built using the specified type.
+            </summary>
+            <typeparam name="TToken">The type of the Token entity.</typeparam>
+            <returns>An <see cref="T:OpenIddict.Abstractions.IOpenIddictTokenStore`1"/>.</returns>
+        </member>
+        <member name="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder">
+            <summary>
+            Exposes the necessary methods required to configure the OpenIddict core services.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.
+            </summary>
+            <param name="services">The services collection.</param>
+        </member>
+        <member name="P:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.Services">
+            <summary>
+            Gets the services collection.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.Configure(System.Action{OpenIddict.Core.OpenIddictCoreOptions})">
+            <summary>
+            Amends the default OpenIddict core configuration.
+            </summary>
+            <param name="configuration">The delegate used to configure the OpenIddict options.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.AddApplicationStore``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds a custom application store by a custom implementation derived
+            from <see cref="T:OpenIddict.Abstractions.IOpenIddictApplicationStore`1"/>.
+            Note: when using this overload, the application store
+            must be either a non-generic or closed generic service.
+            </summary>
+            <typeparam name="TStore">The type of the custom store.</typeparam>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.AddApplicationStore(System.Type,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds a custom application store by a custom implementation derived
+            from <see cref="T:OpenIddict.Abstractions.IOpenIddictApplicationStore`1"/>.
+            Note: when using this overload, the application store can be
+            either a non-generic, a closed or an open generic service.
+            </summary>
+            <param name="type">The type of the custom store.</param>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.AddAuthorizationStore``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds a custom authorization store by a custom implementation derived
+            from <see cref="T:OpenIddict.Abstractions.IOpenIddictAuthorizationStore`1"/>.
+            Note: when using this overload, the authorization store
+            must be either a non-generic or closed generic service.
+            </summary>
+            <typeparam name="TStore">The type of the custom store.</typeparam>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.AddAuthorizationStore(System.Type,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds a custom authorization store by a custom implementation derived
+            from <see cref="T:OpenIddict.Abstractions.IOpenIddictAuthorizationStore`1"/>.
+            Note: when using this overload, the authorization store can be
+            either a non-generic, a closed or an open generic service.
+            </summary>
+            <param name="type">The type of the custom store.</param>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.AddScopeStore``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds a custom scope store by a custom implementation derived
+            from <see cref="T:OpenIddict.Abstractions.IOpenIddictScopeStore`1"/>.
+            Note: when using this overload, the scope store
+            must be either a non-generic or closed generic service.
+            </summary>
+            <typeparam name="TStore">The type of the custom store.</typeparam>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.AddScopeStore(System.Type,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds a custom scope store by a custom implementation derived
+            from <see cref="T:OpenIddict.Abstractions.IOpenIddictScopeStore`1"/>.
+            Note: when using this overload, the scope store can be
+            either a non-generic, a closed or an open generic service.
+            </summary>
+            <param name="type">The type of the custom store.</param>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.AddTokenStore``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds a custom token store by a custom implementation derived
+            from <see cref="T:OpenIddict.Abstractions.IOpenIddictTokenStore`1"/>.
+            Note: when using this overload, the token store
+            must be either a non-generic or closed generic service.
+            </summary>
+            <typeparam name="TStore">The type of the custom store.</typeparam>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.AddTokenStore(System.Type,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds a custom token store by a custom implementation derived
+            from <see cref="T:OpenIddict.Abstractions.IOpenIddictTokenStore`1"/>.
+            Note: when using this overload, the token store can be
+            either a non-generic, a closed or an open generic service.
+            </summary>
+            <param name="type">The type of the custom store.</param>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.ReplaceApplicationManager``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Replace the default application manager by a custom manager derived
+            from <see cref="T:OpenIddict.Core.OpenIddictApplicationManager`1"/>.
+            Note: when using this overload, the application manager
+            must be either a non-generic or closed generic service.
+            </summary>
+            <typeparam name="TManager">The type of the custom manager.</typeparam>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.ReplaceApplicationManager(System.Type,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Replace the default application manager by a custom manager derived
+            from <see cref="T:OpenIddict.Core.OpenIddictApplicationManager`1"/>.
+            Note: when using this overload, the application manager can be
+            either a non-generic, a closed or an open generic service.
+            </summary>
+            <param name="type">The type of the custom manager.</param>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.ReplaceApplicationStoreResolver``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Replaces the default application store resolver by a custom implementation.
+            </summary>
+            <typeparam name="TResolver">The type of the custom store.</typeparam>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.ReplaceApplicationStoreResolver(System.Type,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Replaces the default application store resolver by a custom implementation.
+            </summary>
+            <param name="type">The type of the custom store.</param>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.ReplaceAuthorizationManager``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Replace the default authorization manager by a custom manager derived
+            from <see cref="T:OpenIddict.Core.OpenIddictAuthorizationManager`1"/>.
+            Note: when using this overload, the authorization manager
+            must be either a non-generic or closed generic service.
+            </summary>
+            <typeparam name="TManager">The type of the custom manager.</typeparam>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.ReplaceAuthorizationManager(System.Type,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Replace the default authorization manager by a custom manager derived
+            from <see cref="T:OpenIddict.Core.OpenIddictAuthorizationManager`1"/>.
+            Note: when using this overload, the authorization manager can be
+            either a non-generic, a closed or an open generic service.
+            </summary>
+            <param name="type">The type of the custom manager.</param>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.ReplaceAuthorizationStoreResolver``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Replaces the default authorization store resolver by a custom implementation.
+            </summary>
+            <typeparam name="TResolver">The type of the custom store.</typeparam>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.ReplaceAuthorizationStoreResolver(System.Type,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Replaces the default authorization store resolver by a custom implementation.
+            </summary>
+            <param name="type">The type of the custom store.</param>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.ReplaceScopeManager``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Replace the default scope manager by a custom manager
+            derived from <see cref="T:OpenIddict.Core.OpenIddictScopeManager`1"/>.
+            Note: when using this overload, the scope manager
+            must be either a non-generic or closed generic service.
+            </summary>
+            <typeparam name="TManager">The type of the custom manager.</typeparam>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.ReplaceScopeManager(System.Type,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Replace the default scope manager by a custom manager
+            derived from <see cref="T:OpenIddict.Core.OpenIddictScopeManager`1"/>.
+            Note: when using this overload, the scope manager can be
+            either a non-generic, a closed or an open generic service.
+            </summary>
+            <param name="type">The type of the custom manager.</param>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.ReplaceScopeStoreResolver``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Replaces the default scope store resolver by a custom implementation.
+            </summary>
+            <typeparam name="TResolver">The type of the custom store.</typeparam>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.ReplaceScopeStoreResolver(System.Type,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Replaces the default scope store resolver by a custom implementation.
+            </summary>
+            <param name="type">The type of the custom store.</param>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.ReplaceTokenManager``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Replace the default token manager by a custom manager
+            derived from <see cref="T:OpenIddict.Core.OpenIddictTokenManager`1"/>.
+            Note: when using this overload, the token manager
+            must be either a non-generic or closed generic service.
+            </summary>
+            <typeparam name="TManager">The type of the custom manager.</typeparam>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.ReplaceTokenManager(System.Type,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Replace the default token manager by a custom manager
+            derived from <see cref="T:OpenIddict.Core.OpenIddictTokenManager`1"/>.
+            Note: when using this overload, the token manager can be
+            either a non-generic, a closed or an open generic service.
+            </summary>
+            <param name="type">The type of the custom manager.</param>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.ReplaceTokenStoreResolver``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Replaces the default token store resolver by a custom implementation.
+            </summary>
+            <typeparam name="TResolver">The type of the custom store.</typeparam>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.ReplaceTokenStoreResolver(System.Type,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Replaces the default token store resolver by a custom implementation.
+            </summary>
+            <param name="type">The type of the custom store.</param>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.SetDefaultApplicationEntity``1">
+            <summary>
+            Configures OpenIddict to use the specified entity as the default application entity.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.SetDefaultApplicationEntity(System.Type)">
+            <summary>
+            Configures OpenIddict to use the specified entity as the default application entity.
+            </summary>
+            <param name="type">The application entity type.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.SetDefaultAuthorizationEntity``1">
+            <summary>
+            Configures OpenIddict to use the specified entity as the default authorization entity.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.SetDefaultAuthorizationEntity(System.Type)">
+            <summary>
+            Configures OpenIddict to use the specified entity as the default authorization entity.
+            </summary>
+            <param name="type">The authorization entity type.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.SetDefaultScopeEntity``1">
+            <summary>
+            Configures OpenIddict to use the specified entity as the default scope entity.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.SetDefaultScopeEntity(System.Type)">
+            <summary>
+            Configures OpenIddict to use the specified entity as the default scope entity.
+            </summary>
+            <param name="type">The scope entity type.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.SetDefaultTokenEntity``1">
+            <summary>
+            Configures OpenIddict to use the specified entity as the default token entity.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder.SetDefaultTokenEntity(System.Type)">
+            <summary>
+            Configures OpenIddict to use the specified entity as the default token entity.
+            </summary>
+            <param name="type">The token entity type.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreExtensions.AddCore(Microsoft.Extensions.DependencyInjection.OpenIddictBuilder)">
+            <summary>
+            Registers the OpenIddict core services in the DI container.
+            </summary>
+            <param name="builder">The services builder used by OpenIddict to register new services.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictCoreExtensions.AddCore(Microsoft.Extensions.DependencyInjection.OpenIddictBuilder,System.Action{Microsoft.Extensions.DependencyInjection.OpenIddictCoreBuilder})">
+            <summary>
+            Registers the OpenIddict core services in the DI container.
+            </summary>
+            <param name="builder">The services builder used by OpenIddict to register new services.</param>
+            <param name="configuration">The configuration delegate used to configure the core services.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictBuilder"/>.</returns>
+        </member>
+    </members>
+</doc>

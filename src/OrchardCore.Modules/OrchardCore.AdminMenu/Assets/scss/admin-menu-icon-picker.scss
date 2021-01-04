@@ -1,0 +1,23 @@
+@import "../../node_modules/bootstrap/scss/functions";
+@import "../../node_modules/bootstrap/scss/variables";
+
+#iconPickerModal {
+
+    .iconpicker-popover.popover {
+        width: 100%;
+        border: none;
+    }
+
+    .iconpicker-items {
+        min-height: 258px;
+
+        .iconpicker-item {
+            // Optimally this should be a different color per admin theme bootswatch
+            background-color: $body-color;
+        }
+    }
+}
+
+.remove-icon, .sample-icon {
+    width: 40px;
+}

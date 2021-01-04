@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>NodaTime</id>
+    <version>3.0.3</version>
+    <authors>Jon Skeet</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">Apache-2.0</license>
+    <licenseUrl>https://licenses.nuget.org/Apache-2.0</licenseUrl>
+    <projectUrl>https://nodatime.org/</projectUrl>
+    <description>Noda Time is a date and time API acting as an alternative to the built-in DateTime/DateTimeOffset etc types in .NET.</description>
+    <tags>date time timezone calendar nodatime</tags>
+    <repository type="git" url="https://github.com/nodatime/nodatime" commit="930e76086b19c5c250ffaf6c7b3423a63366f463" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="System.Runtime.CompilerServices.Unsafe" version="4.7.1" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

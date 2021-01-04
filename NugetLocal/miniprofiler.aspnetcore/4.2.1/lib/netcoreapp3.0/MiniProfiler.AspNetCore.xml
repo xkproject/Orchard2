@@ -1,0 +1,320 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MiniProfiler.AspNetCore</name>
+    </assembly>
+    <members>
+        <member name="P:StackExchange.Profiling.EmbeddedProvider.ResourceCache">
+            <summary>
+            Embedded resource contents keyed by filename.
+            </summary>
+        </member>
+        <member name="T:StackExchange.Profiling.Internal.MiniProfilerBuilder">
+            <summary>
+            Allows fine grained configuration of MiniProfiler services.
+            </summary>
+        </member>
+        <member name="M:StackExchange.Profiling.Internal.MiniProfilerBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes a new <see cref="T:StackExchange.Profiling.Internal.MiniProfilerBuilder"/> instance.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+            <exception cref="T:System.ArgumentNullException">Throws when <paramref name="services"/> is null.</exception>
+        </member>
+        <member name="P:StackExchange.Profiling.Internal.MiniProfilerBuilder.Services">
+            <summary>
+            Services for this <see cref="T:StackExchange.Profiling.Internal.MiniProfilerBuilder"/>.
+            </summary>
+        </member>
+        <member name="T:StackExchange.Profiling.MiniProfilerExtensions">
+            <summary>
+            Extension methods for MiniProfiler
+            </summary>
+        </member>
+        <member name="M:StackExchange.Profiling.MiniProfilerExtensions.RenderIncludes(StackExchange.Profiling.MiniProfiler,Microsoft.AspNetCore.Http.HttpContext,StackExchange.Profiling.RenderOptions)">
+            <summary>
+            Renders script tag for including MiniProfiler.
+            </summary>
+            <param name="profiler">The profiler to render a tag for.</param>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> this tag is being rendered in.</param>
+            <param name="renderOptions">The option overrides (if any) to use rendering this MiniProfiler.</param>
+        </member>
+        <member name="M:StackExchange.Profiling.MiniProfilerExtensions.RenderIncludes(StackExchange.Profiling.MiniProfiler,Microsoft.AspNetCore.Http.HttpContext,System.Nullable{StackExchange.Profiling.RenderPosition},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Int32},System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
+            <summary>
+            Renders script tag for including MiniProfiler.
+            </summary>
+            <param name="profiler">The profiler to render a tag for.</param>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> this tag is being rendered in.</param>
+            <param name="position">The UI position to render the profiler in (defaults to <see cref="P:StackExchange.Profiling.Internal.MiniProfilerBaseOptions.PopupRenderPosition"/>).</param>
+            <param name="showTrivial">Whether to show trivial timings column initially or not (defaults to <see cref="P:StackExchange.Profiling.Internal.MiniProfilerBaseOptions.PopupShowTrivial"/>).</param>
+            <param name="showTimeWithChildren">Whether to show time with children column initially or not (defaults to <see cref="P:StackExchange.Profiling.Internal.MiniProfilerBaseOptions.PopupShowTimeWithChildren"/>).</param>
+            <param name="maxTracesToShow">The maximum number of profilers to show (before the oldest is removed - defaults to <see cref="P:StackExchange.Profiling.Internal.MiniProfilerBaseOptions.PopupMaxTracesToShow"/>).</param>
+            <param name="showControls">Whether to show the controls (defaults to <see cref="P:StackExchange.Profiling.Internal.MiniProfilerBaseOptions.ShowControls"/>).</param>
+            <param name="startHidden">Whether to start hidden (defaults to <see cref="P:StackExchange.Profiling.Internal.MiniProfilerBaseOptions.PopupStartHidden"/>).</param>
+        </member>
+        <member name="T:StackExchange.Profiling.MiniProfilerMiddleware">
+            <summary>
+            Represents a middleware that starts and stops a MiniProfiler
+            </summary>
+        </member>
+        <member name="M:StackExchange.Profiling.MiniProfilerMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Options.IOptions{StackExchange.Profiling.MiniProfilerOptions})">
+            <summary>
+            Creates a new instance of <see cref="T:StackExchange.Profiling.MiniProfilerMiddleware"/>
+            </summary>
+            <param name="next">The delegate representing the next middleware in the request pipeline.</param>
+            <param name="hostingEnvironment">The Hosting Environment.</param>
+            <param name="options">The middleware options, containing the rules to apply.</param>
+            <exception cref="T:System.ArgumentNullException">Throws when <paramref name="next"/>, <paramref name="hostingEnvironment"/>, or <paramref name="options"/> is <c>null</c>.</exception>
+        </member>
+        <member name="M:StackExchange.Profiling.MiniProfilerMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Executes the MiniProfiler-wrapped middleware.
+            </summary>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
+            <returns>A task that represents the execution of the MiniProfiler-wrapped middleware.</returns>
+            <exception cref="T:System.ArgumentNullException">Throws when <paramref name="context"/> is <c>null</c>.</exception>
+        </member>
+        <member name="M:StackExchange.Profiling.MiniProfilerMiddleware.AuthorizeRequestAsync(Microsoft.AspNetCore.Http.HttpContext,System.Boolean,System.Boolean)">
+            <summary>
+            Returns true if the current request is allowed to see the profiler response.
+            </summary>
+            <param name="context">The context to attempt to authorize a user for.</param>
+            <param name="isList">Whether this is a list route being accessed.</param>
+            <param name="setResponse">Whether to set response properties</param>
+        </member>
+        <member name="M:StackExchange.Profiling.MiniProfilerMiddleware.ResultsIndexAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Returns the list of profiling sessions
+            </summary>
+            <param name="context">The results list HTML, if authorized.</param>
+        </member>
+        <member name="M:StackExchange.Profiling.MiniProfilerMiddleware.ResultsListAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Returns the JSON needed for the results list in MiniProfiler
+            </summary>
+            <param name="context">The context to get the results list for.</param>
+        </member>
+        <member name="M:StackExchange.Profiling.MiniProfilerMiddleware.GetSingleProfilerResultAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Returns either JSON or full page HTML of a previous <c>MiniProfiler</c> session, 
+            identified by its <c>"?id=GUID"</c> on the query.
+            </summary>
+            <param name="context">The context to get a profiler response for.</param>
+        </member>
+        <member name="T:StackExchange.Profiling.MiniProfilerOptions">
+            <summary>
+            Options for configuring MiniProfiler
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerOptions.RouteBasePath">
+            <summary>
+            The path under which ALL routes are registered in, defaults to the application root.  For example, "/myDirectory/" would yield
+            "/myDirectory/includes.min.js" rather than "/mini-profiler-resources/includes.min.js"
+            Any setting here should be absolute for the application, e.g. "/myDirectory/"
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerOptions.ShouldProfile">
+            <summary>
+            Set a function to control whether a given request should be profiled at all.
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerOptions.ResultsAuthorize">
+            <summary>
+            A function that determines who can access the MiniProfiler results URL and list URL.  It should return true when
+            the request client has access to results, false for a 401 to be returned.
+            <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> parameter is the current request and will not be null.
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerOptions.ResultsAuthorizeAsync">
+            <summary>
+            An async function that determines who can access the MiniProfiler results URL and list URL.  It should return true when
+            the request client has access to results, false for a 401 to be returned.
+            <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> parameter is the current request and will not be null.
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerOptions.ResultsListAuthorize">
+            <summary>
+            Special authorization function that is called for the list results (listing all the profiling sessions), 
+            we also test for results authorize always. This must be set and return true, to enable the listing feature.
+            <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> parameter is the current request and will not be null.
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerOptions.ResultsListAuthorizeAsync">
+            <summary>
+            Special async authorization function that is called for the list results (listing all the profiling sessions), 
+            we also test for results authorize always. This must be set and return true, to enable the listing feature.
+            <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> parameter is the current request and will not be null.
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerOptions.UserIdProvider">
+            <summary>
+            Function to provide the unique user ID based on the request, to store MiniProfiler IDs user
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerOptions.EnableServerTimingHeader">
+            <summary>
+            Whether to add a Server-Timing header after profiling a request. Only supported in .NET Core 3.0 and higher.
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerOptions.EnableMvcFilterProfiling">
+            <summary>
+            Whether to profile MVC filters as individual steps.
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerOptions.MvcFilterMinimumSaveMs">
+            <summary>
+            The minimum duration to record for MVC filter timings, anything below this will be discarded as noise.
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerOptions.EnableMvcViewProfiling">
+            <summary>
+            Whether to profile MVC views as individual steps.
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerOptions.MvcViewMinimumSaveMs">
+            <summary>
+            The minimum duration to record for MVC view timings, anything below this will be discarded as noise.
+            </summary>
+        </member>
+        <member name="T:StackExchange.Profiling.RequestState">
+            <summary>
+            Stores the request state, passed down in the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.RequestState.IsAuthorized">
+            <summary>
+            Is the user authorized to see this MiniProfiler?
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.RequestState.RequestIDs">
+            <summary>
+            Store this as a string so we generate it once
+            </summary>
+        </member>
+        <member name="T:StackExchange.Profiling.Storage.MemoryCacheStorage">
+            <summary>
+            A IMemoryCache-based provider for storing MiniProfiler instances (based on System.Runtime.Caching.MemoryCache)
+            </summary>
+        </member>
+        <member name="F:StackExchange.Profiling.Storage.MemoryCacheStorage.CacheKeyPrefix">
+            <summary>
+            The string that prefixes all keys that MiniProfilers are saved under, e.g.
+            <c>"mini-profiler-ecfb0050-7ce8-4bf1-bf82-2cb38e90e31e".</c>
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.Storage.MemoryCacheStorage.CacheDuration">
+            <summary>
+            Gets or sets how long to cache each <see cref="T:StackExchange.Profiling.MiniProfiler"/> for, in absolute terms.
+            </summary>
+        </member>
+        <member name="M:StackExchange.Profiling.Storage.MemoryCacheStorage.#ctor(Microsoft.Extensions.Caching.Memory.IMemoryCache,System.TimeSpan)">
+            <summary>
+            Creates a memory cache provider, storing each result in the provided IMemoryCache
+            for the specified duration.
+            </summary>
+            <param name="cache">The <see cref="T:Microsoft.Extensions.Caching.Memory.IMemoryCache"/> to use for storage.</param>
+            <param name="cacheDuration">The duration to cache each profiler, before it expires from cache.</param>
+            <exception cref="T:System.ArgumentNullException">Throws when <paramref name="cache"/> is null.</exception>
+        </member>
+        <member name="M:StackExchange.Profiling.Storage.MemoryCacheStorage.GetUnviewedIds(System.String)">
+            <summary>
+            Returns a list of <see cref="P:StackExchange.Profiling.MiniProfiler.Id"/>s that haven't been seen by <paramref name="user"/>.
+            </summary>
+            <param name="user">User identified by the current <c>MiniProfilerOptions.UserProvider</c></param>
+        </member>
+        <member name="M:StackExchange.Profiling.Storage.MemoryCacheStorage.GetUnviewedIdsAsync(System.String)">
+            <summary>
+            Returns a list of <see cref="P:StackExchange.Profiling.MiniProfiler.Id"/>s that haven't been seen by <paramref name="user"/>.
+            </summary>
+            <param name="user">User identified by the current <c>MiniProfilerOptions.UserProvider</c></param>
+        </member>
+        <member name="M:StackExchange.Profiling.Storage.MemoryCacheStorage.List(System.Int32,System.Nullable{System.DateTime},System.Nullable{System.DateTime},StackExchange.Profiling.Storage.ListResultsOrder)">
+            <summary>
+            List the latest profiling results.
+            </summary>
+            <param name="maxResults">The maximum number of results to return.</param>
+            <param name="start">(Optional) The start of the date range to fetch.</param>
+            <param name="finish">(Optional) The end of the date range to fetch.</param>
+            <param name="orderBy">(Optional) The order to fetch profiler IDs in.</param>
+        </member>
+        <member name="M:StackExchange.Profiling.Storage.MemoryCacheStorage.ListAsync(System.Int32,System.Nullable{System.DateTime},System.Nullable{System.DateTime},StackExchange.Profiling.Storage.ListResultsOrder)">
+            <summary>
+            List the latest profiling results.
+            </summary>
+            <param name="maxResults">The maximum number of results to return.</param>
+            <param name="start">(Optional) The start of the date range to fetch.</param>
+            <param name="finish">(Optional) The end of the date range to fetch.</param>
+            <param name="orderBy">(Optional) The order to fetch profiler IDs in.</param>
+        </member>
+        <member name="M:StackExchange.Profiling.Storage.MemoryCacheStorage.Load(System.Guid)">
+            <summary>
+            Returns the saved <see cref="T:StackExchange.Profiling.MiniProfiler"/> identified by <paramref name="id"/>. Also marks the resulting
+            profiler <see cref="P:StackExchange.Profiling.MiniProfiler.HasUserViewed"/> to true.
+            </summary>
+            <param name="id">The profiler ID to load.</param>
+            <returns>The loaded <see cref="T:StackExchange.Profiling.MiniProfiler"/>.</returns>
+        </member>
+        <member name="M:StackExchange.Profiling.Storage.MemoryCacheStorage.LoadAsync(System.Guid)">
+            <summary>
+            Returns the saved <see cref="T:StackExchange.Profiling.MiniProfiler"/> identified by <paramref name="id"/>. Also marks the resulting
+            profiler <see cref="P:StackExchange.Profiling.MiniProfiler.HasUserViewed"/> to true.
+            </summary>
+            <param name="id">The profiler ID to load.</param>
+            <returns>The loaded <see cref="T:StackExchange.Profiling.MiniProfiler"/>.</returns>
+        </member>
+        <member name="M:StackExchange.Profiling.Storage.MemoryCacheStorage.Save(StackExchange.Profiling.MiniProfiler)">
+            <summary>
+            Saves <paramref name="profiler"/> to the HttpRuntime.Cache under a key concatenated with <see cref="F:StackExchange.Profiling.Storage.MemoryCacheStorage.CacheKeyPrefix"/>
+            and the parameter's <see cref="P:StackExchange.Profiling.MiniProfiler.Id"/>.
+            </summary>
+            <param name="profiler">The <see cref="T:StackExchange.Profiling.MiniProfiler"/> to save.</param>
+        </member>
+        <member name="M:StackExchange.Profiling.Storage.MemoryCacheStorage.SaveAsync(StackExchange.Profiling.MiniProfiler)">
+            <summary>
+            Saves <paramref name="profiler"/> to the HttpRuntime.Cache under a key concatenated with <see cref="F:StackExchange.Profiling.Storage.MemoryCacheStorage.CacheKeyPrefix"/>
+            and the parameter's <see cref="P:StackExchange.Profiling.MiniProfiler.Id"/>.
+            </summary>
+            <param name="profiler">The <see cref="T:StackExchange.Profiling.MiniProfiler"/> to save.</param>
+        </member>
+        <member name="M:StackExchange.Profiling.Storage.MemoryCacheStorage.SetUnviewed(System.String,System.Guid)">
+            <summary>
+            Set the profile to unviewed for this user
+            </summary>
+            <param name="user">The user to set this profiler ID as unviewed for.</param>
+            <param name="id">The profiler ID to set unviewed.</param>
+        </member>
+        <member name="M:StackExchange.Profiling.Storage.MemoryCacheStorage.SetUnviewedAsync(System.String,System.Guid)">
+            <summary>
+            Set the profile to unviewed for this user
+            </summary>
+            <param name="user">The user to set this profiler ID as unviewed for.</param>
+            <param name="id">The profiler ID to set unviewed.</param>
+        </member>
+        <member name="M:StackExchange.Profiling.Storage.MemoryCacheStorage.SetViewed(System.String,System.Guid)">
+            <summary>
+            Set the profile to viewed for this user
+            </summary>
+            <param name="user">The user to set this profiler ID as viewed for.</param>
+            <param name="id">The profiler ID to set viewed.</param>
+        </member>
+        <member name="M:StackExchange.Profiling.Storage.MemoryCacheStorage.SetViewedAsync(System.String,System.Guid)">
+            <summary>
+            Set the profile to viewed for this user
+            </summary>
+            <param name="user">The user to set this profiler ID as viewed for.</param>
+            <param name="id">The profiler ID to set viewed.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Builder.MiniProfilerBuilderExtensions">
+            <summary>
+            Extension methods for the MiniProfiler middleware.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Builder.MiniProfilerBuilderExtensions.UseMiniProfiler(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Adds middleware for profiling HTTP requests.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> instance this method extends.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="builder"/> is null.</exception>
+        </member>
+    </members>
+</doc>

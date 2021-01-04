@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>CommandLineParser</id>
+    <version>2.4.3</version>
+    <title>Command Line Parser Library</title>
+    <authors>gsscoder,nemec,ericnewton76</authors>
+    <owners>gsscoder,nemec,ericnewton76</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://raw.githubusercontent.com/gsscoder/commandline/master/doc/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/gsscoder/commandline</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/commandlineparser/commandline/master/art/CommandLine20.png</iconUrl>
+    <description>Terse syntax C# command line parser for .NET.  For FSharp support see CommandLineParser.FSharp.  The Command Line Parser Library offers to CLR applications a clean and concise API for manipulating command line arguments and related tasks.</description>
+    <copyright>Copyright (c) 2005 - 2018 Giacomo Stelluti Scala &amp; Contributors</copyright>
+    <tags>command line commandline argument option parser parsing library syntax shell</tags>
+    <dependencies>
+      <group targetFramework=".NETStandard2.0" />
+    </dependencies>
+  </metadata>
+</package>

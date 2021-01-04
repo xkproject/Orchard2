@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OpenIddict.Validation.ServerIntegration</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationServerIntegrationBuilder">
+            <summary>
+            Exposes the necessary methods required to configure the OpenIddict validation services.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationServerIntegrationBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.
+            </summary>
+            <param name="services">The services collection.</param>
+        </member>
+        <member name="P:Microsoft.Extensions.DependencyInjection.OpenIddictValidationServerIntegrationBuilder.Services">
+            <summary>
+            Gets the services collection.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationServerIntegrationBuilder.Configure(System.Action{OpenIddict.Validation.ServerIntegration.OpenIddictValidationServerIntegrationOptions})">
+            <summary>
+            Amends the default OpenIddict validation/server integration configuration.
+            </summary>
+            <param name="configuration">The delegate used to configure the OpenIddict options.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationServerIntegrationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationServerIntegrationBuilder.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationServerIntegrationBuilder.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationServerIntegrationBuilder.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationServerIntegrationExtensions">
+            <summary>
+            Exposes extensions allowing to register the OpenIddict validation/server integration services.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationServerIntegrationExtensions.UseLocalServer(Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder)">
+            <summary>
+            Registers the OpenIddict validation/server integration services in the DI container
+            and automatically imports the configuration from the local OpenIddict server.
+            </summary>
+            <param name="builder">The services builder used by OpenIddict to register new services.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationServerIntegrationExtensions.UseLocalServer(Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder,System.Action{Microsoft.Extensions.DependencyInjection.OpenIddictValidationServerIntegrationBuilder})">
+            <summary>
+            Registers the OpenIddict validation/server integration services in the DI container
+            and automatically imports the configuration from the local OpenIddict server.
+            </summary>
+            <param name="builder">The services builder used by OpenIddict to register new services.</param>
+            <param name="configuration">The configuration delegate used to configure the validation services.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictBuilder"/>.</returns>
+        </member>
+        <member name="T:OpenIddict.Validation.ServerIntegration.OpenIddictValidationServerIntegrationConfiguration">
+            <summary>
+            Contains the methods required to ensure that the OpenIddict validation/server integration configuration is valid.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.ServerIntegration.OpenIddictValidationServerIntegrationConfiguration.#ctor(Microsoft.Extensions.Options.IOptionsMonitor{OpenIddict.Server.OpenIddictServerOptions})">
+            <summary>
+            Creates a new instance of the <see cref="T:OpenIddict.Validation.ServerIntegration.OpenIddictValidationServerIntegrationConfiguration"/> class.
+            </summary>
+            <param name="options">The OpenIddict server options.</param>
+        </member>
+        <member name="M:OpenIddict.Validation.ServerIntegration.OpenIddictValidationServerIntegrationConfiguration.Configure(OpenIddict.Validation.OpenIddictValidationOptions)">
+            <summary>
+            Populates the default OpenIddict validation/server integration options
+            and ensures that the configuration is in a consistent and valid state.
+            </summary>
+            <param name="options">The options instance to initialize.</param>
+        </member>
+        <member name="M:OpenIddict.Validation.ServerIntegration.OpenIddictValidationServerIntegrationConfiguration.PostConfigure(System.String,OpenIddict.Validation.OpenIddictValidationOptions)">
+            <summary>
+            Populates the default OpenIddict validation/server integration options
+            and ensures that the configuration is in a consistent and valid state.
+            </summary>
+            <param name="name">The name of the options instance to configure, if applicable.</param>
+            <param name="options">The options instance to initialize.</param>
+        </member>
+        <member name="T:OpenIddict.Validation.ServerIntegration.OpenIddictValidationServerIntegrationOptions">
+            <summary>
+            Provides various settings needed to configure the OpenIddict validation/server integration.
+            </summary>
+        </member>
+    </members>
+</doc>

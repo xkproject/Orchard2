@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>SpecFlow.NUnit.Runners</id>
+    <version>3.5.5</version>
+    <title>SpecFlow.NUnit.Runners</title>
+    <authors>SpecFlow Team</authors>
+    <owners>SpecFlow Team</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">LICENSE.txt</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <icon>images\specflow-icon.png</icon>
+    <projectUrl>https://www.specflow.org/</projectUrl>
+    <description>Combined package to setup SpecFlow with NUnit easily for running the tests with the NUnit runners.</description>
+    <summary>Combined package to setup SpecFlow with NUnit easily for running the tests with the NUnit runners.</summary>
+    <copyright>Copyright © SpecFlow Team</copyright>
+    <language>en-US</language>
+    <tags>specflow nunit nunit.runners nunit-console</tags>
+    <dependencies>
+      <dependency id="SpecFlow.NUnit" version="[3.5.5]" />
+      <dependency id="NUnit.Console" version="3.9.0" />
+      <dependency id="NUnit3TestAdapter" version="3.10.0" />
+    </dependencies>
+  </metadata>
+</package>

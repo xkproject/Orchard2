@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using OrchardCore.Data.Documents;
 
 namespace OrchardCore.ContentManagement.Metadata.Records
 {
-    public class ContentDefinitionRecord
+    public class ContentDefinitionRecord : Document
     {
         public ContentDefinitionRecord()
         {
@@ -10,9 +11,7 @@ namespace OrchardCore.ContentManagement.Metadata.Records
             ContentPartDefinitionRecords = new List<ContentPartDefinitionRecord>();
         }
 
-        public int Id { get; set; }
         public IList<ContentTypeDefinitionRecord> ContentTypeDefinitionRecords { get; set; }
         public IList<ContentPartDefinitionRecord> ContentPartDefinitionRecords { get; set; }
-        public int Serial { get; set; }
     }
 }

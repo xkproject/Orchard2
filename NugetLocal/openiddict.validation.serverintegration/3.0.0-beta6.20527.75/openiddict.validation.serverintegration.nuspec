@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>OpenIddict.Validation.ServerIntegration</id>
+    <version>3.0.0-beta6.20527.75</version>
+    <authors>Kévin Chalet</authors>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="expression">Apache-2.0</license>
+    <licenseUrl>https://licenses.nuget.org/Apache-2.0</licenseUrl>
+    <icon>Icon.png</icon>
+    <projectUrl>https://github.com/openiddict/openiddict-core</projectUrl>
+    <description>Local server integration package for the OpenIddict validation services.</description>
+    <copyright>© Kévin Chalet. All rights reserved.</copyright>
+    <tags>authentication jwt openidconnect openiddict security server validation</tags>
+    <repository type="git" url="git://github.com/openiddict/openiddict-core" commit="65bca18eb21192cb6dbeb7b41ecf69a3b4a57fb9" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.1">
+        <dependency id="OpenIddict.Server" version="3.0.0-beta6.20527.75" exclude="Build,Analyzers" />
+        <dependency id="OpenIddict.Validation" version="3.0.0-beta6.20527.75" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="OpenIddict.Server" version="3.0.0-beta6.20527.75" exclude="Build,Analyzers" />
+        <dependency id="OpenIddict.Validation" version="3.0.0-beta6.20527.75" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.1">
+        <dependency id="OpenIddict.Server" version="3.0.0-beta6.20527.75" exclude="Build,Analyzers" />
+        <dependency id="OpenIddict.Validation" version="3.0.0-beta6.20527.75" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

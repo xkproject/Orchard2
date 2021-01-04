@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>GraphQL</id>
+    <version>2.4.0</version>
+    <authors>Joe McBride</authors>
+    <owners>Joe McBride</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/graphql-dotnet/graphql-dotnet</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/graphql-dotnet/graphql-dotnet/master/assets/logo.64x64.png</iconUrl>
+    <description>GraphQL for .NET</description>
+    <tags>GraphQL json api</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.5">
+        <dependency id="GraphQL-Parser" version="3.0.0" exclude="Build,Analyzers" />
+        <dependency id="Newtonsoft.Json" version="10.0.3" exclude="Build,Analyzers" />
+        <dependency id="System.Buffers" version="4.5.0" exclude="Build,Analyzers" />
+        <dependency id="System.Reactive.Core" version="3.1.1" exclude="Build,Analyzers" />
+        <dependency id="System.Reactive.Linq" version="3.1.1" exclude="Build,Analyzers" />
+        <dependency id="System.ValueTuple" version="4.5.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="GraphQL-Parser" version="3.0.0" exclude="Build,Analyzers" />
+        <dependency id="NETStandard.Library" version="1.6.1" exclude="Build,Analyzers" />
+        <dependency id="Newtonsoft.Json" version="10.0.3" exclude="Build,Analyzers" />
+        <dependency id="System.Buffers" version="4.5.0" exclude="Build,Analyzers" />
+        <dependency id="System.Reactive.Core" version="3.1.1" exclude="Build,Analyzers" />
+        <dependency id="System.Reactive.Linq" version="3.1.1" exclude="Build,Analyzers" />
+        <dependency id="System.Reflection.TypeExtensions" version="4.4.0" exclude="Build,Analyzers" />
+        <dependency id="System.ValueTuple" version="4.5.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="GraphQL-Parser" version="3.0.0" exclude="Build,Analyzers" />
+        <dependency id="Newtonsoft.Json" version="10.0.3" exclude="Build,Analyzers" />
+        <dependency id="System.Buffers" version="4.5.0" exclude="Build,Analyzers" />
+        <dependency id="System.Reactive.Core" version="3.1.1" exclude="Build,Analyzers" />
+        <dependency id="System.Reactive.Linq" version="3.1.1" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework=".NETFramework4.5" />
+      <frameworkAssembly assemblyName="System" targetFramework=".NETFramework4.5" />
+    </frameworkAssemblies>
+  </metadata>
+</package>

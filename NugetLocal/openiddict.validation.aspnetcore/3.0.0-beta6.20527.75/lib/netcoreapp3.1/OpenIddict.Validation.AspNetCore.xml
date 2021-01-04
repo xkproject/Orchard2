@@ -1,0 +1,330 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OpenIddict.Validation.AspNetCore</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationAspNetCoreBuilder">
+            <summary>
+            Exposes the necessary methods required to configure
+            the OpenIddict validation ASP.NET Core integration.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationAspNetCoreBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationAspNetCoreBuilder"/>.
+            </summary>
+            <param name="services">The services collection.</param>
+        </member>
+        <member name="P:Microsoft.Extensions.DependencyInjection.OpenIddictValidationAspNetCoreBuilder.Services">
+            <summary>
+            Gets the services collection.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationAspNetCoreBuilder.Configure(System.Action{OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreOptions})">
+            <summary>
+            Amends the default OpenIddict validation ASP.NET Core configuration.
+            </summary>
+            <param name="configuration">The delegate used to configure the OpenIddict options.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationAspNetCoreBuilder.SetRealm(System.String)">
+            <summary>
+            Sets the realm returned to the caller as part of the WWW-Authenticate header.
+            </summary>
+            <param name="realm">The issuer address.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationAspNetCoreBuilder.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationAspNetCoreBuilder.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationAspNetCoreBuilder.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationAspNetCoreExtensions">
+            <summary>
+            Exposes extensions allowing to register the OpenIddict validation services.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationAspNetCoreExtensions.UseAspNetCore(Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder)">
+            <summary>
+            Registers the OpenIddict validation services for ASP.NET Core in the DI container.
+            </summary>
+            <param name="builder">The services builder used by OpenIddict to register new services.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationAspNetCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationAspNetCoreExtensions.UseAspNetCore(Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder,System.Action{Microsoft.Extensions.DependencyInjection.OpenIddictValidationAspNetCoreBuilder})">
+            <summary>
+            Registers the OpenIddict validation services for ASP.NET Core in the DI container.
+            </summary>
+            <param name="builder">The services builder used by OpenIddict to register new services.</param>
+            <param name="configuration">The configuration delegate used to configure the validation services.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OpenIddictValidationAspNetCoreHelpers">
+            <summary>
+            Exposes companion extensions for the OpenIddict/ASP.NET Core integration.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenIddictValidationAspNetCoreHelpers.GetHttpRequest(OpenIddict.Validation.OpenIddictValidationTransaction)">
+            <summary>
+            Retrieves the <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance stored in the <see cref="T:OpenIddict.Validation.OpenIddictValidationTransaction"/> properties.
+            </summary>
+            <param name="transaction">The transaction instance.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance or <c>null</c> if it couldn't be found.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenIddictValidationAspNetCoreHelpers.GetOpenIddictValidationEndpointType(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Retrieves the <see cref="T:OpenIddict.Validation.OpenIddictValidationEndpointType"/> instance stored in <see cref="T:OpenIddict.Validation.OpenIddictValidationEvents.BaseContext"/>.
+            </summary>
+            <param name="context">The context instance.</param>
+            <returns>The <see cref="T:OpenIddict.Validation.OpenIddictValidationEndpointType"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenIddictValidationAspNetCoreHelpers.GetOpenIddictValidationRequest(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Retrieves the <see cref="T:OpenIddict.Abstractions.OpenIddictRequest"/> instance stored in <see cref="T:OpenIddict.Validation.OpenIddictValidationEvents.BaseContext"/>.
+            </summary>
+            <param name="context">The context instance.</param>
+            <returns>The <see cref="T:OpenIddict.Abstractions.OpenIddictRequest"/> instance or <c>null</c> if it couldn't be found.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenIddictValidationAspNetCoreHelpers.GetOpenIddictValidationResponse(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Retrieves the <see cref="T:OpenIddict.Abstractions.OpenIddictResponse"/> instance stored in <see cref="T:OpenIddict.Validation.OpenIddictValidationEvents.BaseContext"/>.
+            </summary>
+            <param name="context">The context instance.</param>
+            <returns>The <see cref="T:OpenIddict.Abstractions.OpenIddictResponse"/> instance or <c>null</c> if it couldn't be found.</returns>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreConfiguration">
+            <summary>
+            Contains the methods required to ensure that the OpenIddict validation configuration is valid.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreConfiguration.Configure(Microsoft.AspNetCore.Authentication.AuthenticationOptions)">
+            <summary>
+            Registers the OpenIddict validation handler in the global authentication options.
+            </summary>
+            <param name="options">The options instance to initialize.</param>
+        </member>
+        <member name="M:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreConfiguration.PostConfigure(System.String,Microsoft.AspNetCore.Authentication.AuthenticationOptions)">
+            <summary>
+            Ensures that the authentication configuration is in a consistent and valid state.
+            </summary>
+            <param name="name">The name of the options instance to configure, if applicable.</param>
+            <param name="options">The options instance to initialize.</param>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreConstants">
+            <summary>
+            Exposes common constants used by the OpenIddict ASP.NET Core host.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreDefaults">
+            <summary>
+            Exposes the default values used by the OpenIddict validation handler.
+            </summary>
+        </member>
+        <member name="F:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme">
+            <summary>
+            Default value for <see cref="P:Microsoft.AspNetCore.Authentication.AuthenticationScheme.Name"/>.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreFeature">
+            <summary>
+            Exposes the current validation transaction to the ASP.NET Core host.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreFeature.Transaction">
+            <summary>
+            Gets or sets the validation transaction that encapsulates all specific
+            information about an individual OpenID Connect validation request.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandler">
+            <summary>
+            Provides the logic necessary to extract, validate and handle OpenID Connect requests.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandler.#ctor(OpenIddict.Validation.IOpenIddictValidationDispatcher,OpenIddict.Validation.IOpenIddictValidationFactory,Microsoft.Extensions.Options.IOptionsMonitor{OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreOptions},Microsoft.Extensions.Logging.ILoggerFactory,System.Text.Encodings.Web.UrlEncoder,Microsoft.AspNetCore.Authentication.ISystemClock)">
+            <summary>
+            Creates a new instance of the <see cref="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandler"/> class.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandler.HandleRequestAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandler.HandleAuthenticateAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandler.HandleChallengeAsync(Microsoft.AspNetCore.Authentication.AuthenticationProperties)">
+            <inheritdoc/>
+        </member>
+        <member name="M:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandler.HandleForbiddenAsync(Microsoft.AspNetCore.Authentication.AuthenticationProperties)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlerFilters">
+            <summary>
+            Contains a collection of event handler filters commonly used by the ASP.NET Core handlers.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlerFilters.RequireHttpRequest">
+            <summary>
+            Represents a filter that excludes the associated handlers if no ASP.NET Core request can be found.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.InferIssuerFromHost">
+            <summary>
+            Contains the logic responsible of infering the default issuer from the HTTP request host and validating it.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.InferIssuerFromHost.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.InferIssuerFromHost.HandleAsync(OpenIddict.Validation.OpenIddictValidationEvents.ProcessRequestContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ExtractAccessTokenFromAuthorizationHeader">
+            <summary>
+            Contains the logic responsible of extracting the access token from the standard HTTP Authorization header.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ExtractAccessTokenFromAuthorizationHeader.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ExtractAccessTokenFromAuthorizationHeader.HandleAsync(OpenIddict.Validation.OpenIddictValidationEvents.ProcessAuthenticationContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ExtractAccessTokenFromBodyForm">
+            <summary>
+            Contains the logic responsible of extracting the access token from the standard access_token form parameter.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ExtractAccessTokenFromBodyForm.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ExtractAccessTokenFromBodyForm.HandleAsync(OpenIddict.Validation.OpenIddictValidationEvents.ProcessAuthenticationContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ExtractAccessTokenFromQueryString">
+            <summary>
+            Contains the logic responsible of extracting the access token from the standard access_token query parameter.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ExtractAccessTokenFromQueryString.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ExtractAccessTokenFromQueryString.HandleAsync(OpenIddict.Validation.OpenIddictValidationEvents.ProcessAuthenticationContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.AttachHostChallengeError">
+            <summary>
+            Contains the logic responsible of attaching the error details using the ASP.NET Core authentication properties.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.AttachHostChallengeError.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.AttachHostChallengeError.HandleAsync(OpenIddict.Validation.OpenIddictValidationEvents.ProcessChallengeContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.AttachHttpResponseCode`1">
+            <summary>
+            Contains the logic responsible of attaching an appropriate HTTP status code.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.AttachHttpResponseCode`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.AttachHttpResponseCode`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.AttachCacheControlHeader`1">
+            <summary>
+            Contains the logic responsible of attaching the appropriate HTTP response cache headers.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.AttachCacheControlHeader`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.AttachCacheControlHeader`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.AttachWwwAuthenticateHeader`1">
+            <summary>
+            Contains the logic responsible of attaching errors details to the WWW-Authenticate header.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.AttachWwwAuthenticateHeader`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.AttachWwwAuthenticateHeader`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ProcessChallengeErrorResponse`1">
+            <summary>
+            Contains the logic responsible of processing challenge responses that contain a WWW-Authenticate header.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ProcessChallengeErrorResponse`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ProcessChallengeErrorResponse`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ProcessJsonResponse`1">
+            <summary>
+            Contains the logic responsible of processing OpenID Connect responses that must be returned as JSON.
+            Note: this handler is not used when the OpenID Connect request is not initially handled by ASP.NET Core.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ProcessJsonResponse`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers.ProcessJsonResponse`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreOptions">
+            <summary>
+            Provides various settings needed to configure the OpenIddict ASP.NET Core validation integration.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreOptions.Realm">
+            <summary>
+            Gets or sets the optional "realm" value returned to the caller as part of the WWW-Authenticate header.
+            </summary>
+        </member>
+    </members>
+</doc>

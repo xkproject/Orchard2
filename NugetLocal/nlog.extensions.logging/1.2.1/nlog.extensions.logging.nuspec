@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>NLog.Extensions.Logging</id>
+    <version>1.2.1</version>
+    <authors>Microsoft,Julian Verdurmen</authors>
+    <owners>Microsoft,Julian Verdurmen</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/NLog/NLog.Extensions.Logging/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/NLog/NLog.Extensions.Logging</projectUrl>
+    <iconUrl>http://nlog-project.org/NConfig.png</iconUrl>
+    <description>NLog provider for Microsoft.Extensions.Logging for usage in .NET Standard libraries and console applicaties.
+
+For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.Web.AspNetCore</description>
+    <releaseNotes>-  Fixed null-reference-exception when parsing empty scope-property collection (@snakefoot)
+-  BeginScope: support for non-serializable objects + performance improvement (20-50% cpu, 35% times less allocations) (#232) (@snakefoot)
+-  BeginScope should accept any type of KeyValuePair (Swallow exceptions) (@snakefoot)
+
+Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD</releaseNotes>
+    <tags>NLog Microsoft.Extensions.Logging log logfiles netcore nlog</tags>
+    <repository type="git" url="git://github.com/NLog/NLog.Extensions.Logging" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.5.1">
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="1.0.2" exclude="Build,Analyzers" />
+        <dependency id="NLog" version="[4.5.8, 5.0.0-beta01)" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETFramework4.6.1">
+        <dependency id="Microsoft.Extensions.Logging" version="2.0.1" exclude="Build,Analyzers" />
+        <dependency id="NLog" version="[4.5.8, 5.0.0-beta01)" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="1.0.2" exclude="Build,Analyzers" />
+        <dependency id="NETStandard.Library" version="1.6.0" exclude="Build,Analyzers" />
+        <dependency id="NLog" version="[4.5.8, 5.0.0-beta01)" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard1.5">
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="1.0.2" exclude="Build,Analyzers" />
+        <dependency id="NETStandard.Library" version="1.6.0" exclude="Build,Analyzers" />
+        <dependency id="NLog" version="[4.5.8, 5.0.0-beta01)" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.Extensions.Logging" version="2.0.1" exclude="Build,Analyzers" />
+        <dependency id="NLog" version="[4.5.8, 5.0.0-beta01)" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

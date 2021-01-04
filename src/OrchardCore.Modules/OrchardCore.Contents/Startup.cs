@@ -1,11 +1,20 @@
 using System;
+using Fluid;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using OrchardCore.Admin;
+using OrchardCore.AdminMenu.Services;
 using OrchardCore.ContentManagement;
 using OrchardCore.ContentManagement.Display;
 using OrchardCore.ContentManagement.Display.ContentDisplay;
 using OrchardCore.ContentManagement.Handlers;
+using OrchardCore.ContentManagement.Metadata.Models;
+using OrchardCore.ContentManagement.Routing;
+using OrchardCore.Contents.AdminNodes;
+using OrchardCore.Contents.Controllers;
 using OrchardCore.Contents.Deployment;
 using OrchardCore.Contents.Drivers;
 using OrchardCore.Contents.Feeds.Builders;
@@ -14,121 +23,217 @@ using OrchardCore.Contents.Indexing;
 using OrchardCore.Contents.Liquid;
 using OrchardCore.Contents.Models;
 using OrchardCore.Contents.Recipes;
+using OrchardCore.Contents.Security;
 using OrchardCore.Contents.Services;
+using OrchardCore.Contents.Settings;
+using OrchardCore.Contents.Sitemaps;
 using OrchardCore.Contents.TagHelpers;
+using OrchardCore.Contents.ViewModels;
 using OrchardCore.ContentTypes.Editors;
 using OrchardCore.Data.Migration;
 using OrchardCore.Deployment;
+using OrchardCore.DisplayManagement;
 using OrchardCore.DisplayManagement.Descriptors;
 using OrchardCore.DisplayManagement.Handlers;
+using OrchardCore.DisplayManagement.Views;
 using OrchardCore.Entities;
-using OrchardCore.Environment.Navigation;
 using OrchardCore.Feeds;
 using OrchardCore.Indexing;
 using OrchardCore.Liquid;
 using OrchardCore.Lists.Settings;
 using OrchardCore.Modules;
+using OrchardCore.Mvc.Core.Utilities;
+using OrchardCore.Navigation;
 using OrchardCore.Recipes;
 using OrchardCore.Security.Permissions;
+using OrchardCore.Sitemaps.Builders;
+using OrchardCore.Sitemaps.Handlers;
+using OrchardCore.Sitemaps.Models;
+using OrchardCore.Sitemaps.Services;
 
 namespace OrchardCore.Contents
 {
     public class Startup : StartupBase
     {
+        private readonly AdminOptions _adminOptions;
+
+        static Startup()
+        {
+            TemplateContext.GlobalMemberAccessStrategy.Register<ContentItem>();
+            TemplateContext.GlobalMemberAccessStrategy.Register<ContentElement>();
+            TemplateContext.GlobalMemberAccessStrategy.Register<ShapeViewModel<ContentItem>>();
+            TemplateContext.GlobalMemberAccessStrategy.Register<ContentTypePartDefinition>();
+            TemplateContext.GlobalMemberAccessStrategy.Register<ContentPartFieldDefinition>();
+            TemplateContext.GlobalMemberAccessStrategy.Register<ContentFieldDefinition>();
+            TemplateContext.GlobalMemberAccessStrategy.Register<ContentPartDefinition>();
+        }
+
+        public Startup(IOptions<AdminOptions> adminOptions)
+        {
+            _adminOptions = adminOptions.Value;
+        }
+
         public override void ConfigureServices(IServiceCollection services)
         {
             services.AddContentManagement();
             services.AddContentManagementDisplay();
             services.AddScoped<IPermissionProvider, Permissions>();
+            services.AddScoped<IPermissionProvider, ContentTypePermissions>();
+            services.AddScoped<IAuthorizationHandler, ContentTypeAuthorizationHandler>();
             services.AddScoped<IShapeTableProvider, Shapes>();
             services.AddScoped<INavigationProvider, AdminMenu>();
             services.AddScoped<IContentDisplayDriver, ContentsDriver>();
             services.AddScoped<IContentHandler, ContentsHandler>();
             services.AddRecipeExecutionStep<ContentStep>();
 
+            services.AddScoped<IContentItemIndexHandler, FullTextContentIndexHandler>();
             services.AddScoped<IContentItemIndexHandler, AspectsContentIndexHandler>();
             services.AddScoped<IContentItemIndexHandler, DefaultContentIndexHandler>();
-            services.AddScoped<IContentAliasProvider, ContentItemIdAliasProvider>();
+            services.AddScoped<IContentHandleProvider, ContentItemIdHandleProvider>();
             services.AddScoped<IContentItemIndexHandler, ContentItemIndexCoordinator>();
 
             services.AddIdGeneration();
             services.AddScoped<IDataMigration, Migrations>();
 
             // Common Part
-            services.AddSingleton<ContentPart, CommonPart>();
+            services.AddContentPart<CommonPart>()
+                .UseDisplayDriver<DateEditorDriver>()
+                .UseDisplayDriver<OwnerEditorDriver>();
+
             services.AddScoped<IContentTypePartDefinitionDisplayDriver, CommonPartSettingsDisplayDriver>();
-            services.AddScoped<IContentPartDisplayDriver, DateEditorDriver>();
-            services.AddScoped<IContentPartDisplayDriver, OwnerEditorDriver>();
 
-            // Feeds
-            // TODO: Move to feature
-            services.AddScoped<IFeedItemBuilder, CommonFeedItemBuilder>();
+            // FullTextAspect
+            services.AddScoped<IContentTypeDefinitionDisplayDriver, FullTextAspectSettingsDisplayDriver>();
+            services.AddScoped<IContentHandler, FullTextAspectContentHandler>();
 
-            services.AddTagHelpers(typeof(ContentLinkTagHelper).Assembly);
-        }
+            services.AddTagHelpers<ContentLinkTagHelper>();
+            services.AddTagHelpers<ContentItemTagHelper>();
+            services.Configure<AutorouteOptions>(options =>
+            {
+                if (options.GlobalRouteValues.Count == 0)
+                {
+                    options.GlobalRouteValues = new RouteValueDictionary
+                    {
+                        {"Area", "OrchardCore.Contents"},
+                        {"Controller", "Item"},
+                        {"Action", "Display"}
+                    };
 
-        public override void Configure(IApplicationBuilder builder, IRouteBuilder routes, IServiceProvider serviceProvider)
-        {
-            routes.MapAreaRoute(
-                name: "DisplayContentItem",
-                areaName: "OrchardCore.Contents",
-                template: "Contents/ContentItems/{contentItemId}",
-                defaults: new { controller = "Item", action = "Display" }
-            );
+                    options.ContentItemIdKey = "contentItemId";
+                    options.ContainedContentItemIdKey = "containedContentItemId";
+                    options.JsonPathKey = "jsonPath";
+                }
+            });
 
-            routes.MapAreaRoute(
-                name: "PreviewContentItem",
-                areaName: "OrchardCore.Contents",
-                template: "Contents/ContentItems/{contentItemId}/Preview",
-                defaults: new { controller = "Item", action = "Preview" }
-            );
+            services.AddScoped<IContentsAdminListFilter, DefaultContentsAdminListFilter>();
+            services.AddScoped<IContentsAdminListQueryService, DefaultContentsAdminListQueryService>();
 
-            routes.MapAreaRoute(
-                name: "PreviewContentItemVersion",
-                areaName: "OrchardCore.Contents",
-                template: "Contents/ContentItems/{contentItemId}/Version/{version}/Preview",
-                defaults: new { controller = "Item", action = "Preview" }
-            );
+            services.AddScoped<IDisplayManager<ContentOptionsViewModel>, DisplayManager<ContentOptionsViewModel>>();
+            services.AddScoped<IDisplayDriver<ContentOptionsViewModel>, ContentOptionsDisplayDriver>();
 
-            // Admin
-            routes.MapAreaRoute(
-                name: "EditContentItem",
-                areaName: "OrchardCore.Contents",
-                template: "Admin/Contents/ContentItems/{contentItemId}/Edit",
-                defaults: new { controller = "Admin", action = "Edit" }
-            );
-
-            routes.MapAreaRoute(
-                name: "CreateContentItem",
-                areaName: "OrchardCore.Contents",
-                template: "Admin/Contents/ContentTypes/{id}/Create",
-                defaults: new { controller = "Admin", action = "Create" }
-            );
-
-            routes.MapAreaRoute(
-                name: "AdminContentItem",
-                areaName: "OrchardCore.Contents",
-                template: "Admin/Contents/ContentItems/{contentItemId}/Display",
-                defaults: new { controller = "Admin", action = "Display" }
-            );
-
-            routes.MapAreaRoute(
-                name: "ListContentItems",
-                areaName: "OrchardCore.Contents",
-                template: "Admin/Contents/ContentItems",
-                defaults: new { controller = "Admin", action = "List" }
-            );
-        }
-    }
-
-    [RequireFeatures("OrchardCore.Liquid")]
-    public class LiquidStartup : StartupBase
-    {
-        public override void ConfigureServices(IServiceCollection services)
-        {
+            // Liquid
             services.AddScoped<ILiquidTemplateEventHandler, ContentLiquidTemplateEventHandler>();
 
             services.AddLiquidFilter<BuildDisplayFilter>("shape_build_display");
+            services.AddLiquidFilter<ContentItemFilter>("content_item_id");
+            services.AddLiquidFilter<DisplayTextFilter>("display_text");
+            services.AddLiquidFilter<DisplayUrlFilter>("display_url");
+            services.AddLiquidFilter<FullTextFilter>("full_text");
+
+            services.AddScoped<IContentItemRecursionHelper<FullTextFilter>, ContentItemRecursionHelper<FullTextFilter>>();
+            services.AddScoped<IContentItemRecursionHelper<BuildDisplayFilter>, ContentItemRecursionHelper<BuildDisplayFilter>>();
+        }
+
+        public override void Configure(IApplicationBuilder builder, IEndpointRouteBuilder routes, IServiceProvider serviceProvider)
+        {
+            var itemControllerName = typeof(ItemController).ControllerName();
+
+            routes.MapAreaControllerRoute(
+                name: "DisplayContentItem",
+                areaName: "OrchardCore.Contents",
+                pattern: "Contents/ContentItems/{contentItemId}",
+                defaults: new { controller = itemControllerName, action = nameof(ItemController.Display) }
+            );
+
+            routes.MapAreaControllerRoute(
+                name: "PreviewContentItem",
+                areaName: "OrchardCore.Contents",
+                pattern: "Contents/ContentItems/{contentItemId}/Preview",
+                defaults: new { controller = itemControllerName, action = nameof(ItemController.Preview) }
+            );
+
+            routes.MapAreaControllerRoute(
+                name: "PreviewContentItemVersion",
+                areaName: "OrchardCore.Contents",
+                pattern: "Contents/ContentItems/{contentItemId}/Version/{version}/Preview",
+                defaults: new { controller = itemControllerName, action = nameof(ItemController.Preview) }
+            );
+
+            // Admin
+            var adminControllerName = typeof(AdminController).ControllerName();
+
+            routes.MapAreaControllerRoute(
+                name: "EditContentItem",
+                areaName: "OrchardCore.Contents",
+                pattern: _adminOptions.AdminUrlPrefix + "/Contents/ContentItems/{contentItemId}/Edit",
+                defaults: new { controller = adminControllerName, action = nameof(AdminController.Edit) }
+            );
+
+            routes.MapAreaControllerRoute(
+                name: "CreateContentItem",
+                areaName: "OrchardCore.Contents",
+                pattern: _adminOptions.AdminUrlPrefix + "/Contents/ContentTypes/{id}/Create",
+                defaults: new { controller = adminControllerName, action = nameof(AdminController.Create) }
+            );
+
+            routes.MapAreaControllerRoute(
+                name: "AdminContentItem",
+                areaName: "OrchardCore.Contents",
+                pattern: _adminOptions.AdminUrlPrefix + "/Contents/ContentItems/{contentItemId}/Display",
+                defaults: new { controller = adminControllerName, action = nameof(AdminController.Display) }
+            );
+
+            routes.MapAreaControllerRoute(
+                name: "ListContentItems",
+                areaName: "OrchardCore.Contents",
+                pattern: _adminOptions.AdminUrlPrefix + "/Contents/ContentItems/{contentTypeId?}",
+                defaults: new { controller = adminControllerName, action = nameof(AdminController.List) }
+            );
+
+            routes.MapAreaControllerRoute(
+                name: "AdminPublishContentItem",
+                areaName: "OrchardCore.Contents",
+                pattern: _adminOptions.AdminUrlPrefix + "/Contents/ContentItems/{contentItemId}/Publish",
+                defaults: new { controller = adminControllerName, action = nameof(AdminController.Publish) }
+            );
+
+            routes.MapAreaControllerRoute(
+                name: "AdminDiscardDraftContentItem",
+                areaName: "OrchardCore.Contents",
+                pattern: _adminOptions.AdminUrlPrefix + "/Contents/ContentItems/{contentItemId}/DiscardDraft",
+                defaults: new { controller = adminControllerName, action = nameof(AdminController.DiscardDraft) }
+            );
+
+            routes.MapAreaControllerRoute(
+                name: "AdminDeleteContentItem",
+                areaName: "OrchardCore.Contents",
+                pattern: _adminOptions.AdminUrlPrefix + "/Contents/ContentItems/{contentItemId}/Delete",
+                defaults: new { controller = adminControllerName, action = nameof(AdminController.Remove) }
+            );
+
+            routes.MapAreaControllerRoute(
+                name: "AdminCloneContentItem",
+                areaName: "OrchardCore.Contents",
+                pattern: _adminOptions.AdminUrlPrefix + "/Contents/ContentItems/{contentItemId}/Clone",
+                defaults: new { controller = adminControllerName, action = nameof(AdminController.Clone) }
+            );
+
+            routes.MapAreaControllerRoute(
+                name: "AdminUnpublishContentItem",
+                areaName: "OrchardCore.Contents",
+                pattern: _adminOptions.AdminUrlPrefix + "/Contents/ContentItems/{contentItemId}/Unpublish",
+                defaults: new { controller = adminControllerName, action = nameof(AdminController.Unpublish) }
+            );
         }
     }
 
@@ -144,6 +249,51 @@ namespace OrchardCore.Contents
             services.AddTransient<IDeploymentSource, ContentDeploymentSource>();
             services.AddSingleton<IDeploymentStepFactory>(new DeploymentStepFactory<ContentDeploymentStep>());
             services.AddScoped<IDisplayDriver<DeploymentStep>, ContentDeploymentStepDriver>();
+        }
+    }
+
+    [RequireFeatures("OrchardCore.AdminMenu")]
+    public class AdminMenuStartup : StartupBase
+    {
+        public override void ConfigureServices(IServiceCollection services)
+        {
+            services.AddSingleton<IAdminNodeProviderFactory>(new AdminNodeProviderFactory<ContentTypesAdminNode>());
+            services.AddScoped<IAdminNodeNavigationBuilder, ContentTypesAdminNodeNavigationBuilder>();
+            services.AddScoped<IDisplayDriver<MenuItem>, ContentTypesAdminNodeDriver>();
+        }
+    }
+
+    [Feature("OrchardCore.Contents.FileContentDefinition")]
+    public class FileContentDefinitionStartup : StartupBase
+    {
+        public override void ConfigureServices(IServiceCollection services)
+        {
+            services.AddFileContentDefinitionStore();
+        }
+    }
+
+    [RequireFeatures("OrchardCore.Sitemaps")]
+    public class SitemapsStartup : StartupBase
+    {
+        public override void ConfigureServices(IServiceCollection services)
+        {
+            services.AddScoped<ISitemapSourceBuilder, ContentTypesSitemapSourceBuilder>();
+            services.AddScoped<ISitemapSourceUpdateHandler, ContentTypesSitemapSourceUpdateHandler>();
+            services.AddScoped<ISitemapSourceModifiedDateProvider, ContentTypesSitemapSourceModifiedDateProvider>();
+            services.AddScoped<IDisplayDriver<SitemapSource>, ContentTypesSitemapSourceDriver>();
+            services.AddScoped<ISitemapSourceFactory, SitemapSourceFactory<ContentTypesSitemapSource>>();
+            services.AddScoped<IContentItemsQueryProvider, DefaultContentItemsQueryProvider>();
+            services.AddScoped<IContentHandler, ContentTypesSitemapUpdateHandler>();
+        }
+    }
+
+    [RequireFeatures("OrchardCore.Feeds")]
+    public class FeedsStartup : StartupBase
+    {
+        public override void ConfigureServices(IServiceCollection services)
+        {
+            // Feeds
+            services.AddScoped<IFeedItemBuilder, CommonFeedItemBuilder>();
         }
     }
 }

@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>SpecFlow.Tools.MsBuild.Generation</id>
+    <version>3.5.5</version>
+    <title>SpecFlow.Tools.MsBuild.Generation</title>
+    <authors>SpecFlow Team</authors>
+    <owners>SpecFlow Team</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">LICENSE.txt</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <icon>images\specflow-icon.png</icon>
+    <projectUrl>https://www.specflow.org/</projectUrl>
+    <description>Package to enable the code-behind file generation during build time http://specflow.org/documentation/Generate-Tests-from-MsBuild/</description>
+    <summary>Package to enable the code-behind file generation during build time http://specflow.org/documentation/Generate-Tests-from-MsBuild/</summary>
+    <copyright>Copyright © SpecFlow Team</copyright>
+    <language>en-US</language>
+    <tags>specflow msbuild</tags>
+    <dependencies>
+      <dependency id="SpecFlow" version="[3.5.5]" />
+    </dependencies>
+  </metadata>
+</package>

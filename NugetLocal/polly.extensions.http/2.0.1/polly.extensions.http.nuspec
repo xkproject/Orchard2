@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Polly.Extensions.Http</id>
+    <version>2.0.1</version>
+    <title>Polly.Extensions.Http</title>
+    <authors>App vNext</authors>
+    <owners>App vNext</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://raw.github.com/App-vNext/Polly.Extensions.Http/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/App-vNext/Polly.Extensions.Http</projectUrl>
+    <iconUrl>https://raw.github.com/App-vNext/Polly.Extensions.Http/master/Polly.png</iconUrl>
+    <description>Polly.Extensions.Http is an extensions package containing opinionated convenience methods for configuring Polly policies to handle transient faults typical of calls through HttpClient.</description>
+    <releaseNotes>2.0.1
+     ---------------------
+     - Version 2 RTM, for integration to ASPNET Core 2.1 IHttpClientFactory
+
+     2.0.0-v2alpha
+     ---------------------
+     - Publish as strong-named package only (discontinue non-strong-named versions)
+     - Add .NetStandard 2.0 target
+
+     1.0.3
+     ---------------------
+     - RTM version
+
+     1.0.2-rc1
+     ---------------------
+     - Reference Polly v5.9.0
+     - Update xUnit and FluentAssertions dependencies
+
+     1.0.1-preview2
+     ---------------------
+     - Fix signing of DLLs in strong-name package
+
+     1.0.0-preview2
+     ---------------------
+     - Public release for use with ASP.NET Core 2.1-preview2
+
+     0.1.0
+     ---------------------
+     - Initial implementation</releaseNotes>
+    <copyright>Copyright © 2018, App vNext</copyright>
+    <language>en-US</language>
+    <tags>HttpClient Exception Handling Resilience Transient Fault Policy</tags>
+    <dependencies>
+      <group targetFramework=".NETStandard1.1">
+        <dependency id="Polly" version="6.0.1" />
+        <dependency id="NETStandard.Library" version="1.6.1" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Polly" version="6.0.1" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

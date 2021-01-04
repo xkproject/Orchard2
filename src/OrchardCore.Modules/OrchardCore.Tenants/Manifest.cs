@@ -2,9 +2,9 @@ using OrchardCore.Modules.Manifest;
 
 [assembly: Module(
     Name = "Tenants",
-    Author = "The Orchard Team",
-    Website = "http://orchardproject.net",
-    Version = "2.0.0"
+    Author = ManifestConstants.OrchardCoreTeam,
+    Website = ManifestConstants.OrchardCoreWebsite,
+    Version = ManifestConstants.OrchardCoreVersion
 )]
 
 [assembly: Feature(
@@ -20,5 +20,13 @@ using OrchardCore.Modules.Manifest;
     Name = "Static File Provider",
     Description = "Provides a way to serve independent static files for each tenant.",
     Category = "Infrastructure",
+    DefaultTenantOnly = false
+)]
+
+[assembly: Feature(
+    Id = "OrchardCore.Tenants.Distributed",
+    Name = "Distributed Tenants",
+    Description = "Keeps in sync tenants states, needs a distributed cache e.g. 'Redis Cache'.",
+    Category = "Distributed",
     DefaultTenantOnly = true
 )]

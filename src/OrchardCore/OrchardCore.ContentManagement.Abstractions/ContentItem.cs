@@ -61,7 +61,7 @@ namespace OrchardCore.ContentManagement
 
         /// <summary>
         /// The name of the user who first created this content item version
-        /// and owns content rigths.
+        /// and owns content rights.
         /// </summary>
         public string Owner { get; set; }
 
@@ -70,5 +70,14 @@ namespace OrchardCore.ContentManagement
         /// </summary>
         public string Author { get; set; }
 
+        /// <summary>
+        /// The text representing this content item.
+        /// </summary>
+        public string DisplayText { get; set; }
+
+        public override string ToString()
+        {
+            return string.IsNullOrWhiteSpace(DisplayText) ? $"{ContentType} ({ContentItemId})" : DisplayText;
+        }
     }
 }

@@ -1,13 +1,19 @@
 {% zone "Header" %}
     <!-- Page Header -->
     <!-- Set your background image for this header on the line below. -->
-    <header class="masthead" style="background-image: url('{{ "~/TheBlogTheme/img/about-bg.jpg" | href }}')">
+    {% assign imagePath = Model.ContentItem.Content.Article.Image.Paths.first %}
+    {% if imagePath == nil %}
+        <header class="masthead" style="background-image: url('{{ "~/TheBlogTheme/img/about-bg.jpg" | href }}')">
+    {% else %}
+        {% assign anchor = Model.ContentItem.Content.Article.Image.Anchors.first %}
+        <header class="masthead" style="background-image: url('{{ imagePath | asset_url | resize_url: profile: 'banner', anchor: anchor }}')">
+    {% endif %}
         <div class="overlay"></div>
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 col-md-10 mx-auto">
                     <div class="page-heading">
-                        <h1>{{ Model.ContentItem.Content.TitlePart.Title }}</h1>
+                        <h1>{{ Model.ContentItem.DisplayText }}</h1>
                         <span class="subheading">{{ Model.ContentItem.Content.Article.Subtitle.Text }}</span>
                     </div>
                 </div>
@@ -15,7 +21,6 @@
         </div>
     </header>
 {% endzone %}
-
 
 {{ Model.Content.ContentsMetadata.Value }}
 {{ Model.Content.ContentsMetadata | shape_render }}
