@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Lucene.Net.Queries</id>
+    <version>4.8.0-beta00012</version>
+    <authors>The Apache Software Foundation</authors>
+    <owners>The Apache Software Foundation</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">LICENSE.txt</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <icon>lucene-net-icon-128x128.png</icon>
+    <projectUrl>http://lucenenet.apache.org/</projectUrl>
+    <description>Extended Filters and Queries for the Lucene.Net full-text search engine library from The Apache Software Foundation.</description>
+    <copyright>Copyright © 2006 - 2020 The Apache Software Foundation</copyright>
+    <tags>lucene.net core text search information retrieval lucene apache analysis index query queries</tags>
+    <repository url="https://github.com/apache/lucenenet" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.5">
+        <dependency id="Lucene.Net" version="4.8.0-beta00012" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Lucene.Net" version="4.8.0-beta00012" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.1">
+        <dependency id="Lucene.Net" version="4.8.0-beta00012" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

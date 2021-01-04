@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+  <metadata>
+    <id>OrchardCore.Translations.pl</id>
+    <version>1.0.0-rc2-108003</version>
+    <authors>The Orchard Team</authors>
+    <owners>The Orchard Team</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Orchard Core translation for 'pl' culture</description>
+  </metadata>
+</package>

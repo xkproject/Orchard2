@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,11 +27,11 @@ namespace OrchardCore.Lists.Feeds
             _session = session;
         }
 
-        public FeedQueryMatch Match(FeedContext context)
+        public async Task<FeedQueryMatch> MatchAsync(FeedContext context)
         {
             var model = new ListFeedQueryViewModel();
 
-            if (!context.Updater.TryUpdateModelAsync(model).GetAwaiter().GetResult() || model.ContentItemId == null)
+            if (!await context.Updater.TryUpdateModelAsync(model) || model.ContentItemId == null)
             {
                 return null;
             }
@@ -64,10 +65,7 @@ namespace OrchardCore.Lists.Feeds
                 context.Response.Element.SetElementValue("title", contentItem.DisplayText);
                 context.Response.Element.Add(link);
 
-                if (bodyAspect.Body != null)
-                {
-                    context.Response.Element.SetElementValue("description", bodyAspect.Body.ToString());
-                }
+                context.Response.Element.Add(new XElement("description", new XCData(bodyAspect.Body?.ToString() ?? String.Empty)));
 
                 context.Response.Contextualize(contextualize =>
                 {
@@ -80,11 +78,7 @@ namespace OrchardCore.Lists.Feeds
             else
             {
                 context.Builder.AddProperty(context, null, "title", contentItem.DisplayText);
-
-                if (bodyAspect.Body != null)
-                {
-                    context.Builder.AddProperty(context, null, "description", bodyAspect.Body.ToString());
-                }
+                context.Builder.AddProperty(context, null, new XElement("description", new XCData(bodyAspect.Body?.ToString() ?? String.Empty)));
 
                 context.Response.Contextualize(contextualize =>
                 {

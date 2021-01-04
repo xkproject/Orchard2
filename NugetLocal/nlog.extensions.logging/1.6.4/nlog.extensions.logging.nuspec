@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>NLog.Extensions.Logging</id>
+    <version>1.6.4</version>
+    <authors>Microsoft,Julian Verdurmen</authors>
+    <owners>Microsoft,Julian Verdurmen</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/NLog/NLog.Extensions.Logging/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/NLog/NLog.Extensions.Logging</projectUrl>
+    <iconUrl>https://nlog-project.org/NConfig.png</iconUrl>
+    <description>NLog LoggerProvider for Microsoft.Extensions.Logging for logging in .NET Standard libraries and .NET Core applications.
+
+For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.Web.AspNetCore</description>
+    <releaseNotes>- LogFactory.Setup - Make RegisterConfigSettings public (#423) (@snakefoot)
+- Bump NLog to 4.7.2 (#426) (@dependabot-preview[bot])
+
+Full changelog: https://github.com/NLog/NLog.Extensions.Logging/blob/master/CHANGELOG.MD</releaseNotes>
+    <tags>NLog Microsoft.Extensions.Logging log logging logfiles netcore</tags>
+    <repository type="git" url="https://github.com/NLog/NLog.Extensions.Logging.git" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.5.1">
+        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="NLog" version="4.7.2" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETFramework4.6.1">
+        <dependency id="Microsoft.Extensions.Logging" version="2.1.0" exclude="Build,Analyzers" />
+        <dependency id="NLog" version="4.7.2" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="NETStandard.Library" version="1.6.0" exclude="Build,Analyzers" />
+        <dependency id="NLog" version="4.7.2" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard1.5">
+        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="NETStandard.Library" version="1.6.0" exclude="Build,Analyzers" />
+        <dependency id="NLog" version="4.7.2" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETCoreApp3.0">
+        <dependency id="Microsoft.Extensions.Logging" version="3.0.0" exclude="Build,Analyzers" />
+        <dependency id="NLog" version="4.7.2" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.Extensions.Logging" version="2.1.0" exclude="Build,Analyzers" />
+        <dependency id="NLog" version="4.7.2" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework=".NETFramework4.5.1, .NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System" targetFramework=".NETFramework4.5.1, .NETFramework4.6.1" />
+    </frameworkAssemblies>
+  </metadata>
+</package>

@@ -1,0 +1,352 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OpenIddict.Validation</name>
+    </assembly>
+    <members>
+        <member name="T:OpenIddict.Validation.OpenIddictValidationHelpers">
+            <summary>
+            Defines a set of commonly used helpers.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.OpenIddictValidationHelpers.GetProperty(Microsoft.AspNetCore.Authentication.AuthenticationProperties,System.String)">
+            <summary>
+            Gets a given property from the authentication properties.
+            </summary>
+            <param name="properties">The authentication properties.</param>
+            <param name="property">The specific property to look for.</param>
+            <returns>The value corresponding to the property, or <c>null</c> if the property cannot be found.</returns>
+        </member>
+        <member name="M:OpenIddict.Validation.OpenIddictValidationHelpers.SetProperty(Microsoft.AspNetCore.Authentication.AuthenticationProperties,System.String,System.String)">
+            <summary>
+            Sets the specified property in the authentication properties.
+            </summary>
+            <param name="properties">The authentication properties.</param>
+            <param name="property">The property name.</param>
+            <param name="value">The property value.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Authentication.AuthenticationProperties"/> so that multiple calls can be chained.</returns>
+        </member>
+        <member name="T:OpenIddict.Validation.OpenIddictValidationInitializer">
+            <summary>
+            Contains the methods required to ensure that the configuration used by
+            the OpenIddict validation handler is in a consistent and valid state.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.OpenIddictValidationInitializer.#ctor(Microsoft.AspNetCore.DataProtection.IDataProtectionProvider)">
+            <summary>
+            Creates a new instance of the <see cref="T:OpenIddict.Validation.OpenIddictValidationInitializer"/> class.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.OpenIddictValidationInitializer.PostConfigure(System.String,OpenIddict.Validation.OpenIddictValidationOptions)">
+            <summary>
+            Populates the default OpenIddict validation options and ensure
+            that the configuration is in a consistent and valid state.
+            </summary>
+            <param name="name">The authentication scheme associated with the handler instance.</param>
+            <param name="options">The options instance to initialize.</param>
+        </member>
+        <member name="T:OpenIddict.Validation.OpenIddictValidationProvider">
+            <summary>
+            Provides the logic necessary to extract, validate and handle OAuth2 requests.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Validation.IOpenIddictValidationEvent">
+            <summary>
+            Represents an OpenIddict validation event.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Validation.IOpenIddictValidationEventHandler`1">
+            <summary>
+            Represents a handler able to process <typeparamref name="TEvent"/> events.
+            </summary>
+            <typeparam name="TEvent">The type of the events handled by this instance.</typeparam>
+        </member>
+        <member name="M:OpenIddict.Validation.IOpenIddictValidationEventHandler`1.HandleAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Processes the event.
+            </summary>
+            <param name="notification">The event to process.</param>
+            <param name="cancellationToken">
+            The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.
+            </param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="T:OpenIddict.Validation.IOpenIddictValidationEventService">
+            <summary>
+            Dispatches events by invoking the corresponding handlers.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.IOpenIddictValidationEventService.PublishAsync``1(``0,System.Threading.CancellationToken)">
+            <summary>
+            Publishes a new event.
+            </summary>
+            <typeparam name="TEvent">The type of the event to publish.</typeparam>
+            <param name="notification">The event to publish.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.</returns>
+        </member>
+        <member name="T:OpenIddict.Validation.OpenIddictValidationDefaults">
+            <summary>
+            Exposes the default values used by the OpenIddict validation handler.
+            </summary>
+        </member>
+        <member name="F:OpenIddict.Validation.OpenIddictValidationDefaults.AuthenticationScheme">
+            <summary>
+            Default value for <see cref="P:Microsoft.AspNetCore.Authentication.AuthenticationScheme.Name"/>.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Validation.OpenIddictValidationEvent`1">
+            <summary>
+            Represents an OpenIddict validation event.
+            </summary>
+            <typeparam name="TContext">The type of the context instance associated with the event.</typeparam>
+        </member>
+        <member name="M:OpenIddict.Validation.OpenIddictValidationEvent`1.#ctor(`0)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Validation.OpenIddictValidationEvent`1"/>.
+            </summary>
+            <param name="context">The context instance associated with the event.</param>
+        </member>
+        <member name="P:OpenIddict.Validation.OpenIddictValidationEvent`1.Context">
+            <summary>
+            Gets the context instance associated with the event.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Validation.OpenIddictValidationEventHandler`1">
+            <summary>
+            Represents a handler able to process <typeparamref name="TEvent"/> events.
+            </summary>
+            <typeparam name="TEvent">The type of the events handled by this instance.</typeparam>
+        </member>
+        <member name="M:OpenIddict.Validation.OpenIddictValidationEventHandler`1.#ctor(System.Func{`0,System.Threading.CancellationToken,System.Threading.Tasks.Task})">
+            <summary>
+            Creates a new event using the specified handler delegate.
+            </summary>
+            <param name="handler">The event handler delegate</param>
+        </member>
+        <member name="M:OpenIddict.Validation.OpenIddictValidationEventHandler`1.HandleAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Processes the event.
+            </summary>
+            <param name="notification">The event to process.</param>
+            <param name="cancellationToken">
+            The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.
+            </param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="T:OpenIddict.Validation.OpenIddictValidationEvents">
+            <summary>
+            Contains common events used by the OpenIddict validation handler.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Validation.OpenIddictValidationEvents.ApplyChallenge">
+            <summary>
+            Invoked when a challenge response is returned to the caller.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.OpenIddictValidationEvents.ApplyChallenge.#ctor(AspNet.Security.OAuth.Validation.ApplyChallengeContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Validation.OpenIddictValidationEvents.ApplyChallenge"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Validation.OpenIddictValidationEvents.CreateTicket">
+            <summary>
+            Invoked when a ticket is to be created from an introspection response.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.OpenIddictValidationEvents.CreateTicket.#ctor(AspNet.Security.OAuth.Validation.CreateTicketContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Validation.OpenIddictValidationEvents.CreateTicket"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Validation.OpenIddictValidationEvents.DecryptToken">
+            <summary>
+            Invoked when a token is to be decrypted.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.OpenIddictValidationEvents.DecryptToken.#ctor(AspNet.Security.OAuth.Validation.DecryptTokenContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Validation.OpenIddictValidationEvents.DecryptToken"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Validation.OpenIddictValidationEvents.RetrieveToken">
+            <summary>
+            Invoked when a token is to be parsed from a newly-received request.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.OpenIddictValidationEvents.RetrieveToken.#ctor(AspNet.Security.OAuth.Validation.RetrieveTokenContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Validation.OpenIddictValidationEvents.RetrieveToken"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Validation.OpenIddictValidationEvents.ValidateToken">
+            <summary>
+            Invoked when a token is to be validated, before final processing.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.OpenIddictValidationEvents.ValidateToken.#ctor(AspNet.Security.OAuth.Validation.ValidateTokenContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Validation.OpenIddictValidationEvents.ValidateToken"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Validation.OpenIddictValidationEventService">
+            <summary>
+            Dispatches notifications by invoking the corresponding handlers.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.OpenIddictValidationEventService.PublishAsync``1(``0,System.Threading.CancellationToken)">
+            <summary>
+            Publishes a new event.
+            </summary>
+            <typeparam name="TEvent">The type of the event to publish.</typeparam>
+            <param name="notification">The event to publish.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.</returns>
+        </member>
+        <member name="T:OpenIddict.Validation.OpenIddictValidationOptions">
+            <summary>
+            Provides various settings needed to configure the OpenIddict validation handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.OpenIddictValidationOptions.#ctor">
+            <summary>
+            Creates a new instance of the <see cref="T:OpenIddict.Validation.OpenIddictValidationOptions"/> class.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.OpenIddictValidationOptions.UseReferenceTokens">
+            <summary>
+            Gets or sets a boolean indicating whether reference tokens are used.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder">
+            <summary>
+            Exposes the necessary methods required to configure the OpenIddict validation services.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.
+            </summary>
+            <param name="services">The services collection.</param>
+        </member>
+        <member name="P:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder.Services">
+            <summary>
+            Gets the services collection.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder.AddEventHandler``1(OpenIddict.Validation.IOpenIddictValidationEventHandler{``0})">
+            <summary>
+            Registers an event handler for the specified event type.
+            </summary>
+            <param name="handler">The handler added to the DI container.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder.AddEventHandler``1(System.Func{``0,System.Threading.Tasks.Task})">
+            <summary>
+            Registers an event handler for the specified event type.
+            </summary>
+            <param name="handler">The handler added to the DI container.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder.AddEventHandler``1(System.Func{``0,System.Threading.CancellationToken,System.Threading.Tasks.Task})">
+            <summary>
+            Registers an event handler for the specified event type.
+            </summary>
+            <param name="handler">The handler added to the DI container.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder.AddEventHandler``2(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Registers an event handler for the specified event type.
+            </summary>
+            <typeparam name="TEvent">The type of the event.</typeparam>
+            <typeparam name="THandler">The type of the handler.</typeparam>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder.AddEventHandler``1(System.Type,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Registers an event handler for the specified event type.
+            </summary>
+            <param name="type">The type of the handler.</param>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder.Configure(System.Action{OpenIddict.Validation.OpenIddictValidationOptions})">
+            <summary>
+            Amends the default OpenIddict validation configuration.
+            </summary>
+            <param name="configuration">The delegate used to configure the OpenIddict options.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder.AddAudiences(System.String[])">
+            <summary>
+            Registers the specified values as valid audiences. Setting the audiences is recommended
+            when the authorization server issues access tokens for multiple distinct resource servers.
+            </summary>
+            <param name="audiences">The audiences valid for this resource server.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder.RemoveErrorDetails">
+            <summary>
+            Configures OpenIddict not to return the authentication error
+            details as part of the standard WWW-Authenticate response header.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder.SetRealm(System.String)">
+            <summary>
+            Sets the realm, which is used to compute the WWW-Authenticate response header.
+            </summary>
+            <param name="realm">The realm.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder.UseDataProtectionProvider(Microsoft.AspNetCore.DataProtection.IDataProtectionProvider)">
+            <summary>
+            Configures OpenIddict to use a specific data protection provider
+            instead of relying on the default instance provided by the DI container.
+            </summary>
+            <param name="provider">The data protection provider used to create token protectors.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder.UseReferenceTokens">
+            <summary>
+            Configures the OpenIddict validation handler to use reference tokens.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationExtensions.AddValidation(Microsoft.Extensions.DependencyInjection.OpenIddictBuilder)">
+            <summary>
+            Registers the OpenIddict token validation services in the DI container.
+            Note: the validation handler only works with the default token format
+            or reference tokens and cannot be used with JWT tokens. To validate
+            JWT tokens, use the JWT bearer handler shipping with ASP.NET Core.
+            </summary>
+            <param name="builder">The services builder used by OpenIddict to register new services.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationExtensions.AddValidation(Microsoft.Extensions.DependencyInjection.OpenIddictBuilder,System.Action{Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder})">
+            <summary>
+            Registers the OpenIddict token validation services in the DI container.
+            Note: the validation handler only works with the default token format
+            or reference tokens and cannot be used with JWT tokens. To validate
+            JWT tokens, use the JWT bearer handler shipping with ASP.NET Core.
+            </summary>
+            <param name="builder">The services builder used by OpenIddict to register new services.</param>
+            <param name="configuration">The configuration delegate used to configure the validation services.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictBuilder"/>.</returns>
+        </member>
+    </members>
+</doc>

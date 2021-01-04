@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>SpecFlow.NUnit</id>
+    <version>3.5.5</version>
+    <title>SpecFlow.NUnit</title>
+    <authors>SpecFlow Team</authors>
+    <owners>SpecFlow Team</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">LICENSE.txt</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <icon>images\specflow-icon.png</icon>
+    <projectUrl>https://www.specflow.org/</projectUrl>
+    <description>Package to use SpecFlow with NUnit 3.11 and later</description>
+    <summary>Package to use SpecFlow with NUnit 3.11 and later</summary>
+    <copyright>Copyright © SpecFlow Team</copyright>
+    <language>en-US</language>
+    <tags>specflow nunit</tags>
+    <dependencies>
+      <dependency id="SpecFlow" version="[3.5.5]" />
+      <dependency id="SpecFlow.Tools.MsBuild.Generation" version="[3.5.5]" />
+      <dependency id="NUnit" version="3.11.0" />
+    </dependencies>
+  </metadata>
+</package>

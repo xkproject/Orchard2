@@ -1,23 +1,25 @@
 using System;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using OrchardCore.Modules;
+using OrchardCore.Mvc;
 
 namespace OrchardCore.DisplayManagement.Descriptors.ShapeTemplateStrategy
 {
     /// <summary>
-    /// Sets up default options for <see cref="ShapeTemplateViewOptions"/>.
+    /// Sets up default options for <see cref="ShapeTemplateOptions"/>.
     /// </summary>
     public class ShapeTemplateOptionsSetup : IConfigureOptions<ShapeTemplateOptions>
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IHostEnvironment _hostingEnvironment;
         private readonly IApplicationContext _applicationContext;
 
         /// <summary>
-        /// Initializes a new instance of <see cref="ShapeTemplateViewOptions"/>.
+        /// Initializes a new instance of <see cref="ShapeTemplateOptions"/>.
         /// </summary>
-        /// <param name="hostingEnvironment"><see cref="IHostingEnvironment"/> for the application.</param>
-        public ShapeTemplateOptionsSetup(IHostingEnvironment hostingEnvironment, IApplicationContext applicationContext)
+        /// <param name="hostingEnvironment"><see cref="IHostEnvironment"/> for the application.</param>
+        /// <param name="applicationContext"><see cref="IApplicationContext"/> for the application.</param>
+        public ShapeTemplateOptionsSetup(IHostEnvironment hostingEnvironment, IApplicationContext applicationContext)
         {
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _applicationContext = applicationContext;

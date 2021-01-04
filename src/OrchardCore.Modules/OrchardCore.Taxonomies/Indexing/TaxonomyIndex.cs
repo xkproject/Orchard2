@@ -11,8 +11,6 @@ using YesSql.Indexes;
 
 namespace OrchardCore.Taxonomies.Indexing
 {
-    // Remark: 
-
     public class TaxonomyIndex : MapIndex
     {
         public string TaxonomyContentItemId { get; set; }
@@ -54,14 +52,22 @@ namespace OrchardCore.Taxonomies.Indexing
                     _contentDefinitionManager = _contentDefinitionManager ?? _serviceProvider.GetRequiredService<IContentDefinitionManager>();
 
                     // Search for Taxonomy fields
-                    var fieldDefinitions = _contentDefinitionManager
-                        .GetTypeDefinition(contentItem.ContentType)
+                    var contentTypeDefinition = _contentDefinitionManager.GetTypeDefinition(contentItem.ContentType);
+
+                    // This can occur when content items become orphaned, particularly layer widgets when a layer is removed, before its widgets have been unpublished.
+                    if (contentTypeDefinition == null)
+                    {
+                        _ignoredTypes.Add(contentItem.ContentType);
+                        return null;
+                    }
+                    
+                    var fieldDefinitions = contentTypeDefinition
                         .Parts.SelectMany(x => x.PartDefinition.Fields.Where(f => f.FieldDefinition.Name == nameof(TaxonomyField)))
                         .ToArray();
 
                     // This type doesn't have any TaxonomyField, ignore it
                     if (fieldDefinitions.Length == 0)
-                    {                        
+                    {
                         _ignoredTypes.Add(contentItem.ContentType);
                         return null;
                     }

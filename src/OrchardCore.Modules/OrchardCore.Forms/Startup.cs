@@ -20,6 +20,7 @@ namespace OrchardCore.Forms
             TemplateContext.GlobalMemberAccessStrategy.Register<FormInputElementPart>();
             TemplateContext.GlobalMemberAccessStrategy.Register<LabelPart>();
             TemplateContext.GlobalMemberAccessStrategy.Register<InputPart>();
+            TemplateContext.GlobalMemberAccessStrategy.Register<SelectPart>();
             TemplateContext.GlobalMemberAccessStrategy.Register<TextAreaPart>();
             TemplateContext.GlobalMemberAccessStrategy.Register<ButtonPart>();
         }
@@ -30,27 +31,40 @@ namespace OrchardCore.Forms
             {
                 options.Filters.Add<ExportModelStateAttribute>();
                 options.Filters.Add<ImportModelStateAttribute>();
+                options.Filters.Add<ImportModelStatePageFilter>();
             });
 
-            services.AddScoped<IContentPartDisplayDriver, FormPartDisplay>();
-            services.AddScoped<IContentPartDisplayDriver, FormElementPartDisplay>();
-            services.AddScoped<IContentPartDisplayDriver, FormInputElementPartDisplay>();
-            services.AddScoped<IContentPartDisplayDriver, ButtonPartDisplay>();
-            services.AddScoped<IContentPartDisplayDriver, LabelPartDisplay>();
-            services.AddScoped<IContentPartDisplayDriver, InputPartDisplay>();
-            services.AddScoped<IContentPartDisplayDriver, TextAreaPartDisplay>();
-            services.AddScoped<IContentPartDisplayDriver, ValidationSummaryPartDisplay>();
-            services.AddScoped<IContentPartDisplayDriver, ValidationPartDisplay>();
+            services.AddScoped<IContentDisplayDriver, FormContentDisplayDriver>();
 
-            services.AddSingleton<ContentPart, FormPart>();
-            services.AddSingleton<ContentPart, FormElementPart>();
-            services.AddSingleton<ContentPart, FormInputElementPart>();
-            services.AddSingleton<ContentPart, LabelPart>();
-            services.AddSingleton<ContentPart, ButtonPart>();
-            services.AddSingleton<ContentPart, InputPart>();
-            services.AddSingleton<ContentPart, TextAreaPart>();
-            services.AddSingleton<ContentPart, ValidationSummaryPart>();
-            services.AddSingleton<ContentPart, ValidationPart>();
+            services.AddContentPart<FormPart>()
+                    .UseDisplayDriver<FormPartDisplay>();
+
+            services.AddContentPart<FormElementPart>()
+                    .UseDisplayDriver<FormElementPartDisplay>();
+
+            services.AddContentPart<FormInputElementPart>()
+                    .UseDisplayDriver<FormInputElementPartDisplay>();
+
+            services.AddContentPart<LabelPart>()
+                    .UseDisplayDriver<LabelPartDisplay>();
+
+            services.AddContentPart<ButtonPart>()
+                    .UseDisplayDriver<ButtonPartDisplay>();
+
+            services.AddContentPart<InputPart>()
+                    .UseDisplayDriver<InputPartDisplay>();
+
+            services.AddContentPart<SelectPart>()
+                .UseDisplayDriver<SelectPartDisplayDriver>();
+
+            services.AddContentPart<TextAreaPart>()
+                    .UseDisplayDriver<TextAreaPartDisplay>();
+
+            services.AddContentPart<ValidationSummaryPart>()
+                    .UseDisplayDriver<ValidationSummaryPartDisplay>();
+
+            services.AddContentPart<ValidationPart>()
+                    .UseDisplayDriver<ValidationPartDisplay>();
 
             services.AddScoped<IDataMigration, Migrations>();
         }

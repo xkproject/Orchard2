@@ -1,0 +1,271 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MiniProfiler.AspNetCore.Mvc</name>
+    </assembly>
+    <members>
+        <member name="T:StackExchange.Profiling.Internal.ProfilingActionFilter">
+            <summary>
+            Internal MiniProfiler architecture, not meant for consumption.
+            This can and probably will break without warning. Don't use the .Internal namespace directly.
+            This filter can be applied globally to hook up automatic action profiling.
+            </summary>
+        </member>
+        <member name="M:StackExchange.Profiling.Internal.ProfilingActionFilter.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
+            <summary>
+            Happens before the action starts running
+            </summary>
+            <param name="context">The filter context to handle the start of.</param>
+        </member>
+        <member name="M:StackExchange.Profiling.Internal.ProfilingActionFilter.OnActionExecuted(Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext)">
+            <summary>
+            Happens after the action executes
+            </summary>
+            <param name="context">The filter context to handle the end of.</param>
+        </member>
+        <member name="T:StackExchange.Profiling.Internal.ProfilingViewComponentInvoker">
+            <summary>
+            A MiniProfiler-Wrapped <see cref="T:Microsoft.AspNetCore.Mvc.ViewComponents.IViewComponentInvoker"/>.
+            </summary>
+        </member>
+        <member name="M:StackExchange.Profiling.Internal.ProfilingViewComponentInvoker.#ctor(Microsoft.AspNetCore.Mvc.ViewComponents.IViewComponentInvoker)">
+            <summary>
+            Creates a new <see cref="T:StackExchange.Profiling.Internal.ProfilingViewComponentInvoker"/>.
+            </summary>
+            <param name="defaultViewComponentInvoker">The <see cref="T:Microsoft.AspNetCore.Mvc.ViewComponents.IViewComponentInvoker"/> to wrap.</param>
+        </member>
+        <member name="M:StackExchange.Profiling.Internal.ProfilingViewComponentInvoker.InvokeAsync(Microsoft.AspNetCore.Mvc.ViewComponents.ViewComponentContext)">
+            <summary>
+            Invokes the wrapped view component, wrapped in a profiler step.
+            </summary>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.Mvc.ViewComponents.ViewComponentContext"/>.</param>
+        </member>
+        <member name="T:StackExchange.Profiling.Internal.ProfilingViewEngine">
+            <summary>
+            Internal MiniProfiler architecture, not meant for consumption.
+            This can and probably will break without warning. Don't use the .Internal namespace directly.
+            You can wrap your view engines with this view to enable profiling on views and partial.
+            </summary>
+        </member>
+        <member name="M:StackExchange.Profiling.Internal.ProfilingViewEngine.#ctor(Microsoft.AspNetCore.Mvc.ViewEngines.IViewEngine)">
+            <summary>
+            Initializes a new instance of the <see cref="T:StackExchange.Profiling.Internal.ProfilingViewEngine"/> class. 
+            </summary>
+            <param name="wrapped">Original view engine to profile</param>
+        </member>
+        <member name="M:StackExchange.Profiling.Internal.ProfilingViewEngine.FindView(Microsoft.AspNetCore.Mvc.ActionContext,System.String,System.Boolean)">
+            <summary>
+            Finds the view with the given <paramref name="viewName"/> using view locations and information from the
+            <paramref name="context"/>.
+            </summary>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.Mvc.ActionContext"/>.</param>
+            <param name="viewName">The name of the view.</param>
+            <param name="isMainPage">Determines if the page being found is the main page for an action.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.ViewEngines.ViewEngineResult"/> of locating the view.</returns>
+        </member>
+        <member name="M:StackExchange.Profiling.Internal.ProfilingViewEngine.GetView(System.String,System.String,System.Boolean)">
+            <summary>
+            Gets the view with the given <paramref name="viewPath"/>, relative to <paramref name="executingFilePath"/>
+            unless <paramref name="viewPath"/> is already absolute.
+            </summary>
+            <param name="executingFilePath">The absolute path to the currently-executing view, if any.</param>
+            <param name="viewPath">The path to the view.</param>
+            <param name="isMainPage">Determines if the page being found is the main page for an action.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.ViewEngines.ViewEngineResult"/> of locating the view.</returns>
+        </member>
+        <member name="T:StackExchange.Profiling.Internal.WrappedView">
+            <summary>
+            Internal MiniProfiler architecture, not meant for consumption.
+            This can and probably will break without warning. Don't use the .Internal namespace directly.
+            Wrapped MVC View that ProfilingViewEngine uses to log profiling data
+            </summary>
+        </member>
+        <member name="F:StackExchange.Profiling.Internal.WrappedView._wrapped">
+            <summary>
+            MVC IView that is wrapped by the ProfilingViewEngine
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.Internal.WrappedView.Path">
+            <summary>
+            Gets the wrapped view path.
+            </summary>
+        </member>
+        <member name="M:StackExchange.Profiling.Internal.WrappedView.#ctor(Microsoft.AspNetCore.Mvc.ViewEngines.IView)">
+            <summary>
+            Initializes a new instance of the <see cref="T:StackExchange.Profiling.Internal.WrappedView"/> class. 
+            </summary>
+            <param name="wrapped">The view to wrap in a profiler</param>
+        </member>
+        <member name="M:StackExchange.Profiling.Internal.WrappedView.RenderAsync(Microsoft.AspNetCore.Mvc.Rendering.ViewContext)">
+            <summary>
+            Renders the WrappedView and logs profiling data
+            </summary>
+            <param name="context">Context to render</param>
+        </member>
+        <member name="T:StackExchange.Profiling.MiniProfilerScriptTagHelper">
+            <summary>
+            Tag helper to render MiniProfiler in ASP.NET Core views, e.g. &lt;mini-profiler position="Right" /&gt;
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerScriptTagHelper.ViewContext">
+            <summary>
+            The view context of this tag helper, for accessing HttpContext on render.
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerScriptTagHelper.Position">
+            <summary>
+            The UI position to render the profiler in (defaults to <see cref="P:StackExchange.Profiling.Internal.MiniProfilerBaseOptions.PopupRenderPosition"/>).
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerScriptTagHelper.ShowTrivial">
+            <summary>
+            Whether to show trivial timings column initially or not (defaults to <see cref="P:StackExchange.Profiling.Internal.MiniProfilerBaseOptions.PopupShowTrivial"/>).
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerScriptTagHelper.ShowTimeWithChildren">
+            <summary>
+            Whether to show time with children column initially or not (defaults to <see cref="P:StackExchange.Profiling.Internal.MiniProfilerBaseOptions.PopupShowTimeWithChildren"/>).
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerScriptTagHelper.MaxTraces">
+            <summary>
+            The maximum number of profilers to show (before the oldest is removed - defaults to <see cref="P:StackExchange.Profiling.Internal.MiniProfilerBaseOptions.PopupMaxTracesToShow"/>).
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerScriptTagHelper.ShowControls">
+            <summary>
+            Whether to show the controls (defaults to <see cref="P:StackExchange.Profiling.Internal.MiniProfilerBaseOptions.ShowControls"/>).
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerScriptTagHelper.StartHidden">
+            <summary>
+            Whether to start hidden (defaults to <see cref="P:StackExchange.Profiling.Internal.MiniProfilerBaseOptions.PopupStartHidden"/>).
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerScriptTagHelper.ColorScheme">
+            <summary>
+            The color scheme to start with:
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerScriptTagHelper.Nonce">
+            <summary>
+            The JavaScript nonce (if any) to use on this script tag render.
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.MiniProfilerScriptTagHelper.RenderOptions">
+            <summary>
+            The options to use when rendering this MiniProfiler.
+            Note: overrides all other options.
+            </summary>
+        </member>
+        <member name="M:StackExchange.Profiling.MiniProfilerScriptTagHelper.Process(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext,Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput)">
+            <summary>
+            Processes this tag, rendering some lovely HTML.
+            </summary>
+            <param name="context">The context to render in.</param>
+            <param name="output">The output to render to.</param>
+        </member>
+        <member name="T:StackExchange.Profiling.Data.MvcDiagnosticListener">
+            <summary>
+            Diagnostic listener for Microsoft.AspNetCore.Mvc.* events
+            </summary>
+            <remarks>
+            See:
+            - https://github.com/dotnet/aspnetcore/blob/v3.0.0/src/Mvc/Mvc.Core/src/MvcCoreDiagnosticListenerExtensions.cs
+            - https://github.com/dotnet/aspnetcore/blob/v3.0.0/src/Mvc/Mvc.Core/src/Diagnostics/MvcDiagnostics.cs
+            - https://github.com/dotnet/aspnetcore/blob/v3.0.0/src/Mvc/Mvc.Razor/src/Diagnostics/MvcDiagnostics.cs
+            </remarks>
+        </member>
+        <member name="P:StackExchange.Profiling.Data.MvcDiagnosticListener.ListenerName">
+            <summary>
+            Diagnostic Listener name to handle.
+            </summary>
+        </member>
+        <member name="M:StackExchange.Profiling.Data.MvcDiagnosticListener.OnCompleted">
+            <summary>
+            Notifies the observer that the provider has finished sending push-based notifications.
+            </summary>
+        </member>
+        <member name="M:StackExchange.Profiling.Data.MvcDiagnosticListener.OnError(System.Exception)">
+            <summary>
+            Notifies the observer that the provider has experienced an error condition.
+            </summary>
+            <param name="error">An object that provides additional information about the error.</param>
+        </member>
+        <member name="F:StackExchange.Profiling.Data.MvcDiagnosticListener.CurrentTiming">
+            <summary>
+            Stores the current timing in the tree, on each request.
+            </summary>
+        </member>
+        <member name="M:StackExchange.Profiling.Data.MvcDiagnosticListener.OnNext(System.Collections.Generic.KeyValuePair{System.String,System.Object})">
+            <summary>
+            Provides the observer with new data.
+            </summary>
+            <param name="kv">The current notification information.</param>
+        </member>
+        <member name="T:StackExchange.Profiling.ProfileScriptTagHelper">
+            <summary>
+            Tag helper to profile script execution in ASP.NET Core views, e.g. 
+            &lt;profile-script name="My Step" /&gt;
+            ...script blocks...
+            &lt;/profile-script&gt;
+            Include as self closing to provide initialization only.
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.ProfileScriptTagHelper.ViewContext">
+            <summary>
+            The <see cref="P:StackExchange.Profiling.ProfileScriptTagHelper.ViewContext"/> for this control, gets injected.
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.ProfileScriptTagHelper.Name">
+            <summary>
+            The name of this <see cref="T:StackExchange.Profiling.MiniProfiler"/> step.
+            </summary>
+        </member>
+        <member name="M:StackExchange.Profiling.ProfileScriptTagHelper.ProcessAsync(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext,Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput)">
+            <summary>
+            Renders the tag helper.
+            </summary>
+            <param name="context">The context we're rendering in.</param>
+            <param name="output">The output we're rendering to.</param>
+            <returns>The task to await.</returns>
+        </member>
+        <member name="T:StackExchange.Profiling.ProfileTagHelper">
+            <summary>
+            Tag helper to profile child contents in ASP.NET Core views, e.g. 
+            &lt;profile name="My Step" /&gt;
+            ...child content...
+            &lt;/profile&gt;
+            </summary>
+        </member>
+        <member name="P:StackExchange.Profiling.ProfileTagHelper.Name">
+            <summary>
+            The name of this <see cref="T:StackExchange.Profiling.MiniProfiler"/> step.
+            </summary>
+        </member>
+        <member name="M:StackExchange.Profiling.ProfileTagHelper.ProcessAsync(Microsoft.AspNetCore.Razor.TagHelpers.TagHelperContext,Microsoft.AspNetCore.Razor.TagHelpers.TagHelperOutput)">
+            <summary>
+            Processes this section, profiling the contents within.
+            </summary>
+            <param name="context">The context to render in.</param>
+            <param name="output">The output to render to.</param>
+        </member>
+        <member name="T:Microsoft.Extensions.DependencyInjection.MvcExtensions">
+            <summary>
+            Extension methods for configuring MiniProfiler for MVC.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.MvcExtensions.AddMiniProfiler(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{StackExchange.Profiling.MiniProfilerOptions})">
+            <summary>
+            Adds MiniProfiler timings for actions and views.
+            </summary>
+            <param name="services">The services collection to configure.</param>
+            <param name="configureOptions">An <see cref="T:System.Action`1"/> to configure options for MiniProfiler.</param>
+        </member>
+        <member name="T:Microsoft.Extensions.DependencyInjection.MiniProfilerOptionsDefaults">
+            <summary>
+            Configures the default (important: with DI for IMemoryCache) before further user configuration.
+            </summary>
+        </member>
+    </members>
+</doc>

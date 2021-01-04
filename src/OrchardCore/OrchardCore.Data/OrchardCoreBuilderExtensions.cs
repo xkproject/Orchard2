@@ -2,14 +2,13 @@ using System;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using OrchardCore.Data;
+using OrchardCore.Data.Documents;
 using OrchardCore.Data.Migration;
 using OrchardCore.Environment.Shell;
 using OrchardCore.Environment.Shell.Models;
+using OrchardCore.Environment.Shell.Scope;
 using OrchardCore.Modules;
 using YesSql;
 using YesSql.Indexes;
@@ -20,16 +19,15 @@ using YesSql.Provider.SqlServer;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
+    /// <summary>
+    /// Provides extension methods for <see cref="OrchardCoreBuilder"/> to add database access functionality.
+    /// </summary>
     public static class OrchardCoreBuilderExtensions
     {
-        public static IApplicationBuilder UseDataAccess(this IApplicationBuilder app)
-        {
-            return app.UseMiddleware<CommitSessionMiddleware>();
-        }
-
         /// <summary>
         /// Adds tenant level data access services.
         /// </summary>
+        /// <param name="builder">The <see cref="OrchardCoreBuilder"/>.</param>
         public static OrchardCoreBuilder AddDataAccess(this OrchardCoreBuilder builder)
         {
             builder.ConfigureServices(services =>
@@ -38,14 +36,14 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.AddScoped<IModularTenantEvents, AutomaticDataMigrations>();
 
                 // Adding supported databases
-                services.TryAddDataProvider(name: "Sql Server", value: "SqlConnection", hasConnectionString: true, hasTablePrefix: true, isDefault: false);
+                services.TryAddDataProvider(name: "Sql Server", value: "SqlConnection", hasConnectionString: true, sampleConnectionString: "Server=localhost;Database=Orchard;User Id=username;Password=password", hasTablePrefix: true, isDefault: false);
                 services.TryAddDataProvider(name: "Sqlite", value: "Sqlite", hasConnectionString: false, hasTablePrefix: false, isDefault: true);
-                services.TryAddDataProvider(name: "MySql", value: "MySql", hasConnectionString: true, hasTablePrefix: true, isDefault: false);
-                services.TryAddDataProvider(name: "Postgres", value: "Postgres", hasConnectionString: true, hasTablePrefix: true, isDefault: false);
+                services.TryAddDataProvider(name: "MySql", value: "MySql", hasConnectionString: true, sampleConnectionString: "Server=localhost;Database=Orchard;Uid=username;Pwd=password", hasTablePrefix: true, isDefault: false);
+                services.TryAddDataProvider(name: "Postgres", value: "Postgres", hasConnectionString: true, sampleConnectionString: "Server=localhost;Port=5432;Database=Orchard;User Id=username;Password=password", hasTablePrefix: true, isDefault: false);
 
                 // Configuring data access
 
-                services.AddSingleton<IStore>(sp =>
+                services.AddSingleton(sp =>
                 {
                     var shellSettings = sp.GetService<ShellSettings>();
 
@@ -116,43 +114,23 @@ namespace Microsoft.Extensions.DependencyInjection
 
                     session.RegisterIndexes(scopedServices.ToArray());
 
-                    var httpContext = sp.GetRequiredService<IHttpContextAccessor>()?.HttpContext;
-
-                    if (httpContext != null)
+                    ShellScope.RegisterBeforeDispose(scope =>
                     {
-                        httpContext.Items[typeof(YesSql.ISession)] = session;
-                    }
+                        return scope.ServiceProvider
+                            .GetRequiredService<IDocumentStore>()
+                            .CommitAsync();
+                    });
 
                     return session;
                 });
+
+                services.AddScoped<IDocumentStore, DocumentStore>();
+                services.AddSingleton<IFileDocumentStore, FileDocumentStore>();
 
                 services.AddTransient<IDbConnectionAccessor, DbConnectionAccessor>();
             });
 
             return builder;
-        }
-    }
-
-    public class CommitSessionMiddleware
-    {
-        private readonly RequestDelegate _next;
-
-        public CommitSessionMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
-
-        public async Task Invoke(HttpContext httpContext)
-        {
-            await _next.Invoke(httpContext);
-
-            // Don't resolve to prevent instantiating one in case of static sites
-            var session = httpContext.Items[typeof(YesSql.ISession)] as YesSql.ISession;
-
-            if (session != null)
-            {
-                await session.CommitAsync();
-            }
         }
     }
 }

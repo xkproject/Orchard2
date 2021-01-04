@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.AspNetCore.Authentication.MicrosoftAccount</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.AspNetCore.Authentication.MicrosoftAccount.MicrosoftAccountOptions">
+            <summary>
+            Configuration options for <see cref="T:Microsoft.AspNetCore.Authentication.MicrosoftAccount.MicrosoftAccountHandler"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Authentication.MicrosoftAccount.MicrosoftAccountOptions.#ctor">
+            <summary>
+            Initializes a new <see cref="T:Microsoft.AspNetCore.Authentication.MicrosoftAccount.MicrosoftAccountOptions"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Authentication.MicrosoftAccount.MicrosoftChallengeProperties">
+            <summary>
+            See https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow#request-an-authorization-code for reference
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.Authentication.MicrosoftAccount.MicrosoftChallengeProperties.ResponseModeKey">
+            <summary>
+            The parameter key for the "response_mode" argument being used for a challenge request.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.Authentication.MicrosoftAccount.MicrosoftChallengeProperties.DomainHintKey">
+            <summary>
+            The parameter key for the "domain_hint" argument being used for a challenge request.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.Authentication.MicrosoftAccount.MicrosoftChallengeProperties.LoginHintKey">
+            <summary>
+            The parameter key for the "login_hint" argument being used for a challenge request.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.Authentication.MicrosoftAccount.MicrosoftChallengeProperties.PromptKey">
+            <summary>
+            The parameter key for the "prompt" argument being used for a challenge request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.MicrosoftAccount.MicrosoftChallengeProperties.ResponseMode">
+            <summary>
+            The "response_mode" parameter value being used for a challenge request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.MicrosoftAccount.MicrosoftChallengeProperties.DomainHint">
+            <summary>
+            The "domain_hint" parameter value being used for a challenge request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.MicrosoftAccount.MicrosoftChallengeProperties.LoginHint">
+            <summary>
+            The "login_hint" parameter value being used for a challenge request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.MicrosoftAccount.MicrosoftChallengeProperties.Prompt">
+            <summary>
+            The "prompt" parameter value being used for a challenge request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.MicrosoftAccount.Resources.Exception_MissingId">
+            <summary>The user does not have an id.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.MicrosoftAccount.Resources.Exception_OptionMustBeProvided">
+            <summary>The '{0}' option must be provided.</summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Authentication.MicrosoftAccount.Resources.FormatException_OptionMustBeProvided(System.Object)">
+            <summary>The '{0}' option must be provided.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.Authentication.MicrosoftAccount.Resources.Exception_ValidatorHandlerMismatch">
+            <summary>An ICertificateValidator cannot be specified at the same time as an HttpMessageHandler unless it is a WebRequestHandler.</summary>
+        </member>
+    </members>
+</doc>

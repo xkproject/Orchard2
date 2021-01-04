@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>MySqlConnector</id>
+    <version>0.43.0</version>
+    <title>Async MySQL ADO.NET Connector</title>
+    <authors>Bradley Grainger,Caleb Lloyd</authors>
+    <owners>Bradley Grainger,Caleb Lloyd</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://mysql-net.github.io/MySqlConnector/</projectUrl>
+    <iconUrl>https://mysql-net.github.io/MySqlConnector/img/logo.png</iconUrl>
+    <description>A truly async MySQL ADO.NET provider, supporting MySQL Server, MariaDB, Percona Server, Amazon Aurora, Azure Database for MySQL and more.</description>
+    <releaseNotes>https://mysql-net.github.io/MySqlConnector/overview/version-history/</releaseNotes>
+    <copyright>Copyright 2016–2018 Bradley Grainger</copyright>
+    <tags>mysql mysqlconnector async ado.net database netcore</tags>
+    <repository type="git" url="https://github.com/mysql-net/MySqlConnector.git" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.5">
+        <dependency id="System.Buffers" version="4.4.0" exclude="Build,Analyzers" />
+        <dependency id="System.Memory" version="4.5.0" exclude="Build,Analyzers" />
+        <dependency id="System.Threading.Tasks.Extensions" version="4.3.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETFramework4.6.1">
+        <dependency id="System.Buffers" version="4.4.0" exclude="Build,Analyzers" />
+        <dependency id="System.Memory" version="4.5.0" exclude="Build,Analyzers" />
+        <dependency id="System.Threading.Tasks.Extensions" version="4.3.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="NETStandard.Library" version="1.6.1" exclude="Build,Analyzers" />
+        <dependency id="System.Buffers" version="4.4.0" exclude="Build,Analyzers" />
+        <dependency id="System.Data.Common" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Diagnostics.Process" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Memory" version="4.5.0" exclude="Build,Analyzers" />
+        <dependency id="System.Net.NameResolution" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Net.Security" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Security.Cryptography.Algorithms" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Threading.Tasks.Extensions" version="4.3.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETCoreApp2.1" />
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="System.Buffers" version="4.4.0" exclude="Build,Analyzers" />
+        <dependency id="System.Memory" version="4.5.0" exclude="Build,Analyzers" />
+        <dependency id="System.Threading.Tasks.Extensions" version="4.3.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Data" targetFramework=".NETFramework4.5, .NETFramework4.6.1" />
+      <frameworkAssembly assemblyName="System.Transactions" targetFramework=".NETFramework4.5, .NETFramework4.6.1" />
+    </frameworkAssemblies>
+  </metadata>
+</package>

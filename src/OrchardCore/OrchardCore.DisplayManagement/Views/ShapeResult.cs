@@ -5,6 +5,7 @@ using OrchardCore.DisplayManagement.Descriptors;
 using OrchardCore.DisplayManagement.Handlers;
 using OrchardCore.DisplayManagement.Implementation;
 using OrchardCore.DisplayManagement.Shapes;
+using OrchardCore.DisplayManagement.Zones;
 using OrchardCore.Environment.Cache;
 
 namespace OrchardCore.DisplayManagement.Views
@@ -12,23 +13,25 @@ namespace OrchardCore.DisplayManagement.Views
     public class ShapeResult : IDisplayResult
     {
         private string _defaultLocation;
-        private IDictionary<string, string> _otherLocations;
+        private Dictionary<string, string> _otherLocations;
+        private string _name;
         private string _differentiator;
         private string _prefix;
         private string _cacheId;
         private readonly string _shapeType;
-        private readonly Func<IBuildShapeContext, Task<IShape>> _shapeBuilder;
+        private readonly Func<IBuildShapeContext, ValueTask<IShape>> _shapeBuilder;
         private readonly Func<IShape, Task> _processing;
         private Action<CacheContext> _cache;
         private string _groupId;
         private Action<ShapeDisplayContext> _displaying;
+        private Func<Task<bool>> _renderPredicateAsync;
 
-        public ShapeResult(string shapeType, Func<IBuildShapeContext, Task<IShape>> shapeBuilder)
+        public ShapeResult(string shapeType, Func<IBuildShapeContext, ValueTask<IShape>> shapeBuilder)
             : this(shapeType, shapeBuilder, null)
         {
         }
 
-        public ShapeResult(string shapeType, Func<IBuildShapeContext, Task<IShape>> shapeBuilder, Func<IShape, Task> processing)
+        public ShapeResult(string shapeType, Func<IBuildShapeContext, ValueTask<IShape>> shapeBuilder, Func<IShape, Task> processing)
         {
             // The shape type is necessary before the shape is created as it will drive the placement
             // resolution which itself can prevent the shape from being created.
@@ -54,9 +57,9 @@ namespace OrchardCore.DisplayManagement.Views
             if (String.IsNullOrEmpty(_defaultLocation))
             {
                 _defaultLocation = context.DefaultZone;
-            }            
+            }
 
-            // Look into specific implementations of placements (like placement.info files)
+            // Look into specific implementations of placements (like placement.json files and IShapePlacementProviders)
             var placement = context.FindPlacement(_shapeType, _differentiator, displayType, context);
 
             // Look for mapped display type locations
@@ -86,9 +89,8 @@ namespace OrchardCore.DisplayManagement.Views
             {
                 placement.DefaultPosition = context.DefaultPosition;
             }
-            
 
-            // If there are no placement or it's explicitely noop then stop rendering execution
+            // If there are no placement or it's explicitly noop then stop rendering execution
             if (String.IsNullOrEmpty(placement.Location) || placement.Location == "-")
             {
                 return;
@@ -103,6 +105,12 @@ namespace OrchardCore.DisplayManagement.Views
                 return;
             }
 
+            // If a condition has been applied to this result evaluate it only if the shape has been placed.
+            if (_renderPredicateAsync != null && !(await _renderPredicateAsync()))
+            {
+                return;
+            }
+
             var newShape = Shape = await _shapeBuilder(context);
 
             // Ignore it if the driver returned a null shape.
@@ -111,12 +119,15 @@ namespace OrchardCore.DisplayManagement.Views
                 return;
             }
 
-            ShapeMetadata newShapeMetadata = newShape.Metadata;
+            var newShapeMetadata = newShape.Metadata;
             newShapeMetadata.Prefix = _prefix;
-            newShapeMetadata.Name = _differentiator ?? _shapeType;
+            newShapeMetadata.Name = _name ?? _differentiator ?? _shapeType;
+            newShapeMetadata.Differentiator = _differentiator ?? _shapeType;
             newShapeMetadata.DisplayType = displayType;
             newShapeMetadata.PlacementSource = placement.Source;
             newShapeMetadata.Tab = placement.GetTab();
+            newShapeMetadata.Card = placement.GetCard();
+            newShapeMetadata.Column = placement.GetColumn();
             newShapeMetadata.Type = _shapeType;
 
             if (_displaying != null)
@@ -188,13 +199,15 @@ namespace OrchardCore.DisplayManagement.Views
                 }
             }
 
-            if (String.IsNullOrEmpty(position))
+            position = !String.IsNullOrEmpty(position) ? position : null;
+
+            if (parentShape is ZoneOnDemand zoneOnDemand)
             {
-                parentShape.Add(newShape);
+                await zoneOnDemand.AddAsync(newShape, position);
             }
-            else
+            else if (parentShape is Shape shape)
             {
-                parentShape.Add(newShape, position);
+                shape.Add(newShape, position);
             }
         }
 
@@ -244,6 +257,15 @@ namespace OrchardCore.DisplayManagement.Views
         }
 
         /// <summary>
+        /// Sets the shape name regardless its 'Differentiator'.
+        /// </summary>
+        public ShapeResult Name(string name)
+        {
+            _name = name;
+            return this;
+        }
+
+        /// <summary>
         /// Sets a discriminator that is used to find the location of the shape when two shapes of the same type are displayed.
         /// </summary>
         public ShapeResult Differentiator(string differentiator)
@@ -270,6 +292,16 @@ namespace OrchardCore.DisplayManagement.Views
         {
             _cacheId = cacheId;
             _cache = cache;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets a condition that must return true for the shape to render.
+        /// The condition is only evaluated if the shape has been placed.
+        /// </summary>
+        public ShapeResult RenderWhen(Func<Task<bool>> renderPredicateAsync)
+        {
+            _renderPredicateAsync = renderPredicateAsync;
             return this;
         }
 

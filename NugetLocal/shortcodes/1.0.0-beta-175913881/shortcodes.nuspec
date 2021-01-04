@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Shortcodes</id>
+    <version>1.0.0-beta-175913881</version>
+    <title>Shortcodes processor for .NET</title>
+    <authors>Sebastien Ros</authors>
+    <owners>Sebastien Ros</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <projectUrl>https://github.com/sebastienros/shortcodes</projectUrl>
+    <description>Shortcodes processor for .NET with focus on performance and simplicity.</description>
+    <copyright>Sebastien Ros</copyright>
+    <tags>shortcode template</tags>
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="System.Threading.Tasks.Extensions" version="4.5.4" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.1" />
+    </dependencies>
+  </metadata>
+</package>

@@ -1,0 +1,1220 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OpenIddict.Server</name>
+    </assembly>
+    <members>
+        <member name="T:OpenIddict.Server.OpenIddictServerInitializer">
+            <summary>
+            Contains the methods required to ensure that the configuration
+            used by OpenIddict is in a consistent and valid state.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerInitializer.#ctor(Microsoft.Extensions.Caching.Distributed.IDistributedCache,Microsoft.AspNetCore.DataProtection.IDataProtectionProvider)">
+            <summary>
+            Creates a new instance of the <see cref="T:OpenIddict.Server.OpenIddictServerInitializer"/> class.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerInitializer.PostConfigure(System.String,OpenIddict.Server.OpenIddictServerOptions)">
+            <summary>
+            Populates the default OpenID Connect server options and ensure
+            that the configuration is in a consistent and valid state.
+            </summary>
+            <param name="name">The authentication scheme associated with the handler instance.</param>
+            <param name="options">The options instance to initialize.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerProvider">
+            <summary>
+            Provides the logic necessary to extract, validate and handle OpenID Connect requests.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.IOpenIddictServerEvent">
+            <summary>
+            Represents an OpenIddict server event.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.IOpenIddictServerEventHandler`1">
+            <summary>
+            Represents a handler able to process <typeparamref name="TEvent"/> events.
+            </summary>
+            <typeparam name="TEvent">The type of the events handled by this instance.</typeparam>
+        </member>
+        <member name="M:OpenIddict.Server.IOpenIddictServerEventHandler`1.HandleAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Processes the event.
+            </summary>
+            <param name="notification">The event to process.</param>
+            <param name="cancellationToken">
+            The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.
+            </param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="T:OpenIddict.Server.IOpenIddictServerEventService">
+            <summary>
+            Dispatches events by invoking the corresponding handlers.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.IOpenIddictServerEventService.PublishAsync``1(``0,System.Threading.CancellationToken)">
+            <summary>
+            Publishes a new event.
+            </summary>
+            <typeparam name="TEvent">The type of the event to publish.</typeparam>
+            <param name="notification">The event to publish.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.</returns>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerDefaults">
+            <summary>
+            Exposes the default values used by the OpenIddict server handler.
+            </summary>
+        </member>
+        <member name="F:OpenIddict.Server.OpenIddictServerDefaults.AuthenticationScheme">
+            <summary>
+            Default value for <see cref="P:Microsoft.AspNetCore.Authentication.AuthenticationScheme.Name"/>.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvent`1">
+            <summary>
+            Represents an OpenIddict server event.
+            </summary>
+            <typeparam name="TContext">The type of the context instance associated with the event.</typeparam>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvent`1.#ctor(`0)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvent`1"/>.
+            </summary>
+            <param name="context">The context instance associated with the event.</param>
+        </member>
+        <member name="P:OpenIddict.Server.OpenIddictServerEvent`1.Context">
+            <summary>
+            Gets the context instance associated with the event.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEventHandler`1">
+            <summary>
+            Represents a handler able to process <typeparamref name="TEvent"/> events.
+            </summary>
+            <typeparam name="TEvent">The type of the events handled by this instance.</typeparam>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEventHandler`1.#ctor(System.Func{`0,System.Threading.CancellationToken,System.Threading.Tasks.Task})">
+            <summary>
+            Creates a new event using the specified handler delegate.
+            </summary>
+            <param name="handler">The event handler delegate</param>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEventHandler`1.HandleAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Processes the event.
+            </summary>
+            <param name="notification">The event to process.</param>
+            <param name="cancellationToken">
+            The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.
+            </param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.
+            </returns>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents">
+            <summary>
+            Contains common events used by the OpenIddict server handler.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.MatchEndpoint">
+            <summary>
+            Represents an event called for each HTTP request to determine if
+            it should be handled by the OpenID Connect server middleware.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.MatchEndpoint.#ctor(AspNet.Security.OpenIdConnect.Server.MatchEndpointContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.MatchEndpoint"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ExtractAuthorizationRequest">
+            <summary>
+            Represents an event called for each request to the authorization endpoint to give the user code
+            a chance to manually extract the authorization request from the ambient HTTP context.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ExtractAuthorizationRequest.#ctor(AspNet.Security.OpenIdConnect.Server.ExtractAuthorizationRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ExtractAuthorizationRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ExtractConfigurationRequest">
+            <summary>
+            Represents an event called for each request to the configuration endpoint to give the user code
+            a chance to manually extract the configuration request from the ambient HTTP context.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ExtractConfigurationRequest.#ctor(AspNet.Security.OpenIdConnect.Server.ExtractConfigurationRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ExtractConfigurationRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ExtractCryptographyRequest">
+            <summary>
+            Represents an event called for each request to the cryptography endpoint to give the user code
+            a chance to manually extract the cryptography request from the ambient HTTP context.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ExtractCryptographyRequest.#ctor(AspNet.Security.OpenIdConnect.Server.ExtractCryptographyRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ExtractCryptographyRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ExtractIntrospectionRequest">
+            <summary>
+            Represents an event called for each request to the introspection endpoint to give the user code
+            a chance to manually extract the introspection request from the ambient HTTP context.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ExtractIntrospectionRequest.#ctor(AspNet.Security.OpenIdConnect.Server.ExtractIntrospectionRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ExtractIntrospectionRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ExtractLogoutRequest">
+            <summary>
+            Represents an event called for each request to the logout endpoint to give the user code
+            a chance to manually extract the logout request from the ambient HTTP context.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ExtractLogoutRequest.#ctor(AspNet.Security.OpenIdConnect.Server.ExtractLogoutRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ExtractLogoutRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ExtractRevocationRequest">
+            <summary>
+            Represents an event called for each request to the revocation endpoint to give the user code
+            a chance to manually extract the revocation request from the ambient HTTP context.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ExtractRevocationRequest.#ctor(AspNet.Security.OpenIdConnect.Server.ExtractRevocationRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ExtractRevocationRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ExtractTokenRequest">
+            <summary>
+            Represents an event called for each request to the token endpoint to give the user code
+            a chance to manually extract the token request from the ambient HTTP context.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ExtractTokenRequest.#ctor(AspNet.Security.OpenIdConnect.Server.ExtractTokenRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ExtractTokenRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ExtractUserinfoRequest">
+            <summary>
+            Represents an event called for each request to the userinfo endpoint to give the user code
+            a chance to manually extract the userinfo request from the ambient HTTP context.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ExtractUserinfoRequest.#ctor(AspNet.Security.OpenIdConnect.Server.ExtractUserinfoRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ExtractUserinfoRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ValidateAuthorizationRequest">
+            <summary>
+            Represents an event called for each request to the authorization endpoint
+            to determine if the request is valid and should continue to be processed.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ValidateAuthorizationRequest.#ctor(AspNet.Security.OpenIdConnect.Server.ValidateAuthorizationRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ValidateAuthorizationRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ValidateConfigurationRequest">
+            <summary>
+            Represents an event called for each request to the configuration endpoint
+            to determine if the request is valid and should continue to be processed.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ValidateConfigurationRequest.#ctor(AspNet.Security.OpenIdConnect.Server.ValidateConfigurationRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ValidateConfigurationRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ValidateCryptographyRequest">
+            <summary>
+            Represents an event called for each request to the cryptography endpoint
+            to determine if the request is valid and should continue to be processed.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ValidateCryptographyRequest.#ctor(AspNet.Security.OpenIdConnect.Server.ValidateCryptographyRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ValidateCryptographyRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ValidateIntrospectionRequest">
+            <summary>
+            Represents an event called for each request to the introspection endpoint
+            to determine if the request is valid and should continue to be processed.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ValidateIntrospectionRequest.#ctor(AspNet.Security.OpenIdConnect.Server.ValidateIntrospectionRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ValidateIntrospectionRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ValidateLogoutRequest">
+            <summary>
+            Represents an event called for each request to the logout endpoint
+            to determine if the request is valid and should continue to be processed.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ValidateLogoutRequest.#ctor(AspNet.Security.OpenIdConnect.Server.ValidateLogoutRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ValidateLogoutRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ValidateRevocationRequest">
+            <summary>
+            Represents an event called for each request to the revocation endpoint
+            to determine if the request is valid and should continue to be processed.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ValidateRevocationRequest.#ctor(AspNet.Security.OpenIdConnect.Server.ValidateRevocationRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ValidateRevocationRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ValidateTokenRequest">
+            <summary>
+            Represents an event called for each request to the token endpoint
+            to determine if the request is valid and should continue to be processed.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ValidateTokenRequest.#ctor(AspNet.Security.OpenIdConnect.Server.ValidateTokenRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ValidateTokenRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ValidateUserinfoRequest">
+            <summary>
+            Represents an event called for each request to the userinfo endpoint
+            to determine if the request is valid and should continue to be processed.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ValidateUserinfoRequest.#ctor(AspNet.Security.OpenIdConnect.Server.ValidateUserinfoRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ValidateUserinfoRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.HandleAuthorizationRequest">
+            <summary>
+            Represents an event called for each validated authorization request
+            to allow the user code to decide how the request should be handled.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.HandleAuthorizationRequest.#ctor(AspNet.Security.OpenIdConnect.Server.HandleAuthorizationRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.HandleAuthorizationRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.HandleConfigurationRequest">
+            <summary>
+            Represents an event called for each validated configuration request
+            to allow the user code to decide how the request should be handled.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.HandleConfigurationRequest.#ctor(AspNet.Security.OpenIdConnect.Server.HandleConfigurationRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.HandleConfigurationRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.HandleCryptographyRequest">
+            <summary>
+            Represents an event called for each validated cryptography request
+            to allow the user code to decide how the request should be handled.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.HandleCryptographyRequest.#ctor(AspNet.Security.OpenIdConnect.Server.HandleCryptographyRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.HandleCryptographyRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.HandleIntrospectionRequest">
+            <summary>
+            Represents an event called for each validated introspection request
+            to allow the user code to decide how the request should be handled.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.HandleIntrospectionRequest.#ctor(AspNet.Security.OpenIdConnect.Server.HandleIntrospectionRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.HandleIntrospectionRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.HandleLogoutRequest">
+            <summary>
+            Represents an event called for each validated logout request
+            to allow the user code to decide how the request should be handled.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.HandleLogoutRequest.#ctor(AspNet.Security.OpenIdConnect.Server.HandleLogoutRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.HandleLogoutRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.HandleRevocationRequest">
+            <summary>
+            Represents an event called for each validated revocation request
+            to allow the user code to decide how the request should be handled.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.HandleRevocationRequest.#ctor(AspNet.Security.OpenIdConnect.Server.HandleRevocationRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.HandleRevocationRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.HandleTokenRequest">
+            <summary>
+            Represents an event called for each validated token request
+            to allow the user code to decide how the request should be handled.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.HandleTokenRequest.#ctor(AspNet.Security.OpenIdConnect.Server.HandleTokenRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.HandleTokenRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.HandleUserinfoRequest">
+            <summary>
+            Represents an event called for each validated userinfo request
+            to allow the user code to decide how the request should be handled.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.HandleUserinfoRequest.#ctor(AspNet.Security.OpenIdConnect.Server.HandleUserinfoRequestContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.HandleUserinfoRequest"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ProcessChallengeResponse">
+            <summary>
+            Represents an event called when processing a challenge response.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ProcessChallengeResponse.#ctor(AspNet.Security.OpenIdConnect.Server.ProcessChallengeResponseContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ProcessChallengeResponse"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ProcessSigninResponse">
+            <summary>
+            Represents an event called when processing a sign-in response.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ProcessSigninResponse.#ctor(AspNet.Security.OpenIdConnect.Server.ProcessSigninResponseContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ProcessSigninResponse"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ProcessSignoutResponse">
+            <summary>
+            Represents an event called when processing a sign-out response.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ProcessSignoutResponse.#ctor(AspNet.Security.OpenIdConnect.Server.ProcessSignoutResponseContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ProcessSignoutResponse"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ApplyAuthorizationResponse">
+            <summary>
+            Represents an event called before the authorization response is returned to the caller.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ApplyAuthorizationResponse.#ctor(AspNet.Security.OpenIdConnect.Server.ApplyAuthorizationResponseContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ApplyAuthorizationResponse"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ApplyConfigurationResponse">
+            <summary>
+            Represents an event called before the configuration response is returned to the caller.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ApplyConfigurationResponse.#ctor(AspNet.Security.OpenIdConnect.Server.ApplyConfigurationResponseContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ApplyConfigurationResponse"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ApplyCryptographyResponse">
+            <summary>
+            Represents an event called before the cryptography response is returned to the caller.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ApplyCryptographyResponse.#ctor(AspNet.Security.OpenIdConnect.Server.ApplyCryptographyResponseContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ApplyCryptographyResponse"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ApplyIntrospectionResponse">
+            <summary>
+            Represents an event called before the introspection response is returned to the caller.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ApplyIntrospectionResponse.#ctor(AspNet.Security.OpenIdConnect.Server.ApplyIntrospectionResponseContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ApplyIntrospectionResponse"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ApplyLogoutResponse">
+            <summary>
+            Represents an event called before the logout response is returned to the caller.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ApplyLogoutResponse.#ctor(AspNet.Security.OpenIdConnect.Server.ApplyLogoutResponseContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ApplyLogoutResponse"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ApplyRevocationResponse">
+            <summary>
+            Represents an event called before the revocation response is returned to the caller.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ApplyRevocationResponse.#ctor(AspNet.Security.OpenIdConnect.Server.ApplyRevocationResponseContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ApplyRevocationResponse"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ApplyTokenResponse">
+            <summary>
+            Represents an event called before the token response is returned to the caller.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ApplyTokenResponse.#ctor(AspNet.Security.OpenIdConnect.Server.ApplyTokenResponseContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ApplyTokenResponse"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.ApplyUserinfoResponse">
+            <summary>
+            Represents an event called before the userinfo response is returned to the caller.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.ApplyUserinfoResponse.#ctor(AspNet.Security.OpenIdConnect.Server.ApplyUserinfoResponseContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.ApplyUserinfoResponse"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.SerializeAuthorizationCode">
+            <summary>
+            Represents an event called when serializing an authorization code.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.SerializeAuthorizationCode.#ctor(AspNet.Security.OpenIdConnect.Server.SerializeAuthorizationCodeContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.SerializeAuthorizationCode"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.SerializeAccessToken">
+            <summary>
+            Represents an event called when serializing an access token.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.SerializeAccessToken.#ctor(AspNet.Security.OpenIdConnect.Server.SerializeAccessTokenContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.SerializeAccessToken"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.SerializeIdentityToken">
+            <summary>
+            Represents an event called when serializing an identity token.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.SerializeIdentityToken.#ctor(AspNet.Security.OpenIdConnect.Server.SerializeIdentityTokenContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.SerializeIdentityToken"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.SerializeRefreshToken">
+            <summary>
+            Represents an event called when serializing a refresh token.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.SerializeRefreshToken.#ctor(AspNet.Security.OpenIdConnect.Server.SerializeRefreshTokenContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.SerializeRefreshToken"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.DeserializeAuthorizationCode">
+            <summary>
+            Represents an event called when deserializing an authorization code.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.DeserializeAuthorizationCode.#ctor(AspNet.Security.OpenIdConnect.Server.DeserializeAuthorizationCodeContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.DeserializeAuthorizationCode"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.DeserializeAccessToken">
+            <summary>
+            Represents an event called when deserializing an access token.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.DeserializeAccessToken.#ctor(AspNet.Security.OpenIdConnect.Server.DeserializeAccessTokenContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.DeserializeAccessToken"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.DeserializeIdentityToken">
+            <summary>
+            Represents an event called when deserializing an identity token.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.DeserializeIdentityToken.#ctor(AspNet.Security.OpenIdConnect.Server.DeserializeIdentityTokenContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.DeserializeIdentityToken"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEvents.DeserializeRefreshToken">
+            <summary>
+            Represents an event called when deserializing a refresh token.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEvents.DeserializeRefreshToken.#ctor(AspNet.Security.OpenIdConnect.Server.DeserializeRefreshTokenContext)">
+            <summary>
+            Creates a new instance of <see cref="T:OpenIddict.Server.OpenIddictServerEvents.DeserializeRefreshToken"/>.
+            </summary>
+            <param name="context">The context instance associated with the notification.</param>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerEventService">
+            <summary>
+            Dispatches notifications by invoking the corresponding handlers.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerEventService.PublishAsync``1(``0,System.Threading.CancellationToken)">
+            <summary>
+            Publishes a new event.
+            </summary>
+            <typeparam name="TEvent">The type of the event to publish.</typeparam>
+            <param name="notification">The event to publish.</param>
+            <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken"/> that can be used to abort the operation.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> that can be used to monitor the asynchronous operation.</returns>
+        </member>
+        <member name="T:OpenIddict.Server.OpenIddictServerOptions">
+            <summary>
+            Provides various settings needed to configure the OpenIddict server handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.OpenIddictServerOptions.#ctor">
+            <summary>
+            Creates a new instance of the <see cref="T:OpenIddict.Server.OpenIddictServerOptions"/> class.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.OpenIddictServerOptions.AcceptAnonymousClients">
+            <summary>
+            Gets or sets a boolean determining whether client identification is optional.
+            Enabling this option allows client applications to communicate with the token
+            and revocation endpoints without having to send their client identifier.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.OpenIddictServerOptions.Cache">
+            <summary>
+            Gets or sets the distributed cache used by OpenIddict. If no cache is explicitly
+            provided, the cache registered in the dependency injection container is used.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.OpenIddictServerOptions.Claims">
+            <summary>
+            Gets the OAuth2/OpenID Connect claims supported by this application.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.OpenIddictServerOptions.DisableAuthorizationStorage">
+            <summary>
+            Gets or sets a boolean indicating whether authorization storage should be disabled.
+            When disabled, ad-hoc authorizations are not created when an authorization code or
+            refresh token is issued and can't be revoked to prevent associated tokens from being used.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.OpenIddictServerOptions.DisableTokenStorage">
+            <summary>
+            Gets or sets a boolean indicating whether token storage should be disabled.
+            When disabled, authorization code and refresh tokens are not stored
+            and cannot be revoked. Using this option is generally not recommended.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.OpenIddictServerOptions.EnableRequestCaching">
+            <summary>
+            Gets or sets a boolean indicating whether request caching should be enabled.
+            When enabled, both authorization and logout requests are automatically stored
+            in the distributed cache, which allows flowing large payloads across requests.
+            Enabling this option is recommended when using external authentication providers
+            or when large GET or POST OpenID Connect authorization requests support is required.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.OpenIddictServerOptions.DisableScopeValidation">
+            <summary>
+            Gets or sets a boolean indicating whether scope validation is disabled.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.OpenIddictServerOptions.GrantTypes">
+            <summary>
+            Gets the OAuth2/OpenID Connect flows enabled for this application.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.OpenIddictServerOptions.IgnoreEndpointPermissions">
+            <summary>
+            Gets or sets a boolean indicating whether endpoint permissions should be ignored.
+            Setting this property to <c>true</c> is NOT recommended, unless all
+            the clients are first-party applications you own, control and fully trust.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.OpenIddictServerOptions.IgnoreGrantTypePermissions">
+            <summary>
+            Gets or sets a boolean indicating whether grant type permissions should be ignored.
+            Setting this property to <c>true</c> is NOT recommended, unless all
+            the clients are first-party applications you own, control and fully trust.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.OpenIddictServerOptions.IgnoreScopePermissions">
+            <summary>
+            Gets or sets a boolean indicating whether scope permissions should be ignored.
+            Setting this property to <c>true</c> is NOT recommended, unless all
+            the clients are first-party applications you own, control and fully trust.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.OpenIddictServerOptions.RandomNumberGenerator">
+            <summary>
+            Gets or sets the random number generator used to generate crypto-secure identifiers.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.OpenIddictServerOptions.Scopes">
+            <summary>
+            Gets the OAuth2/OpenID Connect scopes enabled for this application.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.OpenIddictServerOptions.UseReferenceTokens">
+            <summary>
+            Gets or sets a boolean indicating whether reference tokens should be used.
+            When set to <c>true</c>, authorization codes, access tokens and refresh tokens
+            are stored as ciphertext in the database and a crypto-secure random identifier
+            is returned to the client application. Enabling this option is useful
+            to keep track of all the issued tokens, when storing a very large number
+            of claims in the authorization codes, access tokens and refresh tokens
+            or when immediate revocation of reference access tokens is desired.
+            Note: this option cannot be used when configuring JWT as the access token format.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.OpenIddictServerOptions.UseRollingTokens">
+            <summary>
+            Gets or sets a boolean indicating whether rolling tokens should be used.
+            When disabled, no new token is issued and the refresh token lifetime is
+            dynamically managed by updating the token entry in the database.
+            When this option is enabled, a new refresh token is issued for each
+            refresh token request (and the previous one is automatically revoked
+            unless token revocation was explicitly disabled in the options).
+            </summary>
+        </member>
+        <member name="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder">
+            <summary>
+            Exposes the necessary methods required to configure the OpenIddict server services.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.
+            </summary>
+            <param name="services">The services collection.</param>
+        </member>
+        <member name="P:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.Services">
+            <summary>
+            Gets the services collection.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AddEventHandler``1(OpenIddict.Server.IOpenIddictServerEventHandler{``0})">
+            <summary>
+            Registers an event handler for the specified event type.
+            </summary>
+            <param name="handler">The handler added to the DI container.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AddEventHandler``1(System.Func{``0,System.Threading.Tasks.Task})">
+            <summary>
+            Registers an event handler for the specified event type.
+            </summary>
+            <param name="handler">The handler added to the DI container.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AddEventHandler``1(System.Func{``0,System.Threading.CancellationToken,System.Threading.Tasks.Task})">
+            <summary>
+            Registers an event handler for the specified event type.
+            </summary>
+            <param name="handler">The handler added to the DI container.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AddEventHandler``2(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Registers an event handler for the specified event type.
+            </summary>
+            <typeparam name="TEvent">The type of the event.</typeparam>
+            <typeparam name="THandler">The type of the handler.</typeparam>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AddEventHandler``1(System.Type,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Registers an event handler for the specified event type.
+            </summary>
+            <param name="type">The type of the handler.</param>
+            <param name="lifetime">The lifetime of the registered service.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.Configure(System.Action{OpenIddict.Server.OpenIddictServerOptions})">
+            <summary>
+            Amends the default OpenIddict server configuration.
+            </summary>
+            <param name="configuration">The delegate used to configure the OpenIddict options.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AcceptAnonymousClients">
+            <summary>
+            Makes client identification optional so that token and revocation
+            requests that don't specify a client_id are not automatically rejected.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AddDevelopmentSigningCertificate">
+            <summary>
+            Registers (and generates if necessary) a user-specific development
+            certificate used to sign the JWT tokens issued by OpenIddict.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AddDevelopmentSigningCertificate(System.Security.Cryptography.X509Certificates.X500DistinguishedName)">
+            <summary>
+            Registers (and generates if necessary) a user-specific development
+            certificate used to sign the JWT tokens issued by OpenIddict.
+            </summary>
+            <param name="subject">The subject name associated with the certificate.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AddEphemeralSigningKey">
+            <summary>
+            Registers a new ephemeral key used to sign the JWT tokens issued by OpenIddict: the key
+            is discarded when the application shuts down and tokens signed using this key are
+            automatically invalidated. This method should only be used during development.
+            On production, using a X.509 certificate stored in the machine store is recommended.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AddEphemeralSigningKey(System.String)">
+            <summary>
+            Registers a new ephemeral key used to sign the JWT tokens issued by OpenIddict: the key
+            is discarded when the application shuts down and tokens signed using this key are
+            automatically invalidated. This method should only be used during development.
+            On production, using a X.509 certificate stored in the machine store is recommended.
+            </summary>
+            <param name="algorithm">The algorithm associated with the signing key.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AddEncryptingKey(Microsoft.IdentityModel.Tokens.SecurityKey)">
+            <summary>
+            Registers a <see cref="T:Microsoft.IdentityModel.Tokens.SecurityKey"/> used to encrypt the JWT access tokens issued by OpenIddict.
+            </summary>
+            <param name="key">The security key.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AddSigningCertificate(System.Security.Cryptography.X509Certificates.X509Certificate2)">
+            <summary>
+            Registers a <see cref="T:System.Security.Cryptography.X509Certificates.X509Certificate2"/> that is used to sign the JWT tokens issued by OpenIddict.
+            </summary>
+            <param name="certificate">The certificate used to sign the security tokens issued by the server.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AddSigningCertificate(System.Reflection.Assembly,System.String,System.String)">
+            <summary>
+            Registers a <see cref="T:System.Security.Cryptography.X509Certificates.X509Certificate2"/> retrieved from an
+            embedded resource and used to sign the JWT tokens issued by OpenIddict.
+            </summary>
+            <param name="assembly">The assembly containing the certificate.</param>
+            <param name="resource">The name of the embedded resource.</param>
+            <param name="password">The password used to open the certificate.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AddSigningCertificate(System.IO.Stream,System.String)">
+            <summary>
+            Registers a <see cref="T:System.Security.Cryptography.X509Certificates.X509Certificate2"/> extracted from a
+            stream and used to sign the JWT tokens issued by OpenIddict.
+            </summary>
+            <param name="stream">The stream containing the certificate.</param>
+            <param name="password">The password used to open the certificate.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AddSigningCertificate(System.IO.Stream,System.String,System.Security.Cryptography.X509Certificates.X509KeyStorageFlags)">
+            <summary>
+            Registers a <see cref="T:System.Security.Cryptography.X509Certificates.X509Certificate2"/> extracted from a
+            stream and used to sign the JWT tokens issued by OpenIddict.
+            </summary>
+            <param name="stream">The stream containing the certificate.</param>
+            <param name="password">The password used to open the certificate.</param>
+            <param name="flags">
+            An enumeration of flags indicating how and where
+            to store the private key of the certificate.
+            </param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AddSigningCertificate(System.String)">
+            <summary>
+            Registers a <see cref="T:System.Security.Cryptography.X509Certificates.X509Certificate2"/> retrieved from the X.509
+            machine store and used to sign the JWT tokens issued by OpenIddict.
+            </summary>
+            <param name="thumbprint">The thumbprint of the certificate used to identify it in the X.509 store.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AddSigningCertificate(System.String,System.Security.Cryptography.X509Certificates.StoreName,System.Security.Cryptography.X509Certificates.StoreLocation)">
+            <summary>
+            Registers a <see cref="T:System.Security.Cryptography.X509Certificates.X509Certificate2"/> retrieved from the given
+            X.509 store and used to sign the JWT tokens issued by OpenIddict.
+            </summary>
+            <param name="thumbprint">The thumbprint of the certificate used to identify it in the X.509 store.</param>
+            <param name="name">The name of the X.509 store.</param>
+            <param name="location">The location of the X.509 store.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AddSigningKey(Microsoft.IdentityModel.Tokens.SecurityKey)">
+            <summary>
+            Registers a <see cref="T:Microsoft.IdentityModel.Tokens.SecurityKey"/> used to sign the JWT tokens issued by OpenIddict.
+            Note: using <see cref="T:Microsoft.IdentityModel.Tokens.RsaSecurityKey"/> asymmetric keys is recommended on production.
+            </summary>
+            <param name="key">The security key.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AllowAuthorizationCodeFlow">
+            <summary>
+            Enables authorization code flow support. For more information
+            about this specific OAuth2/OpenID Connect flow, visit
+            https://tools.ietf.org/html/rfc6749#section-4.1 and
+            http://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AllowClientCredentialsFlow">
+            <summary>
+            Enables client credentials flow support. For more information about this
+            specific OAuth2 flow, visit https://tools.ietf.org/html/rfc6749#section-4.4.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AllowCustomFlow(System.String)">
+            <summary>
+            Enables custom grant type support.
+            </summary>
+            <param name="type">The grant type associated with the flow.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AllowImplicitFlow">
+            <summary>
+            Enables implicit flow support. For more information
+            about this specific OAuth2/OpenID Connect flow, visit
+            https://tools.ietf.org/html/rfc6749#section-4.2 and
+            http://openid.net/specs/openid-connect-core-1_0.html#ImplicitFlowAuth.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AllowPasswordFlow">
+            <summary>
+            Enables password flow support. For more information about this specific
+            OAuth2 flow, visit https://tools.ietf.org/html/rfc6749#section-4.3.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.AllowRefreshTokenFlow">
+            <summary>
+            Enables refresh token flow support. For more information about this
+            specific OAuth2 flow, visit https://tools.ietf.org/html/rfc6749#section-6.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.DisableAuthorizationStorage">
+            <summary>
+            Disables authorization storage so that ad-hoc authorizations are
+            not created when an authorization code or refresh token is issued
+            and can't be revoked to prevent associated tokens from being used.
+            Using this option is generally NOT recommended.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.DisableConfigurationEndpoint">
+            <summary>
+            Disables the configuration endpoint.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.DisableCryptographyEndpoint">
+            <summary>
+            Disables the cryptography endpoint.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.DisableHttpsRequirement">
+            <summary>
+            Disables the HTTPS requirement during development.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.DisableSlidingExpiration">
+            <summary>
+            Disables sliding expiration. When using this option, refresh tokens
+            are issued with a fixed expiration date: when they expire, a complete
+            authorization flow must be started to retrieve a new refresh token.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.DisableTokenStorage">
+            <summary>
+            Disables token storage, so that authorization code and
+            refresh tokens are never stored and cannot be revoked.
+            Using this option is generally NOT recommended.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.EnableAuthorizationEndpoint(Microsoft.AspNetCore.Http.PathString)">
+            <summary>
+            Enables the authorization endpoint.
+            </summary>
+            <param name="path">The relative path of the authorization endpoint.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.EnableIntrospectionEndpoint(Microsoft.AspNetCore.Http.PathString)">
+            <summary>
+            Enables the introspection endpoint.
+            </summary>
+            <param name="path">The relative path of the logout endpoint.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.EnableLogoutEndpoint(Microsoft.AspNetCore.Http.PathString)">
+            <summary>
+            Enables the logout endpoint.
+            </summary>
+            <param name="path">The relative path of the logout endpoint.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.EnableRequestCaching">
+            <summary>
+            Enables request caching, so that both authorization and logout requests
+            are automatically stored in the distributed cache, which allows flowing
+            large payloads across requests. Enabling this option is recommended
+            when using external authentication providers or when large GET or POST
+            OpenID Connect authorization requests support is required.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.EnableRevocationEndpoint(Microsoft.AspNetCore.Http.PathString)">
+            <summary>
+            Enables the revocation endpoint.
+            </summary>
+            <param name="path">The relative path of the revocation endpoint.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.DisableScopeValidation">
+            <summary>
+            Allows processing authorization and token requests that specify scopes that have not
+            been registered using <see cref="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.RegisterScopes(System.String[])"/> or the scope manager.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.EnableTokenEndpoint(Microsoft.AspNetCore.Http.PathString)">
+            <summary>
+            Enables the token endpoint.
+            </summary>
+            <param name="path">The relative path of the token endpoint.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.EnableUserinfoEndpoint(Microsoft.AspNetCore.Http.PathString)">
+            <summary>
+            Enables the userinfo endpoint.
+            </summary>
+            <param name="path">The relative path of the userinfo endpoint.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.IgnoreEndpointPermissions">
+            <summary>
+            Disables endpoint permissions enforcement. Calling this method is NOT recommended,
+            unless all the clients are first-party applications you own, control and fully trust.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.IgnoreGrantTypePermissions">
+            <summary>
+            Disables grant type permissions enforcement. Calling this method is NOT recommended,
+            unless all the clients are first-party applications you own, control and fully trust.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.IgnoreScopePermissions">
+            <summary>
+            Disables scope permissions enforcement. Calling this method is NOT recommended,
+            unless all the clients are first-party applications you own, control and fully trust.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.RegisterClaims(System.String[])">
+            <summary>
+            Registers the specified claims as supported claims so
+            they can be returned as part of the discovery document.
+            </summary>
+            <param name="claims">The supported claims.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.RegisterScopes(System.String[])">
+            <summary>
+            Registers the specified scopes as supported scopes so
+            they can be returned as part of the discovery document.
+            </summary>
+            <param name="scopes">The supported scopes.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.SetAccessTokenLifetime(System.TimeSpan)">
+            <summary>
+            Sets the access token lifetime, after which client applications must retrieve
+            a new access token by making a grant_type=refresh_token token request
+            or a prompt=none authorization request, depending on the selected flow.
+            Using long-lived access tokens or tokens that never expire is not recommended.
+            </summary>
+            <param name="lifetime">The access token lifetime.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.SetAuthorizationCodeLifetime(System.TimeSpan)">
+            <summary>
+            Sets the authorization code lifetime, after which client applications
+            are unable to send a grant_type=authorization_code token request.
+            Using short-lived authorization codes is strongly recommended.
+            </summary>
+            <param name="lifetime">The authorization code lifetime.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.SetIdentityTokenLifetime(System.TimeSpan)">
+            <summary>
+            Sets the identity token lifetime, after which client
+            applications should refuse processing identity tokens.
+            </summary>
+            <param name="lifetime">The identity token lifetime.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.SetRefreshTokenLifetime(System.TimeSpan)">
+            <summary>
+            Sets the refresh token lifetime, after which client applications must get
+            a new authorization from the user. When sliding expiration is enabled,
+            a new refresh token is always issued to the client application,
+            which prolongs the validity period of the refresh token.
+            </summary>
+            <param name="lifetime">The refresh token lifetime.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.SetIssuer(System.Uri)">
+            <summary>
+            Sets the issuer address, which is used as the base address
+            for the endpoint URIs returned from the discovery endpoint.
+            </summary>
+            <param name="address">The issuer address.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.UseDataProtectionProvider(Microsoft.AspNetCore.DataProtection.IDataProtectionProvider)">
+            <summary>
+            Configures OpenIddict to use a specific data protection provider
+            instead of relying on the default instance provided by the DI container.
+            </summary>
+            <param name="provider">The data protection provider used to create token protectors.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.UseJsonWebTokens">
+            <summary>
+            Sets JSON Web Token (JWT) as the default token format for access tokens.
+            Note: JWT tokens cannot be used with the OpenIddict validation handler.
+            To validate JWT tokens, use the JWT handler shipping with ASP.NET Core.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.UseReferenceTokens">
+            <summary>
+            Configures OpenIddict to use reference tokens, so that authorization codes,
+            access tokens and refresh tokens are stored as ciphertext in the database
+            (only an identifier is returned to the client application). Enabling this option
+            is useful to keep track of all the issued tokens, when storing a very large
+            number of claims in the authorization codes, access tokens and refresh tokens
+            or when immediate revocation of reference access tokens is desired.
+            Note: this option cannot be used when configuring JWT as the access token format.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder.UseRollingTokens">
+            <summary>
+            Configures OpenIddict to use rolling refresh tokens. When this option is enabled,
+            a new refresh token is always issued for each refresh token request (and the previous
+            one is automatically revoked unless token revocation was explicitly disabled).
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerExtensions.AddServer(Microsoft.Extensions.DependencyInjection.OpenIddictBuilder)">
+            <summary>
+            Registers the OpenIddict token server services in the DI container.
+            </summary>
+            <param name="builder">The services builder used by OpenIddict to register new services.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerExtensions.AddServer(Microsoft.Extensions.DependencyInjection.OpenIddictBuilder,System.Action{Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder})">
+            <summary>
+            Registers the OpenIddict token server services in the DI container.
+            </summary>
+            <param name="builder">The services builder used by OpenIddict to register new services.</param>
+            <param name="configuration">The configuration delegate used to configure the server services.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+    </members>
+</doc>

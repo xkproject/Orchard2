@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>SixLabors.ImageSharp</id>
+    <version>1.0.0-beta0004</version>
+    <authors>Six Labors and contributors</authors>
+    <owners>Six Labors and contributors</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>https://github.com/SixLabors/ImageSharp</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/SixLabors/Branding/master/icons/imagesharp/sixlabors.imagesharp.128.png</iconUrl>
+    <description>A cross-platform library for the processing of image files; written in C#</description>
+    <tags>Image Resize Crop Gif Jpg Jpeg Bitmap Png Core</tags>
+    <repository type="git" url="https://github.com/SixLabors/ImageSharp" />
+    <dependencies>
+      <group targetFramework=".NETStandard1.1">
+        <dependency id="NETStandard.Library" version="1.6.1" exclude="Build,Analyzers" />
+        <dependency id="SixLabors.Core" version="1.0.0-beta0005" exclude="Build,Analyzers" />
+        <dependency id="System.Buffers" version="4.4.0" exclude="Build,Analyzers" />
+        <dependency id="System.IO.Compression" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Memory" version="4.5.0-rc1" exclude="Build,Analyzers" />
+        <dependency id="System.Runtime.CompilerServices.Unsafe" version="4.5.0-rc1" exclude="Build,Analyzers" />
+        <dependency id="System.Threading.Tasks.Parallel" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.ValueTuple" version="4.4.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="NETStandard.Library" version="1.6.1" exclude="Build,Analyzers" />
+        <dependency id="SixLabors.Core" version="1.0.0-beta0005" exclude="Build,Analyzers" />
+        <dependency id="System.Buffers" version="4.4.0" exclude="Build,Analyzers" />
+        <dependency id="System.IO.Compression" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Memory" version="4.5.0-rc1" exclude="Build,Analyzers" />
+        <dependency id="System.Runtime.CompilerServices.Unsafe" version="4.5.0-rc1" exclude="Build,Analyzers" />
+        <dependency id="System.Threading.Tasks.Parallel" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.ValueTuple" version="4.4.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="SixLabors.Core" version="1.0.0-beta0005" exclude="Build,Analyzers" />
+        <dependency id="System.Buffers" version="4.4.0" exclude="Build,Analyzers" />
+        <dependency id="System.Memory" version="4.5.0-rc1" exclude="Build,Analyzers" />
+        <dependency id="System.Runtime.CompilerServices.Unsafe" version="4.5.0-rc1" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

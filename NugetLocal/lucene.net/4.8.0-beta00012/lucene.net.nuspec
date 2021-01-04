@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Lucene.Net</id>
+    <version>4.8.0-beta00012</version>
+    <authors>The Apache Software Foundation</authors>
+    <owners>The Apache Software Foundation</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">LICENSE.txt</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <icon>lucene-net-icon-128x128.png</icon>
+    <projectUrl>http://lucenenet.apache.org/</projectUrl>
+    <description>Lucene.Net is a full-text search engine library capable of advanced text analysis, indexing, and searching. It can be used to easily add search capabilities to applications. Lucene.Net is a C# port of the popular Java Lucene search engine framework from The Apache Software Foundation, targeted at .NET Framework and .NET Core users.</description>
+    <copyright>Copyright © 2006 - 2020 The Apache Software Foundation</copyright>
+    <tags>lucene.net core text search information retrieval lucene apache analysis index query</tags>
+    <repository url="https://github.com/apache/lucenenet" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.5">
+        <dependency id="J2N" version="2.0.0-beta-0009" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="1.1.2" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="J2N" version="2.0.0-beta-0009" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="3.1.3" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.1">
+        <dependency id="J2N" version="2.0.0-beta-0009" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="3.1.3" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

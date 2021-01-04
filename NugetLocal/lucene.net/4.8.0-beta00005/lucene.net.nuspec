@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Lucene.Net</id>
+    <version>4.8.0-beta00005</version>
+    <authors>The Apache Software Foundation</authors>
+    <owners>The Apache Software Foundation</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/apache/lucenenet/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>http://lucenenet.apache.org/</projectUrl>
+    <iconUrl>https://github.com/apache/lucenenet/blob/master/branding/logo/lucene-net-icon-128x128.png?raw=true</iconUrl>
+    <description>Lucene.Net is a full-text search engine library capable of advanced text analysis, indexing, and searching. It can be used to easily add search capabilities to applications. Lucene.Net is a C# port of the popular Java Lucene search engine framework from The Apache Software Foundation, targeted at .NET Framework and .NET Core users.</description>
+    <copyright>Copyright © 2006 - 2017 The Apache Software Foundation</copyright>
+    <tags>lucene.net core text search information retrieval lucene apache analysis index query</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.5" />
+      <group targetFramework=".NETStandard1.6">
+        <dependency id="NETStandard.Library" version="1.6.1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.CSharp" version="4.4.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.DependencyModel" version="2.0.0" exclude="Build,Analyzers" />
+        <dependency id="Newtonsoft.Json" version="10.0.3" exclude="Build,Analyzers" />
+        <dependency id="System.Collections.NonGeneric" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Collections.Specialized" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Diagnostics.Process" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Diagnostics.TraceSource" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.IO.MemoryMappedFiles" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Net.NameResolution" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Net.Sockets" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Threading.Thread" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Threading.ThreadPool" version="4.3.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.CSharp" version="4.4.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework=".NETFramework4.5" />
+      <frameworkAssembly assemblyName="System" targetFramework=".NETFramework4.5" />
+    </frameworkAssemblies>
+    <repository url="https://github.com/apache/lucenenet" />
+  </metadata>
+</package>

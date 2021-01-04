@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>NUnit3TestAdapter</id>
+    <version>3.10.0</version>
+    <title>NUnit 3 Test Adapter for Visual Studio</title>
+    <authors>Charlie Poole, Terje Sandstrom</authors>
+    <owners>Charlie Poole, Terje Sandstrom</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>http://nunit.org/nuget/nunit3-license.txt</licenseUrl>
+    <projectUrl>https://github.com/nunit/docs/wiki/VS-Adapter</projectUrl>
+    <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
+    <description>A package including the NUnit 3 TestAdapter for Visual Studio 2012 onwards.  With this package you don't need to install the VSIX adapter package, and you don't need to upload the adapter to your TFS server.
+
+Note that this package ONLY contains the adapter, not the NUnit framework.  You must also get the framework. You only need one such package for a solution.
+
+The package works with Visual Studio 2012 and newer.</description>
+    <summary>NUnit 3 adapter for running tests in Visual Studio. Works with NUnit 3.x, use the NUnit 2 adapter for 2.x tests.</summary>
+    <releaseNotes>This release works with NUnit 3.0 and higher only.</releaseNotes>
+    <copyright>Copyright (c) 2011-2017 Charlie Poole, 2014-2017 Terje Sandstrom</copyright>
+    <language>en-US</language>
+    <tags>test visualstudio testadapter nunit nunit3</tags>
+    <dependencies>
+      <group targetFramework=".NETCoreApp1.0">
+        <dependency id="Microsoft.DotNet.InternalAbstractions" version="1.0.0" />
+        <dependency id="System.ComponentModel.EventBasedAsync" version="4.3.0" />
+        <dependency id="System.ComponentModel.TypeConverter" version="4.3.0" />
+        <dependency id="System.Diagnostics.Process" version="4.3.0" />
+        <dependency id="System.Reflection" version="4.3.0" />
+        <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="4.3.0" />
+        <dependency id="System.Threading.Thread" version="4.3.0" />
+        <dependency id="System.Xml.XmlDocument" version="4.3.0" />
+        <dependency id="System.Xml.XPath.XmlDocument" version="4.3.0" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

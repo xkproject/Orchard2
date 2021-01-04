@@ -1,0 +1,2782 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SixLabors.ImageSharp.Web</name>
+    </assembly>
+    <members>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.CacheHash">
+            <summary>
+            Creates hashed keys for the given inputs hashing them to string of length ranging from 2 to 64.
+            Hashed keys are the result of the SHA256 computation of the input value for the given length.
+            This ensures low collision rates with a shorter file name.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.CacheHash.#ctor(Microsoft.Extensions.Options.IOptions{SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions})">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Caching.CacheHash"/> class.
+            </summary>
+            <param name="options">The middleware configuration options.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.CacheHash.Create(System.String,System.UInt32)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.HexEncoder">
+            <summary>
+            Provides methods for encoding byte arrays into hexidecimal strings.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.HexEncoder.Encode(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Converts a <see cref="T:System.ReadOnlySpan`1"/> to a hexidecimal formatted <see cref="T:System.String"/> padded to 2 digits.
+            </summary>
+            <param name="bytes">The bytes.</param>
+            <returns>The <see cref="T:System.String"/>.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.ICacheHash">
+            <summary>
+            Defines a contract that allows the creation of hashed file names for storing cached images.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.ICacheHash.Create(System.String,System.UInt32)">
+            <summary>
+            Returns the hashed file name for the cached image file.
+            </summary>
+            <param name="value">The input value to hash.</param>
+            <param name="length">The length of the returned hash without any extensions.</param>
+            <returns>The <see cref="T:System.String"/>.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.IImageCache">
+            <summary>
+            Specifies the contract for caching images.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.IImageCache.GetAsync(System.String)">
+            <summary>
+            Gets the image resolver associated with the specified key.
+            </summary>
+            <param name="key">The cache key.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.Resolvers.IImageResolver"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.IImageCache.SetAsync(System.String,System.IO.Stream,SixLabors.ImageSharp.Web.ImageCacheMetadata)">
+            <summary>
+            Sets the value associated with the specified key.
+            </summary>
+            <param name="key">The cache key.</param>
+            <param name="stream">The stream containing the image to store.</param>
+            <param name="metadata">The <see cref="T:SixLabors.ImageSharp.Web.ImageCacheMetadata"/> associated with the image to store.</param>
+            <returns>The task.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.ConcurrentTLruCache`2">
+            <summary>
+            Pseudo LRU implementation where LRU list is composed of 3 segments: hot, warm and cold. Cost of maintaining
+            segments is amortized across requests. Items are only cycled when capacity is exceeded. Pure read does
+            not cycle items if all segments are within capacity constraints.
+            There are no global locks. On cache miss, a new item is added. Tail items in each segment are dequeued,
+            examined, and are either enqueued or discarded.
+            This scheme of hot, warm and cold is based on the implementation used in MemCached described online here:
+            https://memcached.org/blog/modern-lru/
+            </summary>
+            <remarks>
+            Each segment has a capacity. When segment capacity is exceeded, items are moved as follows:
+            1. New items are added to hot, WasAccessed = false
+            2. When items are accessed, update WasAccessed = true
+            3. When items are moved WasAccessed is set to false.
+            4. When hot is full, hot tail is moved to either Warm or Cold depending on WasAccessed.
+            5. When warm is full, warm tail is moved to warm head or cold depending on WasAccessed.
+            6. When cold is full, cold tail is moved to warm head or removed from dictionary on depending on WasAccessed.
+            </remarks>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.ConcurrentTLruCache`2.#ctor(System.Int32,System.TimeSpan)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Caching.ConcurrentTLruCache`2"/> class with the specified capacity and time to live that has the default.
+            concurrency level, and uses the default comparer for the key type.
+            </summary>
+            <param name="capacity">The maximum number of elements that the FastConcurrentTLru can contain.</param>
+            <param name="timeToLive">The time to live for cached values.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.ConcurrentTLruCache`2.#ctor(System.Int32,System.Int32,System.Collections.Generic.IEqualityComparer{`0},System.TimeSpan)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Caching.ConcurrentTLruCache`2"/> class that has the specified concurrency level, has the.
+            specified initial capacity, uses the specified <see cref="T:System.Collections.Generic.IEqualityComparer`1"/>, and has the specified time to live.
+            </summary>
+            <param name="concurrencyLevel">The estimated number of threads that will update the ConcurrentTLru concurrently.</param>
+            <param name="capacity">The maximum number of elements that the ConcurrentTLru can contain.</param>
+            <param name="comparer">The <see cref="T:System.Collections.Generic.IEqualityComparer`1"/> implementation to use when comparing keys.</param>
+            <param name="timeToLive">The time to live for cached values.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.ConcurrentTLruCache`2.TryGet(`0,`1@)">
+            <summary>
+            Attempts to get the value associated with the specified key from the cache.
+            </summary>
+            <param name="key">The key of the value to get.</param>
+            <param name="value">When this method returns, contains the object from the cache that has the specified key, or the default value of the type if the operation failed.</param>
+            <returns><see langword="true"/> if the key was found in the cache; otherwise, <see langword="false"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.ConcurrentTLruCache`2.GetOrAdd(`0,System.Func{`0,`1})">
+            <summary>
+            Adds a key/value pair to the cache if the key does not already exist. Returns the new value, or the
+            existing value if the key already exists.
+            </summary>
+            <param name="key">The key of the element to add.</param>
+            <param name="valueFactory">The factory function used to generate a value for the key.</param>
+            <returns>The value for the key. This will be either the existing value for the key if the key is already
+            in the cache, or the new value if the key was not in the dictionary.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.ConcurrentTLruCache`2.GetOrAddAsync(`0,System.Func{`0,System.Threading.Tasks.Task{`1}})">
+            <summary>
+            Adds a key/value pair to the cache if the key does not already exist. Returns the new value, or the
+            existing value if the key already exists.
+            </summary>
+            <param name="key">The key of the element to add.</param>
+            <param name="valueFactory">The factory function used to asynchronously generate a value for the key.</param>
+            <returns>A task that represents the asynchronous <see cref="M:SixLabors.ImageSharp.Web.Caching.ConcurrentTLruCache`2.GetOrAdd(`0,System.Func{`0,`1})"/> operation.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.ConcurrentTLruCache`2.TryRemove(`0)">
+            <summary>
+            Attempts to remove and return the value that has the specified key from the cache.
+            </summary>
+            <param name="key">The key of the element to remove.</param>
+            <returns><see langword="true"/> if the object was removed successfully; otherwise, <see langword="false"/>.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.TLruLongTicksPolicy`2">
+            <summary>
+            Time aware Least Recently Used (TLRU) is a variant of LRU which discards the least
+            recently used items first, and any item that has expired.
+            </summary>
+            <remarks>
+            This class measures time using stopwatch.
+            </remarks>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache">
+            <summary>
+            Implements a physical file system based cache.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.cacheRootPath">
+            <summary>
+            The root path for the cache.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.cachedNameLength">
+            <summary>
+            The length of the filename to use (minus the extension) when storing images in the image cache.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.fileProvider">
+            <summary>
+            The file provider abstraction.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.cacheOptions">
+            <summary>
+            The cache configuration options.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.options">
+            <summary>
+            The middleware configuration options.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.formatUtilities">
+            <summary>
+            Contains various format helper methods based on the current configuration.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.#ctor(Microsoft.Extensions.Options.IOptions{SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCacheOptions},Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Options.IOptions{SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions},SixLabors.ImageSharp.Web.FormatUtilities)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache"/> class.
+            </summary>
+            <param name="cacheOptions">The cache configuration options.</param>
+            <param name="environment">The hosting environment the application is running in.</param>
+            <param name="options">The middleware configuration options.</param>
+            <param name="formatUtilities">Contains various format helper methods based on the current configuration.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.GetAsync(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.SetAsync(System.String,System.IO.Stream,SixLabors.ImageSharp.Web.ImageCacheMetadata)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.ToImageFilePath(System.String,SixLabors.ImageSharp.Web.ImageCacheMetadata@)">
+            <summary>
+            Gets the path to the image file based on the supplied root and metadata.
+            </summary>
+            <param name="path">The root path.</param>
+            <param name="metaData">The image metadata.</param>
+            <returns>The <see cref="T:System.String"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.ToMetaDataFilePath(System.String)">
+            <summary>
+            Gets the path to the image file based on the supplied root.
+            </summary>
+            <param name="path">The root path.</param>
+            <returns>The <see cref="T:System.String"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.ToFilePath(System.String,System.Int32)">
+            <summary>
+            Converts the key into a nested file path.
+            </summary>
+            <param name="key">The cache key.</param>
+            <param name="cachedNameLength">The length of the cached file name minus the extension.</param>
+            <returns>The <see cref="T:System.String"/>.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCacheOptions">
+            <summary>
+            Configuration options for the <see cref="T:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache"/>.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCacheOptions.CacheFolder">
+            <summary>
+            Gets or sets the cache folder name.
+            </summary>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemCacheResolver">
+            <summary>
+            Provides means to manage image buffers within the <see cref="T:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache"/>.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemCacheResolver.#ctor(Microsoft.Extensions.FileProviders.IFileInfo,SixLabors.ImageSharp.Web.FormatUtilities)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemCacheResolver"/> class.
+            </summary>
+            <param name="metaFileInfo">The cached metadata file info.</param>
+            <param name="formatUtilities">
+            Contains various format helper methods based on the current configuration.
+            </param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemCacheResolver.GetMetaDataAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemCacheResolver.OpenReadAsync">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Resolvers.IImageCacheResolver">
+            <summary>
+            Specifies the contract for resolving image buffers from different cached locations.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Resolvers.IImageCacheResolver.GetMetaDataAsync">
+            <summary>
+            Asynchronously gets metadata associated with this image.
+            </summary>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.ImageCacheMetadata"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Resolvers.IImageCacheResolver.OpenReadAsync">
+            <summary>
+            Asynchronously gets the input image stream.
+            </summary>
+            <returns>The <see cref="T:System.Threading.Tasks.Task`1"/>.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Resolvers.IImageResolver">
+            <summary>
+            Specifies the contract for resolving image buffers from different locations.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Resolvers.IImageResolver.GetMetaDataAsync">
+            <summary>
+            Asynchronously gets metadata associated with this image.
+            </summary>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.ImageMetadata"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Resolvers.IImageResolver.OpenReadAsync">
+            <summary>
+            Asynchronously gets the input image stream.
+            </summary>
+            <returns>The <see cref="T:System.Threading.Tasks.Task`1"/>.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemResolver">
+            <summary>
+            Provides means to manage image buffers within the physical file system.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemResolver.#ctor(Microsoft.Extensions.FileProviders.IFileInfo,SixLabors.ImageSharp.Web.ImageMetadata@)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemResolver"/> class.
+            </summary>
+            <param name="fileInfo">The input file info.</param>
+            <param name="metadata">The image metadata associated with this file.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemResolver.GetMetaDataAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemResolver.OpenReadAsync">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.CommandParser">
+            <summary>
+            Parses URI derived command values into usable commands for processors.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.CommandParser.#ctor(System.Collections.Generic.IEnumerable{SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter})">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Commands.CommandParser"/> class.
+            </summary>
+            <param name="converters">The collection of command converters.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.CommandParser.ParseValue``1(System.String,System.Globalization.CultureInfo)">
+            <summary>
+            Parses the given string value converting it to the given type.
+            </summary>
+            <param name="value">The string value to parse.</param>
+            <param name="culture">The <see cref="T:System.Globalization.CultureInfo"/> to use as the current culture.</param>
+            <typeparam name="T">
+            The <see cref="T:System.Type"/> to convert the string to.
+            </typeparam>
+            <returns>The converted instance or the default.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.Converters.ArrayConverter`1">
+            <summary>
+            Converts the value of a string to a generic array.
+            </summary>
+            <typeparam name="T">The parameter type to convert to.</typeparam>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Commands.Converters.ArrayConverter`1.Type">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.ArrayConverter`1.ConvertFrom(SixLabors.ImageSharp.Web.Commands.CommandParser,System.Globalization.CultureInfo,System.String,System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.Converters.ColorConverter">
+            <summary>
+            Allows the conversion of strings into rgba32 pixel colors.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.Converters.ColorConverter.HexColorRegex">
+            <summary>
+            The web color hexadecimal regex. Matches strings arranged
+            in rgb, rgba, rrggbb, or rrggbbaa format to match web syntax.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.Converters.ColorConverter.NumberRegex">
+            <summary>
+            The number color regex.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.Converters.ColorConverter.ColorConstantsTable">
+            <summary>
+            The color constants table map.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Commands.Converters.ColorConverter.Type">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.ColorConverter.ConvertFrom(SixLabors.ImageSharp.Web.Commands.CommandParser,System.Globalization.CultureInfo,System.String,System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.Converters.EnumConverter">
+            <summary>
+            The enum converter. Allows conversion to enumerations.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.EnumConverter.ConvertFrom(SixLabors.ImageSharp.Web.Commands.CommandParser,System.Globalization.CultureInfo,System.String,System.Type)">
+            <inheritdoc/>
+            <remarks>
+            Unlike other converters the <see cref="P:SixLabors.ImageSharp.Web.Commands.Converters.EnumConverter.Type"/> property does not
+            match the <paramref name="propertyType"/> value.
+            This allows us to reuse the same converter for infinite enum types.
+            </remarks>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.EnumConverter.GetStringArray(System.String,System.Char)">
+            <summary>
+            Splits a string by separator to return an array of string values.
+            </summary>
+            <param name="input">The input string to split.</param>
+            <param name="separator">The separator to split string by.</param>
+            <returns>The <see cref="T:String[]"/>.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter">
+            <summary>
+            Defines a contract for converting the value of a string into a different data type.
+            Implementations should be stateless by design and also implement <see cref="T:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter`1"/>.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter.Type">
+            <summary>
+            Gets the type this converter returns.
+            </summary>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter`1">
+            <inheritdoc/>
+            <typeparam name="T">The type this converter returns.</typeparam>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter`1.ConvertFrom(SixLabors.ImageSharp.Web.Commands.CommandParser,System.Globalization.CultureInfo,System.String,System.Type)">
+            <summary>
+            Converts the given string to the type of this converter, using the specified culture information.
+            </summary>
+            <returns>
+            A <see cref="T:System.String"/> that represents the converted value.
+            </returns>
+            <param name="parser">The command parser use for parting commands.</param>
+            <param name="culture">
+            The <see cref="T:System.Globalization.CultureInfo"/> to use as the current parsing culture.
+            </param>
+            <param name="value">The <see cref="T:System.String"/> to convert. </param>
+            <param name="propertyType">The property type that the converter will convert to.</param>
+            <exception cref="T:System.NotSupportedException">The conversion cannot be performed.</exception>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.Converters.IntegralNumberConverter`1">
+            <summary>
+            The generic converter for integral types.
+            </summary>
+            <inheritdoc/>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Commands.Converters.IntegralNumberConverter`1.Type">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.IntegralNumberConverter`1.ConvertFrom(SixLabors.ImageSharp.Web.Commands.CommandParser,System.Globalization.CultureInfo,System.String,System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.Converters.ListConverter`1">
+            <summary>
+            Converts the value of a string to a generic list.
+            </summary>
+            <typeparam name="T">The type of result to return.</typeparam>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.ListConverter`1.ConvertFrom(SixLabors.ImageSharp.Web.Commands.CommandParser,System.Globalization.CultureInfo,System.String,System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.Converters.SimpleCommandConverter`1">
+            <summary>
+            The generic converter for simple types that implement <see cref="T:System.IConvertible"/>.
+            </summary>
+            <typeparam name="T">The type of object to convert to.</typeparam>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Commands.Converters.SimpleCommandConverter`1.Type">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.SimpleCommandConverter`1.ConvertFrom(SixLabors.ImageSharp.Web.Commands.CommandParser,System.Globalization.CultureInfo,System.String,System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.DictionaryExtensions">
+            <summary>
+            Extension methods for <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.DictionaryExtensions.GetValueOrDefault``2(System.Collections.Generic.IDictionary{``1,``0},``1)">
+            <summary>
+            Gets the value associated with the specified key or the default value.
+            </summary>
+            <param name="dictionary">The dictionary instance.</param>
+            <param name="key">The key of the value to get.</param>
+            <typeparam name="TValue">The value type.</typeparam>
+            <typeparam name="TKey">The key type.</typeparam>
+            <returns>The value associated with the specified key or the default value.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.IRequestParser">
+            <summary>
+            Defines a contract for parsing commands from image requests.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.IRequestParser.ParseRequestCommands(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Returns a collection of commands from the current request.
+            </summary>
+            <param name="context">Encapsulates all HTTP-specific information about an individual HTTP request.</param>
+            <returns>The <see cref="T:System.Collections.Generic.IDictionary`2"/>.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.QueryCollectionRequestParser">
+            <summary>
+            Parses commands from the request querystring.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.QueryCollectionRequestParser.ParseRequestCommands(Microsoft.AspNetCore.Http.HttpContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.TypeConstants">
+            <summary>
+            Contains reusable type variables.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.Sbyte">
+            <summary>
+            The <see cref="T:System.SByte"/> type.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.Byte">
+            <summary>
+            The <see cref="T:System.Byte"/> type.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.Short">
+            <summary>
+            The <see cref="T:System.Int16"/> type.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.UShort">
+            <summary>
+            The <see cref="T:System.UInt16"/> type.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.Int">
+            <summary>
+            The <see cref="T:System.Int32"/> type.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.UInt">
+            <summary>
+            The <see cref="T:System.UInt32"/> type.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.Long">
+            <summary>
+            The <see cref="T:System.Int64"/> type.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.ULong">
+            <summary>
+            The <see cref="T:System.UInt64"/> type.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.IntegralTypes">
+            <summary>
+            The collection of integral number types.
+            </summary>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.DependencyInjection.ApplicationBuilderExtensions">
+            <summary>
+            Extension methods for <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to simplify middleware registration.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ApplicationBuilderExtensions.UseImageSharp(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Registers the ImageSharp middleware.
+            </summary>
+            <param name="app">The application with the mechanism to configure a request pipeline.</param>
+            <returns><see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder">
+            <summary>
+            Defines a contract for adding ImageSharp services.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder.Services">
+            <summary>
+            Gets the <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> where ImageSharp services are configured.
+            </summary>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilder">
+            <summary>
+            Allows fine grained configuration of ImageSharp services.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilder"/> class.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilder.Services">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions">
+            <summary>
+            Extension methods for <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/> that allow configuration of services.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.SetRequestParser``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder)">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Web.Commands.IRequestParser"/> adding it to the service collection.
+            </summary>
+            <typeparam name="TParser">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Commands.IRequestParser"/>to add.</typeparam>
+            <param name="builder">The core builder.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.SetRequestParser(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder,System.Func{System.IServiceProvider,SixLabors.ImageSharp.Web.Commands.IRequestParser})">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Web.Commands.IRequestParser"/> adding it to the service collection.
+            </summary>
+            <param name="builder">The core builder.</param>
+            <param name="implementationFactory">The factory method for returning a <see cref="T:SixLabors.ImageSharp.Web.Commands.IRequestParser"/>.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.SetMemoryAllocator(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder,System.Func{System.IServiceProvider,SixLabors.ImageSharp.Memory.MemoryAllocator})">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Memory.MemoryAllocator"/> adding it to the service collection.
+            </summary>
+            <param name="builder">The core builder.</param>
+            <param name="implementationFactory">The factory method for returning a <see cref="T:SixLabors.ImageSharp.Memory.MemoryAllocator"/>.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.SetMemoryAllocator``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder)">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Memory.MemoryAllocator"/> adding it to the service collection.
+            </summary>
+            <typeparam name="TMemoryAllocator">The type of class implementing <see cref="T:SixLabors.ImageSharp.Memory.MemoryAllocator"/>to add.</typeparam>
+            <param name="builder">The core builder.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.SetCache``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder)">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Web.Caching.IImageCache"/> adding it to the service collection.
+            </summary>
+            <typeparam name="TCache">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Caching.IImageCache"/>to add.</typeparam>
+            <param name="builder">The core builder.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.SetCache(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder,System.Func{System.IServiceProvider,SixLabors.ImageSharp.Web.Caching.IImageCache})">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Web.Caching.IImageCache"/> adding it to the service collection.
+            </summary>
+            <param name="builder">The core builder.</param>
+            <param name="implementationFactory">The factory method for returning a <see cref="T:SixLabors.ImageSharp.Web.Caching.IImageCache"/>.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.SetCacheHash``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder)">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Web.Caching.ICacheHash"/> adding it to the service collection.
+            </summary>
+            <typeparam name="TCacheHash">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Caching.ICacheHash"/>to add.</typeparam>
+            <param name="builder">The core builder.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.SetCacheHash(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder,System.Func{System.IServiceProvider,SixLabors.ImageSharp.Web.Caching.ICacheHash})">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Web.Caching.ICacheHash"/> adding it to the service collection.
+            </summary>
+            <param name="builder">The core builder.</param>
+            <param name="implementationFactory">The factory method for returning a <see cref="T:SixLabors.ImageSharp.Web.Caching.ICacheHash"/>.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.AddProvider``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder)">
+            <summary>
+            Adds the given <see cref="T:SixLabors.ImageSharp.Web.Providers.IImageProvider"/> to the provider collection within the service collection.
+            </summary>
+            <typeparam name="TProvider">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Providers.IImageProvider"/>to add.</typeparam>
+            <param name="builder">The core builder.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.AddProvider``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder,System.Func{System.IServiceProvider,``0})">
+            <summary>
+            Adds the given <see cref="T:SixLabors.ImageSharp.Web.Providers.IImageProvider"/> to the provider collection within the service collection.
+            </summary>
+            <typeparam name="TProvider">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Providers.IImageProvider"/>to add.</typeparam>
+            <param name="builder">The core builder.</param>
+            <param name="implementationFactory">The factory method for returning a <see cref="T:SixLabors.ImageSharp.Web.Providers.IImageProvider"/>.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.RemoveProvider``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder)">
+            <summary>
+            Removes the given <see cref="T:SixLabors.ImageSharp.Web.Providers.IImageProvider"/> from the provider collection within the service collection.
+            </summary>
+            <typeparam name="TProvider">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Providers.IImageProvider"/>to add.</typeparam>
+            <param name="builder">The core builder.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.ClearProviders(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder)">
+            <summary>
+            Removes all <see cref="T:SixLabors.ImageSharp.Web.Providers.IImageProvider"/> instances from the provider collection within the service collection.
+            </summary>
+            <param name="builder">The core builder.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.AddProcessor``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder)">
+            <summary>
+            Adds the given <see cref="T:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor"/> to the processor collection within the service collection.
+            </summary>
+            <typeparam name="TProcessor">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor"/>to add.</typeparam>
+            <param name="builder">The core builder.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.AddProcessor``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder,System.Func{System.IServiceProvider,``0})">
+            <summary>
+            Adds the given <see cref="T:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor"/> to the processor collection within the service collection.
+            </summary>
+            <typeparam name="TProcessor">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor"/>to add.</typeparam>
+            <param name="builder">The core builder.</param>
+            <param name="implementationFactory">The factory method for returning a <see cref="T:SixLabors.ImageSharp.Web.Providers.IImageProvider"/>.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.RemoveProcessor``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder)">
+            <summary>
+            Removes the given <see cref="T:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor"/> from the processor collection within the service collection.
+            </summary>
+            <typeparam name="TProcessor">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor"/>to add.</typeparam>
+            <param name="builder">The core builder.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.ClearProcessors(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder)">
+            <summary>
+            Removes all <see cref="T:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor"/> instances from the processor collection within the service collection.
+            </summary>
+            <param name="builder">The core builder.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.AddConverter``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder)">
+            <summary>
+            Adds the given <see cref="T:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter"/> to the converter collection within the service collection.
+            </summary>
+            <typeparam name="TConverter">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter"/>to add.</typeparam>
+            <param name="builder">The core builder.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.AddConverter``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder,System.Func{System.IServiceProvider,``0})">
+            <summary>
+            Adds the given <see cref="T:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter"/> to the converter collection within the service collection.
+            </summary>
+            <typeparam name="TConverter">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter"/>to add.</typeparam>
+            <param name="builder">The core builder.</param>
+            <param name="implementationFactory">The factory method for returning a <see cref="T:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter"/>.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.RemoveConverter``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder)">
+            <summary>
+            Removes the given <see cref="T:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter"/> from the converter collection within the service collection.
+            </summary>
+            <typeparam name="TConverter">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter"/>to add.</typeparam>
+            <param name="builder">The core builder.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.ClearConverters(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder)">
+            <summary>
+            Removes all <see cref="T:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter"/> instances from the converter collection within the service collection.
+            </summary>
+            <param name="builder">The core builder.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.Configure``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Registers an action used to configure a particular type of options.
+            </summary>
+            <typeparam name="TOptions">The options type to be configured.</typeparam>
+            <param name="builder">The core builder.</param>
+            <param name="configuration">The configuration being bound.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilderExtensions.Configure``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder,System.Action{``0})">
+            <summary>
+            Registers an action used to configure a particular type of options.
+            </summary>
+            <typeparam name="TOptions">The options type to be configured.</typeparam>
+            <param name="builder">The core builder.</param>
+            <param name="configureOptions">The action used to configure the options.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/>.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpConfiguration">
+            <summary>
+            Provides default configuration settings to be consumed by the middleware.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpConfiguration.Configure(SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.DependencyInjection.ServiceCollectionExtensions">
+            <summary>
+            Extension methods for <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to simplify middleware service registration.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ServiceCollectionExtensions.AddImageSharp(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adds ImageSharp services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> with the default options.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+            <returns>An <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/> that can be used to further configure the ImageSharp services.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ServiceCollectionExtensions.AddImageSharp(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions})">
+            <summary>
+            Adds ImageSharp services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> with the given options.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+            <param name="setupAction">An <see cref="T:System.Action`1"/> to configure the provided <see cref="T:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions"/>.</param>
+            <returns>An <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/> that can be used to further configure the ImageSharp services.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.FormattedImage">
+            <summary>
+            A class encapsulating an image with a particular file encoding.
+            </summary>
+            <seealso cref="T:System.IDisposable"/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.FormattedImage.#ctor(SixLabors.ImageSharp.Image{SixLabors.ImageSharp.PixelFormats.Rgba32},SixLabors.ImageSharp.Formats.IImageFormat)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.FormattedImage"/> class.
+            </summary>
+            <param name="image">The image.</param>
+            <param name="format">The format.</param>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.FormattedImage.Image">
+            <summary>
+            Gets the image.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.FormattedImage.Format">
+            <summary>
+            Gets or sets the format.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.FormattedImage.Encoder">
+            <summary>
+            Gets or sets the encoder.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.FormattedImage.Load(SixLabors.ImageSharp.Configuration,System.IO.Stream)">
+            <summary>
+            Loads the specified source.
+            </summary>
+            <param name="configuration">The configuration.</param>
+            <param name="source">The source.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.FormattedImage"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.FormattedImage.Save(System.IO.Stream)">
+            <summary>
+            Saves image to the specified destination stream.
+            </summary>
+            <param name="destination">The destination stream.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.FormattedImage.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting
+            unmanaged resources.
+            </summary>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.FormatUtilities">
+            <summary>
+            Contains various helper methods based on the given configuration.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.FormatUtilities.#ctor(Microsoft.Extensions.Options.IOptions{SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions})">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.FormatUtilities"/> class.
+            </summary>
+            <param name="options">The middleware options.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.FormatUtilities.GetExtensionFromUri(System.String)">
+            <summary>
+            Gets the file extension for the given image uri.
+            </summary>
+            <param name="uri">The full request uri.</param>
+            <returns>The <see cref="T:System.String"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.FormatUtilities.GetExtensionFromContentType(System.String)">
+            <summary>
+            Gets the correct extension for the given content type (mime-type).
+            </summary>
+            <param name="contentType">The content type (mime-type).</param>
+            <returns>The <see cref="T:System.String"/>.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.ImageCacheMetadata">
+            <summary>
+            Represents the metadata associated with an image file.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageCacheMetadata.#ctor(System.DateTime,System.DateTime,System.String,System.TimeSpan,System.Int64)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.ImageCacheMetadata"/> struct.
+            </summary>
+            <param name="sourceLastWriteTimeUtc">The date and time in coordinated universal time (UTC) since the source file was last modified.</param>
+            <param name="cacheLastWriteTimeUtc">The date and time in coordinated universal time (UTC) since the cache file was last modified.</param>
+            <param name="contentType">The content type for the source file.</param>
+            <param name="cacheControlMaxAge">The maximum amount of time a resource will be considered fresh.</param>
+            <param name="contentLength">The length of the image in bytes.</param>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.ImageCacheMetadata.SourceLastWriteTimeUtc">
+            <summary>
+            Gets the date and time in coordinated universal time (UTC) since the source file was last modified.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.ImageCacheMetadata.CacheLastWriteTimeUtc">
+            <summary>
+            Gets the date and time in coordinated universal time (UTC) since the cached file was last modified.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.ImageCacheMetadata.ContentType">
+            <summary>
+            Gets the content type of the source file.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.ImageCacheMetadata.CacheControlMaxAge">
+            <summary>
+            Gets the maximum amount of time a resource will be considered fresh.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.ImageCacheMetadata.ContentLength">
+            <summary>
+            Gets the length of the image in bytes.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageCacheMetadata.op_Equality(SixLabors.ImageSharp.Web.ImageCacheMetadata@,SixLabors.ImageSharp.Web.ImageCacheMetadata@)">
+            <summary>
+            Compares two <see cref="T:SixLabors.ImageSharp.Web.ImageCacheMetadata"/> objects for equality.
+            </summary>
+            <param name="left">The <see cref="T:SixLabors.ImageSharp.Web.ImageCacheMetadata"/> on the left side of the operand.</param>
+            <param name="right">The <see cref="T:SixLabors.ImageSharp.Web.ImageCacheMetadata"/> on the right side of the operand.</param>
+            <returns>
+            True if the current left is equal to the <paramref name="right"/> parameter; otherwise, false.
+            </returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageCacheMetadata.op_Inequality(SixLabors.ImageSharp.Web.ImageCacheMetadata@,SixLabors.ImageSharp.Web.ImageCacheMetadata@)">
+            <summary>
+            Compares two <see cref="T:SixLabors.ImageSharp.Web.ImageCacheMetadata"/> objects for inequality.
+            </summary>
+            <param name="left">The <see cref="T:SixLabors.ImageSharp.Web.ImageCacheMetadata"/> on the left side of the operand.</param>
+            <param name="right">The <see cref="T:SixLabors.ImageSharp.Web.ImageCacheMetadata"/> on the right side of the operand.</param>
+            <returns>
+            True if the current left is unequal to the <paramref name="right"/> parameter; otherwise, false.
+            </returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageCacheMetadata.FromDictionary(System.Collections.Generic.IDictionary{System.String,System.String})">
+            <summary>
+            Returns a new <see cref="T:SixLabors.ImageSharp.Web.ImageCacheMetadata"/> parsed from the given dictionary.
+            </summary>
+            <param name="dictionary">The dictionary to parse and return the metadata from.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.ImageCacheMetadata"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageCacheMetadata.ReadAsync(System.IO.Stream)">
+            <summary>
+            Asynchronously reads and returns an <see cref="T:SixLabors.ImageSharp.Web.ImageCacheMetadata"/> from the input stream.
+            </summary>
+            <param name="stream">The input stream.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.ImageCacheMetadata"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageCacheMetadata.Equals(SixLabors.ImageSharp.Web.ImageCacheMetadata)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageCacheMetadata.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageCacheMetadata.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageCacheMetadata.ToDictionary">
+            <summary>
+            Returns a new <see cref="T:System.Collections.Generic.Dictionary`2"/> representing the current instance.
+            </summary>
+            <returns>The <see cref="T:System.Collections.Generic.Dictionary`2"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageCacheMetadata.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageCacheMetadata.WriteAsync(System.IO.Stream)">
+            <summary>
+            Asynchronously writes the metadata to the target stream.
+            </summary>
+            <param name="stream">The target stream.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> representing the asynchronous operation.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.ImageMetadata">
+            <summary>
+            Represents the metadata associated with an image file.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageMetadata.#ctor(System.DateTime,System.Int64)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.ImageMetadata"/> struct.
+            </summary>
+            <param name="lastWriteTimeUtc">
+            The date and time in coordinated universal time (UTC) since the source file was last modified.
+            </param>
+            <param name="contentLength">The length of the image in bytes.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageMetadata.#ctor(System.DateTime,System.TimeSpan,System.Int64)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.ImageMetadata"/> struct.
+            </summary>
+            <param name="lastWriteTimeUtc">
+            The date and time in coordinated universal time (UTC) since the source file was last modified.
+            </param>
+            <param name="cacheControlMaxAge">
+            The maximum amount of time a resource will be considered fresh.
+            </param>
+            <param name="contentLength">The length of the image in bytes.</param>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.ImageMetadata.LastWriteTimeUtc">
+            <summary>
+            Gets the date and time in coordinated universal time (UTC) since the source file was last modified.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.ImageMetadata.CacheControlMaxAge">
+            <summary>
+            Gets the maximum amount of time a resource will be considered fresh.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.ImageMetadata.ContentLength">
+            <summary>
+            Gets the length of the image in bytes.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageMetadata.op_Equality(SixLabors.ImageSharp.Web.ImageMetadata@,SixLabors.ImageSharp.Web.ImageMetadata@)">
+            <summary>
+            Compares two <see cref="T:SixLabors.ImageSharp.Web.ImageMetadata"/> objects for equality.
+            </summary>
+            <param name="left">The <see cref="T:SixLabors.ImageSharp.Web.ImageMetadata"/> on the left side of the operand.</param>
+            <param name="right">The <see cref="T:SixLabors.ImageSharp.Web.ImageMetadata"/> on the right side of the operand.</param>
+            <returns>
+            True if the current left is equal to the <paramref name="right"/> parameter; otherwise, false.
+            </returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageMetadata.op_Inequality(SixLabors.ImageSharp.Web.ImageMetadata@,SixLabors.ImageSharp.Web.ImageMetadata@)">
+            <summary>
+            Compares two <see cref="T:SixLabors.ImageSharp.Web.ImageMetadata"/> objects for inequality.
+            </summary>
+            <param name="left">The <see cref="T:SixLabors.ImageSharp.Web.ImageMetadata"/> on the left side of the operand.</param>
+            <param name="right">The <see cref="T:SixLabors.ImageSharp.Web.ImageMetadata"/> on the right side of the operand.</param>
+            <returns>
+            True if the current left is unequal to the <paramref name="right"/> parameter; otherwise, false.
+            </returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageMetadata.Equals(SixLabors.ImageSharp.Web.ImageMetadata)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageMetadata.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageMetadata.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.ImageMetadata.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Middleware.ImageCommandContext">
+            <summary>
+            Contains information about the current image request and parsed commands.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageCommandContext.#ctor(Microsoft.AspNetCore.Http.HttpContext,System.Collections.Generic.IDictionary{System.String,System.String},SixLabors.ImageSharp.Web.Commands.CommandParser,System.Globalization.CultureInfo)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Middleware.ImageCommandContext"/> class.
+            </summary>
+            <param name="context">The current HTTP request context.</param>
+            <param name="commands">The dictionary containing the collection of URI derived processing commands.</param>
+            <param name="parser">The command parser for parsing URI derived processing commands.</param>
+            <param name="culture">The culture used to parse commands.</param>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageCommandContext.Context">
+            <summary>
+            Gets the current HTTP request context.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageCommandContext.Commands">
+            <summary>
+            Gets the dictionary containing the collection of URI derived processing commands.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageCommandContext.Parser">
+            <summary>
+            Gets the command parser for parsing URI derived processing commands.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageCommandContext.Culture">
+            <summary>
+            Gets the culture used for parsing commands.
+            </summary>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Middleware.ImageContext">
+            <summary>
+            Provides information and methods regarding the current image request.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageContext.#ctor(Microsoft.AspNetCore.Http.HttpContext,SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Middleware.ImageContext"/> struct.
+            </summary>
+            <param name="context">The current HTTP request context.</param>
+            <param name="options">The middleware options.</param>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Middleware.ImageContext.PreconditionState">
+            <summary>
+            Enumerates the possible precondition states.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageContext.PreconditionState.Unspecified">
+            <summary>
+            Unspeciified
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageContext.PreconditionState.NotModified">
+            <summary>
+            Not modified
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageContext.PreconditionState.ShouldProcess">
+            <summary>
+            Should process
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageContext.PreconditionState.PreconditionFailed">
+            <summary>
+            Precondition Failed
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageContext.GetDisplayUrl">
+            <summary>
+            Returns the current HTTP request display url.
+            </summary>
+            <returns>The. </returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageContext.ComprehendRequestHeaders(System.DateTimeOffset,System.Int64)">
+            <summary>
+            Analyzes the headers for the current request.
+            </summary>
+            <param name="lastModified">The point in time when the cached file was last modified.</param>
+            <param name="length">The length of the cached file in bytes.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageContext.GetPreconditionState">
+            <summary>
+            Gets the preconditioned state of the request.
+            </summary>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.Middleware.ImageContext.PreconditionState"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageContext.IsHeadRequest">
+            <summary>
+            Gets a value indicating whether this request is a head request.
+            </summary>
+            <returns>THe <see cref="T:System.Boolean"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageContext.SendStatusAsync(System.Int32,SixLabors.ImageSharp.Web.ImageCacheMetadata@)">
+            <summary>
+            Set the response status headers.
+            </summary>
+            <param name="statusCode">The status code.</param>
+            <param name="metaData">The image metadata.</param>
+            <returns>The <see cref="T:System.Threading.Tasks.Task"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageContext.SendAsync(System.IO.Stream,SixLabors.ImageSharp.Web.ImageCacheMetadata)">
+            <summary>
+            Set the response content.
+            </summary>
+            <param name="stream">The output stream.</param>
+            <param name="metaData">The image metadata.</param>
+            <returns>The <see cref="T:System.Threading.Tasks.Task"/>.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Middleware.ImageProcessingContext">
+            <summary>
+            Contains information about the current image request and processed image.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageProcessingContext.#ctor(Microsoft.AspNetCore.Http.HttpContext,System.IO.Stream,System.Collections.Generic.IDictionary{System.String,System.String},System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Middleware.ImageProcessingContext"/> class.
+            </summary>
+            <param name="context">The current HTTP request context.</param>
+            <param name="stream">The stream containing the processed image bytes.</param>
+            <param name="commands">The parsed collection of processing commands.</param>
+            <param name="contentType">The content type for the processed image.</param>
+            <param name="extension">The file extension for the processed image.</param>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageProcessingContext.Context">
+            <summary>
+            Gets the current HTTP request context.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageProcessingContext.Stream">
+            <summary>
+            Gets the stream containing the processed image bytes.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageProcessingContext.Commands">
+            <summary>
+            Gets the parsed collection of processing commands.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageProcessingContext.ContentType">
+            <summary>
+            Gets the content type for for the processed image.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageProcessingContext.Extension">
+            <summary>
+            Gets the file extension for the processed image.
+            </summary>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware">
+            <summary>
+            Middleware for handling the processing of images via image requests.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.WriteWorkers">
+            <summary>
+            The write worker used for limiting identical requests.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.ReadWorkers">
+            <summary>
+            The read worker used for limiting identical requests.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.SourceMetadataLru">
+            <summary>
+            Used to temporarily store source metadata reads to reduce the overhead of cache lookups.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.CacheResolverLru">
+            <summary>
+            Used to temporarily store cache resolver reads to reduce the overhead of cache lookups.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.CacheMetadataLru">
+            <summary>
+            Used to temporarily store cache metadata reads to reduce the overhead of cache lookups.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.next">
+            <summary>
+            The function processing the Http request.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.options">
+            <summary>
+            The configuration options.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.logger">
+            <summary>
+            The type used for performing logging.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.requestParser">
+            <summary>
+            The parser for parsing commands from the current request.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.providers">
+            <summary>
+            The collection of image providers.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.processors">
+            <summary>
+            The collection of image processors.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.cache">
+            <summary>
+            The image cache.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.cacheHash">
+            <summary>
+            The hashing implementation to use when generating cached file names.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.knownCommands">
+            <summary>
+            The collection of known commands gathered from the processors.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.formatUtilities">
+            <summary>
+            Contains various helper methods based on the current configuration.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.commandParser">
+            <summary>
+            Used to parse processing commands.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.parserCulture">
+            <summary>
+            The culture to use when parsing processing commands.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.Extensions.Options.IOptions{SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions},Microsoft.Extensions.Logging.ILoggerFactory,SixLabors.ImageSharp.Web.Commands.IRequestParser,System.Collections.Generic.IEnumerable{SixLabors.ImageSharp.Web.Providers.IImageProvider},System.Collections.Generic.IEnumerable{SixLabors.ImageSharp.Web.Processors.IImageWebProcessor},SixLabors.ImageSharp.Web.Caching.IImageCache,SixLabors.ImageSharp.Web.Caching.ICacheHash,SixLabors.ImageSharp.Web.Commands.CommandParser,SixLabors.ImageSharp.Web.FormatUtilities)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware"/> class.
+            </summary>
+            <param name="next">The next middleware in the pipeline.</param>
+            <param name="options">The middleware configuration options.</param>
+            <param name="loggerFactory">An <see cref="T:Microsoft.Extensions.Logging.ILoggerFactory"/> instance used to create loggers.</param>
+            <param name="requestParser">An <see cref="T:SixLabors.ImageSharp.Web.Commands.IRequestParser"/> instance used to parse image requests for commands.</param>
+            <param name="resolvers">A collection of <see cref="T:SixLabors.ImageSharp.Web.Providers.IImageProvider"/> instances used to resolve images.</param>
+            <param name="processors">A collection of <see cref="T:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor"/> instances used to process images.</param>
+            <param name="cache">An <see cref="T:SixLabors.ImageSharp.Web.Caching.IImageCache"/> instance used for caching images.</param>
+            <param name="cacheHash">An <see cref="T:SixLabors.ImageSharp.Web.Caching.ICacheHash"/>instance used for calculating cached file names.</param>
+            <param name="commandParser">The command parser</param>
+            <param name="formatUtilities">Contains various format helper methods based on the current configuration.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Performs operations upon the current request.
+            </summary>
+            <param name="context">The current HTTP request context.</param>
+            <returns>The <see cref="T:System.Threading.Tasks.Task"/>.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions">
+            <summary>
+            Configuration options for the <see cref="T:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware"/> middleware.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.Configuration">
+            <summary>
+            Gets or sets the base library configuration.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.MemoryStreamManager">
+            <summary>
+            Gets or sets the recyclable memorystream manager used for managing pooled stream
+            buffers independently from image buffer pooling.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.UseInvariantParsingCulture">
+            <summary>
+            Gets or sets a value indicating whether to use culture-independent (invariant)
+            conversion when converting commands.
+            If set to <see langword="false"/> the <see cref="T:SixLabors.ImageSharp.Web.Commands.CommandParser"/> will use
+            the <see cref="P:System.Globalization.CultureInfo.CurrentCulture"/>.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.BrowserMaxAge">
+            <summary>
+            Gets or sets the duration to store images in the browser cache.
+            If an image provider provides a Max-Age for a source image then that will override
+            this value.
+            <para>
+            Defaults to 7 days.
+            </para>
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.CacheMaxAge">
+            <summary>
+            Gets or sets the duration to store images in the image cache.
+            <para>
+            Defaults to 365 days.
+            </para>
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.CachedNameLength">
+            <summary>
+            Gets or sets the length of the filename to use (minus the extension) when storing
+            images in the image cache. Defaults to 12 characters.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.OnParseCommandsAsync">
+            <summary>
+            Gets or sets the additional command parsing method that can be used to used to augment commands.
+            This is called once the commands have been gathered and before an <see cref="T:SixLabors.ImageSharp.Web.Providers.IImageProvider"/> has been assigned.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.OnBeforeSaveAsync">
+            <summary>
+            Gets or sets the additional method that can be used for final manipulation before the image is saved.
+            This is called after image has been processed, but before the image has been saved to the output stream for caching.
+            This can be used to alter the metadata of the resultant image.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.OnProcessedAsync">
+            <summary>
+            Gets or sets the additional processing method.
+            This is called after image has been processed, but before the result has been cached.
+            This can be used to further optimize the resultant image.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.OnPrepareResponseAsync">
+            <summary>
+            Gets or sets the additional response method.
+            This is called after the status code and headers have been set, but before the body has been written.
+            This can be used to add or change the response headers.
+            </summary>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Middleware.LoggerExtensions">
+            <summary>
+            Extensions methods for the <see cref="T:Microsoft.Extensions.Logging.ILogger"/> interface.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.LoggerExtensions.#cctor">
+            <summary>
+            Initializes static members of the <see cref="T:SixLabors.ImageSharp.Web.Middleware.LoggerExtensions"/> class.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.LoggerExtensions.LogImageProcessingFailed(Microsoft.Extensions.Logging.ILogger,System.String,System.Exception)">
+            <summary>
+            Logs that a given image request could not be processed.
+            </summary>
+            <param name="logger">The type used to perform logging.</param>
+            <param name="uri">The full request uri.</param>
+            <param name="exception">The captured exception.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.LoggerExtensions.LogImageResolveFailed(Microsoft.Extensions.Logging.ILogger,System.String)">
+            <summary>
+            Logs that a given image could not be resolved.
+            </summary>
+            <param name="logger">The type used to perform logging.</param>
+            <param name="uri">The full request uri.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.LoggerExtensions.LogImageServed(Microsoft.Extensions.Logging.ILogger,System.String,System.String)">
+            <summary>
+            Logs that a given image request has been served.
+            </summary>
+            <param name="logger">The type used to perform logging.</param>
+            <param name="uri">The full request uri.</param>
+            <param name="key">The cached image key.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.LoggerExtensions.LogImageNotModified(Microsoft.Extensions.Logging.ILogger,System.String)">
+            <summary>
+            Logs that a given image request has not been modified.
+            </summary>
+            <param name="logger">The type used to perform logging.</param>
+            <param name="uri">The full request uri.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.LoggerExtensions.LogImagePreconditionFailed(Microsoft.Extensions.Logging.ILogger,System.String)">
+            <summary>
+            Logs that access to a given image request has been denied.
+            </summary>
+            <param name="logger">The type used to perform logging.</param>
+            <param name="uri">The full request uri.</param>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Middleware.ResponseConstants">
+            <summary>
+            Contains constants related to HTTP respose codes.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ResponseConstants.Status200Ok">
+            <summary>
+            The HTTP 200 OK success status response code indicates that the request has succeeded.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ResponseConstants.Status304NotModified">
+            <summary>
+            The HTTP 304 Not Modified client redirection response code indicates that there is no need
+            to retransmit the requested resources.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ResponseConstants.Status412PreconditionFailed">
+            <summary>
+            The HTTP 412 Precondition Failed client error response code indicates that access to the target
+            resource has been denied.
+            </summary>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Processors.BackgroundColorWebProcessor">
+            <summary>
+            Allows setting of the background color.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.BackgroundColorWebProcessor.Color">
+            <summary>
+            The command for changing the background color.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.BackgroundColorWebProcessor.ColorCommands">
+            <summary>
+            The reusable collection of commands.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Processors.BackgroundColorWebProcessor.Commands">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Processors.BackgroundColorWebProcessor.Process(SixLabors.ImageSharp.Web.FormattedImage,Microsoft.Extensions.Logging.ILogger,System.Collections.Generic.IDictionary{System.String,System.String},SixLabors.ImageSharp.Web.Commands.CommandParser,System.Globalization.CultureInfo)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Processors.FormatWebProcessor">
+            <summary>
+            Allows the changing of image formats.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.FormatWebProcessor.Format">
+            <summary>
+            The command constant for format.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.FormatWebProcessor.FormatCommands">
+            <summary>
+            The reusable collection of commands.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.FormatWebProcessor.options">
+            <summary>
+            The middleware configuration options.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Processors.FormatWebProcessor.#ctor(Microsoft.Extensions.Options.IOptions{SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions})">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Processors.FormatWebProcessor"/> class.
+            </summary>
+            <param name="options">The middleware configuration options.</param>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Processors.FormatWebProcessor.Commands">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Processors.FormatWebProcessor.Process(SixLabors.ImageSharp.Web.FormattedImage,Microsoft.Extensions.Logging.ILogger,System.Collections.Generic.IDictionary{System.String,System.String},SixLabors.ImageSharp.Web.Commands.CommandParser,System.Globalization.CultureInfo)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor">
+            <summary>
+            Specifies the contract for processing images using a querystring URI API.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor.Commands">
+            <summary>
+            Gets the collection of recognized querystring commands.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor.Process(SixLabors.ImageSharp.Web.FormattedImage,Microsoft.Extensions.Logging.ILogger,System.Collections.Generic.IDictionary{System.String,System.String},SixLabors.ImageSharp.Web.Commands.CommandParser,System.Globalization.CultureInfo)">
+            <summary>
+            Processes the image based on the querystring commands.
+            </summary>
+            <param name="image">The image to process.</param>
+            <param name="logger">The type used for performing logging.</param>
+            <param name="commands">The querystring collection containing the processing commands.</param>
+            <param name="parser">The command parser use for parting commands.</param>
+            <param name="culture">
+            The <see cref="T:System.Globalization.CultureInfo"/> to use as the current parsing culture.
+            </param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.FormattedImage"/>.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Processors.JpegQualityWebProcessor">
+            <summary>
+            Allows the setting of quality for the jpeg image format.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.JpegQualityWebProcessor.Quality">
+            <summary>
+            The command constant for quality.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.JpegQualityWebProcessor.QualityCommands">
+            <summary>
+            The reusable collection of commands.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Processors.JpegQualityWebProcessor.Commands">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Processors.JpegQualityWebProcessor.Process(SixLabors.ImageSharp.Web.FormattedImage,Microsoft.Extensions.Logging.ILogger,System.Collections.Generic.IDictionary{System.String,System.String},SixLabors.ImageSharp.Web.Commands.CommandParser,System.Globalization.CultureInfo)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor">
+            <summary>
+            Allows the resizing of images.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Width">
+            <summary>
+            The command constant for the resize width.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Height">
+            <summary>
+            The command constant for the resize height.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Xy">
+            <summary>
+            The command constant for the resize focal point coordinates.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Mode">
+            <summary>
+            The command constant for the resize mode.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Sampler">
+            <summary>
+            The command constant for the resize sampler.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Anchor">
+            <summary>
+            The command constant for the resize sampler.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Compand">
+            <summary>
+            The command constant for the resize compand mode.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Commands">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Process(SixLabors.ImageSharp.Web.FormattedImage,Microsoft.Extensions.Logging.ILogger,System.Collections.Generic.IDictionary{System.String,System.String},SixLabors.ImageSharp.Web.Commands.CommandParser,System.Globalization.CultureInfo)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Processors.WebProcessingExtensions">
+            <summary>
+            Extends the image API to allow processing via a URI API.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Processors.WebProcessingExtensions.Process(SixLabors.ImageSharp.Web.FormattedImage,Microsoft.Extensions.Logging.ILogger,System.Collections.Generic.IEnumerable{SixLabors.ImageSharp.Web.Processors.IImageWebProcessor},System.Collections.Generic.IDictionary{System.String,System.String},SixLabors.ImageSharp.Web.Commands.CommandParser,System.Globalization.CultureInfo)">
+            <summary>
+            Loops through the available processors and updates the image if any match.
+            </summary>
+            <param name="source">The image to resize.</param>
+            <param name="logger">The type used for performing logging.</param>
+            <param name="processors">The collection of available processors.</param>
+            <param name="commands">The parsed collection of processing commands.</param>
+            <param name="commandParser">The command parser use for parting commands.</param>
+            <param name="culture">
+            The <see cref="T:System.Globalization.CultureInfo"/> to use as the current parsing culture.
+            </param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.FormattedImage"/>.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Providers.IImageProvider">
+            <summary>
+            Specifies the contract for returning images from different locations.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Providers.IImageProvider.ProcessingBehavior">
+            <summary>
+            Gets the processing behavior.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Providers.IImageProvider.Match">
+            <summary>
+            Gets or sets the method used by the resolver to identify itself as the correct resolver to use.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Providers.IImageProvider.IsValidRequest(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Gets a value indicating whether the current request passes sanitizing rules.
+            </summary>
+            <param name="context">The current HTTP request context.</param>
+            <returns>
+            <returns>The <see cref="T:System.Boolean"/></returns>
+            </returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Providers.IImageProvider.GetAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Gets the image resolver associated with the context.
+            </summary>
+            <param name="context">The current HTTP request context.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.Resolvers.IImageResolver"/>.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Providers.PhysicalFileSystemProvider">
+            <summary>
+            Returns images stored in the local physical file system.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Providers.PhysicalFileSystemProvider.fileProvider">
+            <summary>
+            The file provider abstraction.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Providers.PhysicalFileSystemProvider.formatUtilities">
+            <summary>
+            Contains various format helper methods based on the current configuration.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Providers.PhysicalFileSystemProvider.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,SixLabors.ImageSharp.Web.FormatUtilities)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Providers.PhysicalFileSystemProvider"/> class.
+            </summary>
+            <param name="environment">The environment used by this middleware.</param>
+            <param name="formatUtilities">Contains various format helper methods based on the current configuration.</param>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Providers.PhysicalFileSystemProvider.ProcessingBehavior">
+            <inheritdoc/>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Providers.PhysicalFileSystemProvider.Match">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Providers.PhysicalFileSystemProvider.IsValidRequest(Microsoft.AspNetCore.Http.HttpContext)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Providers.PhysicalFileSystemProvider.GetAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Providers.ProcessingBehavior">
+            <summary>
+            Enumerates the possible processing behaviors.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Providers.ProcessingBehavior.CommandOnly">
+            <summary>
+            The image will be processed only when commands are supplied.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Providers.ProcessingBehavior.All">
+            <summary>
+            The image will always be processed.
+            </summary>
+        </member>
+        <member name="T:SixLabors.DebugGuard">
+            <summary>
+            Provides methods to protect against invalid parameters for a DEBUG build.
+            </summary>
+        </member>
+        <member name="M:SixLabors.DebugGuard.NotNull``1(``0,System.String)">
+            <summary>
+            Ensures that the value is not null.
+            </summary>
+            <param name="value">The target object, which cannot be null.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <exception cref="T:System.ArgumentNullException"><paramref name="value"/> is null.</exception>
+        </member>
+        <member name="M:SixLabors.DebugGuard.NotNullOrWhiteSpace(System.String,System.String)">
+            <summary>
+            Ensures that the target value is not null, empty, or whitespace.
+            </summary>
+            <param name="value">The target string, which should be checked against being null or empty.</param>
+            <param name="parameterName">Name of the parameter.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="value"/> is null.</exception>
+            <exception cref="T:System.ArgumentException"><paramref name="value"/> is empty or contains only blanks.</exception>
+        </member>
+        <member name="M:SixLabors.DebugGuard.MustBeLessThan``1(``0,``0,System.String)">
+            <summary>
+            Ensures that the specified value is less than a maximum value.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.DebugGuard.MustBeLessThanOrEqualTo``1(``0,``0,System.String)">
+            <summary>
+            Verifies that the specified value is less than or equal to a maximum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.DebugGuard.MustBeGreaterThan``1(``0,``0,System.String)">
+            <summary>
+            Verifies that the specified value is greater than a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.DebugGuard.MustBeGreaterThanOrEqualTo``1(``0,``0,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.DebugGuard.MustBeBetweenOrEqualTo``1(``0,``0,``0,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value and less than
+            or equal to a maximum value and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value of greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.DebugGuard.IsTrue(System.Boolean,System.String,System.String)">
+            <summary>
+            Verifies, that the method parameter with specified target value is true
+            and throws an exception if it is found to be so.
+            </summary>
+            <param name="target">The target value, which cannot be false.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <param name="message">The error message, if any to add to the exception.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="target"/> is false.
+            </exception>
+        </member>
+        <member name="M:SixLabors.DebugGuard.IsFalse(System.Boolean,System.String,System.String)">
+            <summary>
+            Verifies, that the method parameter with specified target value is false
+            and throws an exception if it is found to be so.
+            </summary>
+            <param name="target">The target value, which cannot be true.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <param name="message">The error message, if any to add to the exception.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="target"/> is true.
+            </exception>
+        </member>
+        <member name="M:SixLabors.DebugGuard.MustBeSizedAtLeast``1(System.ReadOnlySpan{``0},System.Int32,System.String)">
+            <summary>
+            Verifies, that the `source` span has the length of 'minLength', or longer.
+            </summary>
+            <typeparam name="T">The element type of the spans.</typeparam>
+            <param name="source">The source span.</param>
+            <param name="minLength">The minimum length.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="source"/> has less than <paramref name="minLength"/> items.
+            </exception>
+        </member>
+        <member name="M:SixLabors.DebugGuard.MustBeSizedAtLeast``1(System.Span{``0},System.Int32,System.String)">
+            <summary>
+            Verifies, that the `source` span has the length of 'minLength', or longer.
+            </summary>
+            <typeparam name="T">The element type of the spans.</typeparam>
+            <param name="source">The target span.</param>
+            <param name="minLength">The minimum length.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="source"/> has less than <paramref name="minLength"/> items.
+            </exception>
+        </member>
+        <member name="M:SixLabors.DebugGuard.DestinationShouldNotBeTooShort``2(System.ReadOnlySpan{``0},System.Span{``1},System.String)">
+            <summary>
+            Verifies that the 'destination' span is not shorter than 'source'.
+            </summary>
+            <typeparam name="TSource">The source element type.</typeparam>
+            <typeparam name="TDest">The destination element type.</typeparam>
+            <param name="source">The source span.</param>
+            <param name="destination">The destination span.</param>
+            <param name="destinationParamName">The name of the argument for 'destination'.</param>
+        </member>
+        <member name="M:SixLabors.DebugGuard.DestinationShouldNotBeTooShort``2(System.Span{``0},System.Span{``1},System.String)">
+            <summary>
+            Verifies that the 'destination' span is not shorter than 'source'.
+            </summary>
+            <typeparam name="TSource">The source element type.</typeparam>
+            <typeparam name="TDest">The destination element type.</typeparam>
+            <param name="source">The source span.</param>
+            <param name="destination">The destination span.</param>
+            <param name="destinationParamName">The name of the argument for 'destination'.</param>
+        </member>
+        <member name="T:SixLabors.Guard">
+            <summary>
+            Provides methods to protect against invalid parameters.
+            </summary>
+            <summary>
+            Provides methods to protect against invalid parameters.
+            </summary>
+        </member>
+        <member name="M:SixLabors.Guard.NotNull``1(``0,System.String)">
+            <summary>
+            Ensures that the value is not null.
+            </summary>
+            <param name="value">The target object, which cannot be null.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <exception cref="T:System.ArgumentNullException"><paramref name="value"/> is null.</exception>
+        </member>
+        <member name="M:SixLabors.Guard.NotNullOrWhiteSpace(System.String,System.String)">
+            <summary>
+            Ensures that the target value is not null, empty, or whitespace.
+            </summary>
+            <param name="value">The target string, which should be checked against being null or empty.</param>
+            <param name="parameterName">Name of the parameter.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="value"/> is null.</exception>
+            <exception cref="T:System.ArgumentException"><paramref name="value"/> is empty or contains only blanks.</exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThan``1(``0,``0,System.String)">
+            <summary>
+            Ensures that the specified value is less than a maximum value.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThanOrEqualTo``1(``0,``0,System.String)">
+            <summary>
+            Verifies that the specified value is less than or equal to a maximum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThan``1(``0,``0,System.String)">
+            <summary>
+            Verifies that the specified value is greater than a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThanOrEqualTo``1(``0,``0,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeBetweenOrEqualTo``1(``0,``0,``0,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value and less than
+            or equal to a maximum value and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value of greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.IsTrue(System.Boolean,System.String,System.String)">
+            <summary>
+            Verifies, that the method parameter with specified target value is true
+            and throws an exception if it is found to be so.
+            </summary>
+            <param name="target">The target value, which cannot be false.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <param name="message">The error message, if any to add to the exception.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="target"/> is false.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.IsFalse(System.Boolean,System.String,System.String)">
+            <summary>
+            Verifies, that the method parameter with specified target value is false
+            and throws an exception if it is found to be so.
+            </summary>
+            <param name="target">The target value, which cannot be true.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <param name="message">The error message, if any to add to the exception.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="target"/> is true.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeSizedAtLeast``1(System.ReadOnlySpan{``0},System.Int32,System.String)">
+            <summary>
+            Verifies, that the `source` span has the length of 'minLength', or longer.
+            </summary>
+            <typeparam name="T">The element type of the spans.</typeparam>
+            <param name="source">The source span.</param>
+            <param name="minLength">The minimum length.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="source"/> has less than <paramref name="minLength"/> items.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeSizedAtLeast``1(System.Span{``0},System.Int32,System.String)">
+            <summary>
+            Verifies, that the `source` span has the length of 'minLength', or longer.
+            </summary>
+            <typeparam name="T">The element type of the spans.</typeparam>
+            <param name="source">The target span.</param>
+            <param name="minLength">The minimum length.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="source"/> has less than <paramref name="minLength"/> items.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.DestinationShouldNotBeTooShort``2(System.ReadOnlySpan{``0},System.Span{``1},System.String)">
+            <summary>
+            Verifies that the 'destination' span is not shorter than 'source'.
+            </summary>
+            <typeparam name="TSource">The source element type.</typeparam>
+            <typeparam name="TDest">The destination element type.</typeparam>
+            <param name="source">The source span.</param>
+            <param name="destination">The destination span.</param>
+            <param name="destinationParamName">The name of the argument for 'destination'.</param>
+        </member>
+        <member name="M:SixLabors.Guard.DestinationShouldNotBeTooShort``2(System.Span{``0},System.Span{``1},System.String)">
+            <summary>
+            Verifies that the 'destination' span is not shorter than 'source'.
+            </summary>
+            <typeparam name="TSource">The source element type.</typeparam>
+            <typeparam name="TDest">The destination element type.</typeparam>
+            <param name="source">The source span.</param>
+            <param name="destination">The destination span.</param>
+            <param name="destinationParamName">The name of the argument for 'destination'.</param>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThan(System.Byte,System.Byte,System.String)">
+            <summary>
+            Ensures that the specified value is less than a maximum value.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThanOrEqualTo(System.Byte,System.Byte,System.String)">
+            <summary>
+            Verifies that the specified value is less than or equal to a maximum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThan(System.Byte,System.Byte,System.String)">
+            <summary>
+            Verifies that the specified value is greater than a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThanOrEqualTo(System.Byte,System.Byte,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeBetweenOrEqualTo(System.Byte,System.Byte,System.Byte,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value and less than
+            or equal to a maximum value and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value of greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThan(System.SByte,System.SByte,System.String)">
+            <summary>
+            Ensures that the specified value is less than a maximum value.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThanOrEqualTo(System.SByte,System.SByte,System.String)">
+            <summary>
+            Verifies that the specified value is less than or equal to a maximum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThan(System.SByte,System.SByte,System.String)">
+            <summary>
+            Verifies that the specified value is greater than a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThanOrEqualTo(System.SByte,System.SByte,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeBetweenOrEqualTo(System.SByte,System.SByte,System.SByte,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value and less than
+            or equal to a maximum value and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value of greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThan(System.Int16,System.Int16,System.String)">
+            <summary>
+            Ensures that the specified value is less than a maximum value.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThanOrEqualTo(System.Int16,System.Int16,System.String)">
+            <summary>
+            Verifies that the specified value is less than or equal to a maximum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThan(System.Int16,System.Int16,System.String)">
+            <summary>
+            Verifies that the specified value is greater than a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThanOrEqualTo(System.Int16,System.Int16,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeBetweenOrEqualTo(System.Int16,System.Int16,System.Int16,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value and less than
+            or equal to a maximum value and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value of greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThan(System.UInt16,System.UInt16,System.String)">
+            <summary>
+            Ensures that the specified value is less than a maximum value.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThanOrEqualTo(System.UInt16,System.UInt16,System.String)">
+            <summary>
+            Verifies that the specified value is less than or equal to a maximum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThan(System.UInt16,System.UInt16,System.String)">
+            <summary>
+            Verifies that the specified value is greater than a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThanOrEqualTo(System.UInt16,System.UInt16,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeBetweenOrEqualTo(System.UInt16,System.UInt16,System.UInt16,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value and less than
+            or equal to a maximum value and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value of greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThan(System.Char,System.Char,System.String)">
+            <summary>
+            Ensures that the specified value is less than a maximum value.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThanOrEqualTo(System.Char,System.Char,System.String)">
+            <summary>
+            Verifies that the specified value is less than or equal to a maximum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThan(System.Char,System.Char,System.String)">
+            <summary>
+            Verifies that the specified value is greater than a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThanOrEqualTo(System.Char,System.Char,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeBetweenOrEqualTo(System.Char,System.Char,System.Char,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value and less than
+            or equal to a maximum value and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value of greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThan(System.Int32,System.Int32,System.String)">
+            <summary>
+            Ensures that the specified value is less than a maximum value.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThanOrEqualTo(System.Int32,System.Int32,System.String)">
+            <summary>
+            Verifies that the specified value is less than or equal to a maximum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThan(System.Int32,System.Int32,System.String)">
+            <summary>
+            Verifies that the specified value is greater than a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThanOrEqualTo(System.Int32,System.Int32,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeBetweenOrEqualTo(System.Int32,System.Int32,System.Int32,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value and less than
+            or equal to a maximum value and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value of greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThan(System.UInt32,System.UInt32,System.String)">
+            <summary>
+            Ensures that the specified value is less than a maximum value.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThanOrEqualTo(System.UInt32,System.UInt32,System.String)">
+            <summary>
+            Verifies that the specified value is less than or equal to a maximum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThan(System.UInt32,System.UInt32,System.String)">
+            <summary>
+            Verifies that the specified value is greater than a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThanOrEqualTo(System.UInt32,System.UInt32,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeBetweenOrEqualTo(System.UInt32,System.UInt32,System.UInt32,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value and less than
+            or equal to a maximum value and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value of greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThan(System.Single,System.Single,System.String)">
+            <summary>
+            Ensures that the specified value is less than a maximum value.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThanOrEqualTo(System.Single,System.Single,System.String)">
+            <summary>
+            Verifies that the specified value is less than or equal to a maximum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThan(System.Single,System.Single,System.String)">
+            <summary>
+            Verifies that the specified value is greater than a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThanOrEqualTo(System.Single,System.Single,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeBetweenOrEqualTo(System.Single,System.Single,System.Single,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value and less than
+            or equal to a maximum value and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value of greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThan(System.Int64,System.Int64,System.String)">
+            <summary>
+            Ensures that the specified value is less than a maximum value.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThanOrEqualTo(System.Int64,System.Int64,System.String)">
+            <summary>
+            Verifies that the specified value is less than or equal to a maximum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThan(System.Int64,System.Int64,System.String)">
+            <summary>
+            Verifies that the specified value is greater than a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThanOrEqualTo(System.Int64,System.Int64,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeBetweenOrEqualTo(System.Int64,System.Int64,System.Int64,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value and less than
+            or equal to a maximum value and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value of greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThan(System.UInt64,System.UInt64,System.String)">
+            <summary>
+            Ensures that the specified value is less than a maximum value.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThanOrEqualTo(System.UInt64,System.UInt64,System.String)">
+            <summary>
+            Verifies that the specified value is less than or equal to a maximum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThan(System.UInt64,System.UInt64,System.String)">
+            <summary>
+            Verifies that the specified value is greater than a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThanOrEqualTo(System.UInt64,System.UInt64,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeBetweenOrEqualTo(System.UInt64,System.UInt64,System.UInt64,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value and less than
+            or equal to a maximum value and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value of greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThan(System.Double,System.Double,System.String)">
+            <summary>
+            Ensures that the specified value is less than a maximum value.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThanOrEqualTo(System.Double,System.Double,System.String)">
+            <summary>
+            Verifies that the specified value is less than or equal to a maximum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThan(System.Double,System.Double,System.String)">
+            <summary>
+            Verifies that the specified value is greater than a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThanOrEqualTo(System.Double,System.Double,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeBetweenOrEqualTo(System.Double,System.Double,System.Double,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value and less than
+            or equal to a maximum value and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value of greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThan(System.Decimal,System.Decimal,System.String)">
+            <summary>
+            Ensures that the specified value is less than a maximum value.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeLessThanOrEqualTo(System.Decimal,System.Decimal,System.String)">
+            <summary>
+            Verifies that the specified value is less than or equal to a maximum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThan(System.Decimal,System.Decimal,System.String)">
+            <summary>
+            Verifies that the specified value is greater than a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeGreaterThanOrEqualTo(System.Decimal,System.Decimal,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.Guard.MustBeBetweenOrEqualTo(System.Decimal,System.Decimal,System.Decimal,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value and less than
+            or equal to a maximum value and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is less than the minimum value of greater than the maximum value.
+            </exception>
+        </member>
+        <member name="T:SixLabors.ThrowHelper">
+            <summary>
+            Helper methods to throw exceptions
+            </summary>
+        </member>
+        <member name="M:SixLabors.ThrowHelper.ThrowArgumentNullExceptionForNotNull(System.String)">
+            <summary>
+            Throws an <see cref="T:System.ArgumentNullException"/> when <see cref="M:SixLabors.Guard.NotNull``1(``0,System.String)"/> fails.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ThrowHelper.ThrowArgumentExceptionForNotNullOrWhitespace(System.String,System.String)">
+            <summary>
+            Throws an <see cref="T:System.ArgumentException"/> when <see cref="M:SixLabors.Guard.NotNullOrWhiteSpace(System.String,System.String)"/> fails.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ThrowHelper.ThrowArgumentOutOfRangeExceptionForMustBeLessThan``1(``0,``0,System.String)">
+            <summary>
+            Throws an <see cref="T:System.ArgumentOutOfRangeException"/> when <see cref="M:SixLabors.Guard.MustBeLessThan``1(``0,``0,System.String)"/> fails.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ThrowHelper.ThrowArgumentOutOfRangeExceptionForMustBeLessThanOrEqualTo``1(``0,``0,System.String)">
+            <summary>
+            Throws an <see cref="T:System.ArgumentOutOfRangeException"/> when <see cref="M:SixLabors.Guard.MustBeLessThanOrEqualTo``1(``0,``0,System.String)"/> fails.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ThrowHelper.ThrowArgumentOutOfRangeExceptionForMustBeGreaterThan``1(``0,``0,System.String)">
+            <summary>
+            Throws an <see cref="T:System.ArgumentOutOfRangeException"/> when <see cref="M:SixLabors.Guard.MustBeGreaterThan``1(``0,``0,System.String)"/> fails.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ThrowHelper.ThrowArgumentOutOfRangeExceptionForMustBeGreaterThanOrEqualTo``1(``0,``0,System.String)">
+            <summary>
+            Throws an <see cref="T:System.ArgumentOutOfRangeException"/> when <see cref="M:SixLabors.Guard.MustBeGreaterThanOrEqualTo``1(``0,``0,System.String)"/> fails.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ThrowHelper.ThrowArgumentOutOfRangeExceptionForMustBeBetweenOrEqualTo``1(``0,``0,``0,System.String)">
+            <summary>
+            Throws an <see cref="T:System.ArgumentOutOfRangeException"/> when <see cref="M:SixLabors.Guard.MustBeBetweenOrEqualTo``1(``0,``0,``0,System.String)"/> fails.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ThrowHelper.ThrowArgumentOutOfRangeExceptionForMustBeSizedAtLeast(System.Int32,System.String)">
+            <summary>
+            Throws an <see cref="T:System.ArgumentException"/> when <see cref="M:SixLabors.Guard.MustBeSizedAtLeast``1(System.ReadOnlySpan{``0},System.Int32,System.String)"/> fails.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ThrowHelper.ThrowArgumentException(System.String,System.String)">
+            <summary>
+            Throws a new <see cref="T:System.ArgumentException"/>.
+            </summary>
+            <param name="message">The message to include in the exception.</param>
+            <param name="name">The argument name.</param>
+            <exception cref="T:System.ArgumentException">Thrown with <paramref name="message"/> and <paramref name="name"/>.</exception>
+        </member>
+        <member name="M:SixLabors.ThrowHelper.ThrowArgumentNullException(System.String,System.String)">
+            <summary>
+            Throws a new <see cref="T:System.ArgumentNullException"/>.
+            </summary>
+            <param name="name">The argument name.</param>
+            <param name="message">The message to include in the exception.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown with <paramref name="name"/> and <paramref name="message"/>.</exception>
+        </member>
+        <member name="M:SixLabors.ThrowHelper.ThrowArgumentOutOfRangeException(System.String,System.String)">
+            <summary>
+            Throws a new <see cref="T:System.ArgumentOutOfRangeException"/>.
+            </summary>
+            <param name="name">The argument name.</param>
+            <param name="message">The message to include in the exception.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown with <paramref name="name"/> and <paramref name="message"/>.</exception>
+        </member>
+    </members>
+</doc>

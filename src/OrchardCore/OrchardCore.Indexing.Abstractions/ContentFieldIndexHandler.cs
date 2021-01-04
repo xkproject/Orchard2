@@ -7,7 +7,7 @@ namespace OrchardCore.Indexing
 {
     /// <summary>
     /// An implementation of <see cref="ContentFieldIndexHandler&lt;TField&gt;"/> is able to take part in the rendering of
-    /// a <see cref="TField"/> instance.
+    /// a <see typeparamref="TField"/> instance.
     /// </summary>
     public abstract class ContentFieldIndexHandler<TField> : IContentFieldIndexHandler where TField : ContentField
     {
@@ -27,7 +27,11 @@ namespace OrchardCore.Indexing
                 {
                     keys.Add($"{key}.{partFieldDefinition.Name}");
                 }
-                keys.Add($"{typePartDefinition.Name}.{partFieldDefinition.Name}");
+
+                if (!keys.Contains($"{typePartDefinition.Name}.{partFieldDefinition.Name}"))
+                {
+                    keys.Add($"{typePartDefinition.Name}.{partFieldDefinition.Name}");
+                }
 
                 var buildFieldIndexContext = new BuildFieldIndexContext(context.DocumentIndex, context.ContentItem, keys, contentPart, typePartDefinition, partFieldDefinition, settings);
 

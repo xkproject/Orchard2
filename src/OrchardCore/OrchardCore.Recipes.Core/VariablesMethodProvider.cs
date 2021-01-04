@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
+using OrchardCore.Environment.Shell.Scope;
 using OrchardCore.Scripting;
 
 namespace OrchardCore.Recipes
@@ -14,12 +16,12 @@ namespace OrchardCore.Recipes
             _globalMethod = new GlobalMethod
             {
                 Name = "variables",
-                Method = serviceprovider => (Func<string, object>) (name =>
+                Method = serviceprovider => (Func<string, object>)(name =>
                 {
                     var value = variables[name].Value<string>();
 
                     // Replace variable value while the result returns another script
-                    while (value.StartsWith("[") && value.EndsWith("]"))
+                    while (value.StartsWith('[') && value.EndsWith(']'))
                     {
                         value = value.Trim('[', ']');
                         value = (ScriptingManager.Evaluate(value, null, null, null) ?? "").ToString();
@@ -31,7 +33,7 @@ namespace OrchardCore.Recipes
             };
         }
 
-        public IScriptingManager ScriptingManager { get; set; }
+        public IScriptingManager ScriptingManager => ShellScope.Services.GetRequiredService<IScriptingManager>();
 
         public IEnumerable<GlobalMethod> GetMethods()
         {

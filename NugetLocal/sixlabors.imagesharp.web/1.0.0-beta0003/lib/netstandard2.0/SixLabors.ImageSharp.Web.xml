@@ -1,0 +1,1839 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SixLabors.ImageSharp.Web</name>
+    </assembly>
+    <members>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.AsyncKeyLock">
+            <summary>
+            The async key lock prevents multiple asynchronous threads acting upon the same object with the given key at the same time.
+            It is designed so that it does not block unique requests allowing a high throughput.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.AsyncKeyLock.Keys">
+            <summary>
+            A collection of doorman counters used for tracking references to the same key.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.AsyncKeyLock.LockAsync(System.String)">
+            <summary>
+            Locks the current thread asynchronously.
+            </summary>
+            <param name="key">The key identifying the specific object to lock against.</param>
+            <returns>
+            The <see cref="T:System.Threading.Tasks.Task`1"/> that will release the lock.
+            </returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.AsyncKeyLock.GetOrCreate(System.String)">
+            <summary>
+            Returns a <see cref="T:System.Threading.SemaphoreSlim"/> matching on the given key
+             or a new one if none is found.
+            </summary>
+            <param name="key">The key identifying the semaphore.</param>
+            <returns>
+            The <see cref="T:System.Threading.SemaphoreSlim"/>.
+            </returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.AsyncKeyLock.Releaser">
+            <summary>
+            The disposable releaser tasked with releasing the semaphore.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.AsyncKeyLock.Releaser.key">
+            <summary>
+            The key identifying the <see cref="T:SixLabors.ImageSharp.Web.Caching.Doorman"/> that limits the number of threads.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.AsyncKeyLock.Releaser.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Caching.AsyncKeyLock.Releaser"/> class.
+            </summary>
+            <param name="key">The key identifying the doorman that limits the number of threads.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.AsyncKeyLock.Releaser.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.CachedInfo">
+            <summary>
+            Contains information about a cached image instance
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.CachedInfo.Expired">
+            <summary>
+            Gets a value indicating whether the cached image is expired
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.CachedInfo.LastModifiedUtc">
+            <summary>
+            Gets the date and time, in coordinated universal time (UTC), the cached image was last written to
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.CachedInfo.Length">
+            <summary>
+            Gets the length, in bytes, of the cached image
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.CachedInfo.#ctor(System.Boolean,System.DateTimeOffset,System.Int64)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Caching.CachedInfo"/> struct.
+            </summary>
+            <param name="expired">Whether the cached image is expired</param>
+            <param name="lastModified">The date and time, in coordinated universal time (UTC), the cached image was last written to</param>
+            <param name="length">The length, in bytes, of the cached image</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.CachedInfo.Equals(SixLabors.ImageSharp.Web.Caching.CachedInfo)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.CachedInfo.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.CachedInfo.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.CacheHash">
+            <summary>
+            Creates hashed keys for the given inputs hashing them to string of length ranging from 2 to 64.
+            Hashed keys are the result of the SHA256 computation of the input value for the given length.
+            This ensures low collision rates with a shorter file name.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.CacheHash.#ctor(Microsoft.Extensions.Options.IOptions{SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions})">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Caching.CacheHash"/> class.
+            </summary>
+            <param name="options">The middleware configuration options</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.CacheHash.Create(System.String,System.UInt32)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.Doorman">
+            <summary>
+            A wrapper around <see cref="T:System.Threading.SemaphoreSlim"/> that operates a one-in-one out policy
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.Doorman.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Caching.Doorman"/> class.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Caching.Doorman.Semaphore">
+            <summary>
+            Gets the SemaphoreSlim that performs the limiting
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Caching.Doorman.RefCount">
+            <summary>
+            Gets or sets the number of references to this doorman.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.Doorman.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.DoormanPool">
+            <summary>
+            Provides a resource pool that enables reusing instances of <see cref="T:SixLabors.ImageSharp.Web.Caching.Doorman"/>
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.DoormanPool.Rent">
+            <summary>
+            Retrieves a <see cref="T:SixLabors.ImageSharp.Web.Caching.Doorman"/> from the pool or a new one if the pool is empty
+            </summary>
+            <returns>Tre <see cref="T:SixLabors.ImageSharp.Web.Caching.Doorman"/></returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.DoormanPool.Return(SixLabors.ImageSharp.Web.Caching.Doorman)">
+            <summary>
+            Returns an doorman to the pool that was previously obtained using the <see cref="M:SixLabors.ImageSharp.Web.Caching.DoormanPool.Rent"></see>
+            method on the same <see cref="T:SixLabors.ImageSharp.Web.Caching.DoormanPool"></see> instance.
+            </summary>
+            <param name="doorman">The doorman to return</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.DoormanPool.Count">
+            <summary>
+            Gets the number of items contained within the pool
+            </summary>
+            <returns>The <see cref="T:System.Int32"/></returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.IAsyncKeyLock">
+            <summary>
+            Defines a contract that allows the prevention of multiple asynchronous threads acting upon the same object with the given
+            key at the same time
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.IAsyncKeyLock.LockAsync(System.String)">
+            <summary>
+            Locks the current thread asynchronously.
+            </summary>
+            <param name="key">The key identifying the specific object to lock against.</param>
+            <returns>
+            The <see cref="T:System.Threading.Tasks.Task`1"/> that will release the lock.
+            </returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.ICacheHash">
+            <summary>
+            Defines a contract that allows the creation of hashed file names for storing cached images.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.ICacheHash.Create(System.String,System.UInt32)">
+            <summary>
+            Returns the hashed file name for the cached image file.
+            </summary>
+            <param name="value">The input value to hash</param>
+            <param name="length">The length of the returned hash without any extensions</param>
+            <returns>The <see cref="T:System.String"/></returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.IImageCache">
+            <summary>
+            Specifies the contract for caching images.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Caching.IImageCache.Settings">
+            <summary>
+            Gets any additional settings.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.IImageCache.GetAsync(System.String)">
+            <summary>
+            Gets the value associated with the specified key.
+            </summary>
+            <param name="key">The cache key</param>
+            <returns>The <see cref="T:System.Threading.Tasks.Task`1"/></returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.IImageCache.IsExpiredAsync(Microsoft.AspNetCore.Http.HttpContext,System.String,System.DateTime)">
+            <summary>
+            Returns a value indicating whether the current cached item is expired.
+            </summary>
+            <param name="context">The current HTTP request context</param>
+            <param name="key">The cache key</param>
+            <param name="minDateUtc">
+            The minimum allowable date and time in coordinated universal time (UTC) since the file was last modified.
+            Calculated as the current datetime minus the maximum allowable cached days.
+            </param>
+            <returns>The <see cref="T:System.Threading.Tasks.Task`1"/></returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.IImageCache.SetAsync(System.String,SixLabors.ImageSharp.Web.Memory.IByteBuffer)">
+            <summary>
+            Sets the value associated with the specified key.
+            Returns the date and time, in coordinated universal time (UTC), that the value was last written to.
+            </summary>
+            <param name="key">The cache key</param>
+            <param name="value">The value to store</param>
+            <returns>The <see cref="T:System.Threading.Tasks.Task`1"/></returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache">
+            <summary>
+            Implements a physical file system based cache.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.Folder">
+            <summary>
+            The configuration key for determining the cache folder.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.DefaultCacheFolder">
+            <summary>
+            The default cache folder name.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.CheckSourceChanged">
+            <summary>
+            The configuration key for checking whether changes in source images should be accounted for when checking the cache.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.DefaultCheckSourceChanged">
+            <summary>
+            The default value for determining whether to check for changes in the source.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.environment">
+            <summary>
+            The hosting environment the application is running in.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.fileProvider">
+            <summary>
+            The file provider abstraction.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.bufferManager">
+            <summary>
+            The buffer manager.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.options">
+            <summary>
+            The middleware configuration options.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment,SixLabors.ImageSharp.Web.Memory.IBufferManager,Microsoft.Extensions.Options.IOptions{SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions})">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache"/> class.
+            </summary>
+            <param name="environment">The hosting environment the application is running in</param>
+            <param name="bufferManager">An <see cref="T:SixLabors.ImageSharp.Web.Memory.IBufferManager"/> instance used to allocate arrays transporting encoded image data</param>
+            <param name="options">The middleware configuration options</param>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.Settings">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.GetAsync(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.IsExpiredAsync(Microsoft.AspNetCore.Http.HttpContext,System.String,System.DateTime)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.SetAsync(System.String,SixLabors.ImageSharp.Web.Memory.IByteBuffer)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Caching.PhysicalFileSystemCache.ToFilePath(System.String)">
+            <summary>
+            Converts the key into a nested file path.
+            </summary>
+            <param name="key">The cache key.</param>
+            <returns>The <see cref="T:System.String"/></returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.CommandDescriptor">
+            <summary>
+            Hold the collection of <see cref="T:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter"/> converters
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.CommandDescriptor.EnumConverter">
+            <summary>
+            A reusable enum converter
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.CommandDescriptor.ConverterCache">
+            <summary>
+            The converter cache.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.CommandDescriptor.GetConverter(System.Type)">
+            <summary>
+            Returns an instance of the correct converter for the given type.
+            </summary>
+            <param name="type">The type.</param>
+            <returns>
+            The <see cref="T:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter"/>.
+            </returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.CommandDescriptor.AddConverter(System.Type,System.Type)">
+            <summary>
+            Adds the given converter for the specified type.
+            </summary>
+            <param name="type">The type.</param>
+            <param name="converter">The converter.</param>
+            <exception cref="T:System.ArgumentException">
+            Thrown if the converter does not implement <see cref="T:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter"/>.
+            </exception>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.CommandParser">
+            <summary>
+            Parses URI derived command values into usable commands for processors.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.CommandParser.Lazy">
+            <summary>
+            A new instance of the <see cref="T:SixLabors.ImageSharp.Web.Commands.CommandParser"/> class with lazy initialization.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.CommandParser.TypeDefaultsCache">
+            <summary>
+            The cache for storing created default types.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.CommandParser.#ctor">
+            <summary>
+            Prevents a default instance of the <see cref="T:SixLabors.ImageSharp.Web.Commands.CommandParser"/> class from being created.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Commands.CommandParser.Instance">
+            <summary>
+            Gets the current <see cref="T:SixLabors.ImageSharp.Web.Commands.CommandParser"/> instance.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.CommandParser.AddConverter(System.Type,System.Type)">
+            <summary>
+            Adds a command converter to the parser.
+            </summary>
+            <param name="type">The <see cref="T:System.Type"/> to add a converter for. </param>
+            <param name="converterType">The type of <see cref="T:SixLabors.ImageSharp.Web.Commands.Converters.CommandConverter"/> to add.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.CommandParser.ParseValue``1(System.String)">
+            <summary>
+            Parses the given string value converting it to the given using the invariant culture.
+            </summary>
+            <param name="value">The string value to parse.</param>
+            <typeparam name="T">
+            The <see cref="T:System.Type"/> to convert the string to.
+            </typeparam>
+            <returns>The converted instance or the default.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.CommandParser.ParseValue``1(System.String,System.Globalization.CultureInfo)">
+            <summary>
+            Parses the given string value converting it to the given type.
+            </summary>
+            <param name="value">The string value to parse.</param>
+            <param name="culture">The <see cref="T:System.Globalization.CultureInfo"/> to use as the current culture.</param>
+            <typeparam name="T">
+            The <see cref="T:System.Type"/> to convert the string to.
+            </typeparam>
+            <returns>The converted instance or the default.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.CommandParser.ParseValue(System.Type,System.String,System.Globalization.CultureInfo)">
+            <summary>
+            Parses the given string value converting it to the given type.
+            </summary>
+            <param name="type">
+            The <see cref="T:System.Type"/> to convert the string to.
+            </param>
+            <param name="value">
+            The <see cref="T:System.String"/> value to parse.
+            </param>
+            <param name="culture">
+            The <see cref="T:System.Globalization.CultureInfo"/> to use as the current culture.
+            <remarks>If not set will parse using <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/></remarks>
+            </param>
+            <returns>
+            The <see cref="T:System.Object"/>.
+            </returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.CommandParser.AddSimpleConverters">
+            <summary>
+            Add the generic converters
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.CommandParser.AddListConverters">
+            <summary>
+            Adds a selection of default list type converters.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.CommandParser.AddArrayConverters">
+            <summary>
+            Adds a selection of default array type converters.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.CommandParser.AddColorConverters">
+            <summary>
+            Adds the default color converters
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.CommandParser.GetDefaultValue(System.Type)">
+            <summary>
+            Returns the default value for the given type.
+            </summary>
+            <param name="type">The <see cref="T:System.Type"/> to return.</param>
+            <returns>The <see cref="T:System.Object"/> representing the default value.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.ComparableExtensions">
+            <summary>
+            Extension methods for classes that implement <see cref="T:System.IComparable`1"/>.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.ComparableExtensions.Clamp(System.SByte,System.SByte,System.SByte)">
+            <summary>
+            Restricts a <see cref="T:System.SByte"/> to be within a specified range.
+            </summary>
+            <param name="value">The The value to clamp.</param>
+            <param name="min">The minimum value. If value is less than min, min will be returned.</param>
+            <param name="max">The maximum value. If value is greater than max, max will be returned.</param>
+            <returns>
+            The <see cref="T:System.SByte"/> representing the clamped value.
+            </returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.ComparableExtensions.Clamp(System.Int16,System.Int16,System.Int16)">
+            <summary>
+            Restricts a <see cref="T:System.Int16"/> to be within a specified range.
+            </summary>
+            <param name="value">The The value to clamp.</param>
+            <param name="min">The minimum value. If value is less than min, min will be returned.</param>
+            <param name="max">The maximum value. If value is greater than max, max will be returned.</param>
+            <returns>
+            The <see cref="T:System.Int16"/> representing the clamped value.
+            </returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.ComparableExtensions.Clamp(System.UInt16,System.UInt16,System.UInt16)">
+            <summary>
+            Restricts a <see cref="T:System.UInt16"/> to be within a specified range.
+            </summary>
+            <param name="value">The The value to clamp.</param>
+            <param name="min">The minimum value. If value is less than min, min will be returned.</param>
+            <param name="max">The maximum value. If value is greater than max, max will be returned.</param>
+            <returns>
+            The <see cref="T:System.UInt16"/> representing the clamped value.
+            </returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.ComparableExtensions.Clamp(System.Int64,System.Int64,System.Int64)">
+            <summary>
+            Restricts a <see cref="T:System.Int64"/> to be within a specified range.
+            </summary>
+            <param name="value">The The value to clamp.</param>
+            <param name="min">The minimum value. If value is less than min, min will be returned.</param>
+            <param name="max">The maximum value. If value is greater than max, max will be returned.</param>
+            <returns>
+            The <see cref="T:System.Int64"/> representing the clamped value.
+            </returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.ComparableExtensions.Clamp(System.UInt64,System.UInt64,System.UInt64)">
+            <summary>
+            Restricts a <see cref="T:System.UInt64"/> to be within a specified range.
+            </summary>
+            <param name="value">The The value to clamp.</param>
+            <param name="min">The minimum value. If value is less than min, min will be returned.</param>
+            <param name="max">The maximum value. If value is greater than max, max will be returned.</param>
+            <returns>
+            The <see cref="T:System.UInt64"/> representing the clamped value.
+            </returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.ComparableExtensions.Clamp(System.Decimal,System.Decimal,System.Decimal)">
+            <summary>
+            Restricts a <see cref="T:System.Decimal"/> to be within a specified range.
+            </summary>
+            <param name="value">The The value to clamp.</param>
+            <param name="min">The minimum value. If value is less than min, min will be returned.</param>
+            <param name="max">The maximum value. If value is greater than max, max will be returned.</param>
+            <returns>
+            The <see cref="T:System.Decimal"/> representing the clamped value.
+            </returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.Converters.ArrayConverter`1">
+            <summary>
+            Converts the value of an string to a generic array.
+            </summary>
+            <typeparam name="T">The parameter type to convert to.</typeparam>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.ArrayConverter`1.ConvertFrom(System.Globalization.CultureInfo,System.String,System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.Converters.CommandConverter">
+            <summary>
+            Converts the value of a string into a different data type.
+            </summary>
+            <remarks>
+            The code here is adapted from the TypeConverter class. We do not use that class as we only need "From" methods and
+            there are several classes within the .NET Framework that automatically wire up type converters.
+            We do not ever want to interfere with that.
+            </remarks>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.CommandConverter.ConvertFrom(System.Globalization.CultureInfo,System.String,System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.CommandConverter.ConvertFromInvariantString(System.String,System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.CommandConverter.GetConvertFromException(System.Object)">
+            <summary>
+            Gets a suitable exception to throw when a conversion cannot be performed.
+            </summary>
+            <param name="value">The value to convert</param>
+            <returns><see cref="T:System.NotSupportedException"/></returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.Converters.EnumConverter">
+            <summary>
+            The enum converter. Allows conversion to enumerations.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.EnumConverter.ConvertFrom(System.Globalization.CultureInfo,System.String,System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.EnumConverter.GetStringArray(System.String,System.Char)">
+            <summary>
+            Splits a string by separator to return an array of string values.
+            </summary>
+            <param name="input">The input string to split.</param>
+            <param name="separator">The separator to split string by.</param>
+            <returns>The <see cref="T:String[]"/></returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter">
+            <summary>
+            Defines a contract for converting the value of a string into a different data type.
+            Implementations of this interface should be stateless by design.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter.ConvertFrom(System.Globalization.CultureInfo,System.String,System.Type)">
+            <summary>
+            Converts the given string to the type of this converter, using the specified culture information.
+            </summary>
+            <returns>
+            An <see cref="T:System.String"/> that represents the converted value.
+            </returns>
+            <param name="culture">
+            The <see cref="T:System.Globalization.CultureInfo"/> to use as the current culture.
+            </param>
+            <param name="value">The <see cref="T:System.String"/> to convert. </param>
+            <param name="propertyType">The property type that the converter will convert to.</param>
+            <exception cref="T:System.NotSupportedException">The conversion cannot be performed.</exception>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.ICommandConverter.ConvertFromInvariantString(System.String,System.Type)">
+            <summary>
+            Converts the given string to the converter's native type using the invariant culture.
+            </summary>
+            <param name="text">The value to convert from.</param>
+            <param name="propertyType">The property type that the converter will convert to.</param>
+            <returns>
+            An <see cref="T:System.Object"/> that represents the converted value.
+            </returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.Converters.IntegralNumberConverter`1">
+            <summary>
+            The generic converter for integral types.
+            </summary>
+            <typeparam name="T">The type of object to convert to.</typeparam>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.IntegralNumberConverter`1.ConvertFrom(System.Globalization.CultureInfo,System.String,System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.Converters.ListConverter`1">
+            <summary>
+            Converts the value of an string to a generic list.
+            </summary>
+            <typeparam name="T">The type to convert from.</typeparam>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.ListConverter`1.ConvertFrom(System.Globalization.CultureInfo,System.String,System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.ListConverter`1.GetStringArray(System.String,System.Globalization.CultureInfo)">
+            <summary>
+            Splits a string by separator to return an array of string values.
+            </summary>
+            <param name="input">The input string to split.</param>
+            <param name="culture">A <see cref="T:System.Globalization.CultureInfo"/>. The current culture to split string by.</param>
+            <returns>The <see cref="T:String[]"/></returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.Converters.Rgba32Converter">
+            <summary>
+            Allows the conversion of strings into rgba32 pixel colors
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.Converters.Rgba32Converter.HexColorRegex">
+            <summary>
+            The web color hexadecimal regex. Matches strings arranged
+            in rgb, rgba, rrggbb, or rrggbbaa format to match web syntax.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.Converters.Rgba32Converter.NumberRegex">
+            <summary>
+            The number color regex.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.Converters.Rgba32Converter.ColorConstantsTable">
+            <summary>
+            The color constants table map.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.Rgba32Converter.ConvertFrom(System.Globalization.CultureInfo,System.String,System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.Rgba32Converter.InitializeRgba32ConstantsTable">
+            <summary>
+            Initializes color table mapping color constants.
+            </summary>
+            <returns>The <see cref="T:System.Collections.Generic.IDictionary`2"/></returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.Converters.SimpleCommandConverter`1">
+            <summary>
+            The generic converter for simple types that implement <see cref="T:System.IConvertible"/>.
+            </summary>
+            <typeparam name="T">The type of object to convert to.</typeparam>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.Converters.SimpleCommandConverter`1.ConvertFrom(System.Globalization.CultureInfo,System.String,System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.DictionaryExtensions">
+            <summary>
+            Extension methods for <see cref="T:System.Collections.Generic.IDictionary`2"/>
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.DictionaryExtensions.GetValueOrDefault``2(System.Collections.Generic.IDictionary{``1,``0},``1)">
+            <summary>
+            Gets the value associated with the specified key or the default value.
+            </summary>
+            <param name="dictionary">The dictionary instance.</param>
+            <param name="key">The key of the value to get.</param>
+            <typeparam name="TValue">The value type.</typeparam>
+            <typeparam name="TKey">The key type.</typeparam>
+            <returns>The value associated with the specified key or the default value.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.IRequestParser">
+            <summary>
+            Defines a contract for parsing commands from image requests
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.IRequestParser.ParseRequestCommands(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Returns a collection of commands from the current request
+            </summary>
+            <param name="context">Encapsulates all HTTP-specific information about an individual HTTP request</param>
+            <returns>The <see cref="T:System.Collections.Generic.IDictionary`2"/></returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.QueryCollectionRequestParser">
+            <summary>
+            Parses commands from the request querystring.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Commands.QueryCollectionRequestParser.ParseRequestCommands(Microsoft.AspNetCore.Http.HttpContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Commands.TypeConstants">
+            <summary>
+            Contains reusable type variables
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.Sbyte">
+            <summary>
+            The <see cref="T:System.SByte"/> type
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.Byte">
+            <summary>
+            The <see cref="T:System.Byte"/> type
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.Short">
+            <summary>
+            The <see cref="T:System.Int16"/> type
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.UShort">
+            <summary>
+            The <see cref="T:System.UInt16"/> type
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.Int">
+            <summary>
+            The <see cref="T:System.Int32"/> type
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.UInt">
+            <summary>
+            The <see cref="T:System.UInt32"/> type
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.Long">
+            <summary>
+            The <see cref="T:System.Int64"/> type
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.ULong">
+            <summary>
+            The <see cref="T:System.UInt64"/> type
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.IntegralTypes">
+            <summary>
+            The collection of integral number types
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Commands.TypeConstants.Rgba32">
+            <summary>
+            The <see cref="T:SixLabors.ImageSharp.PixelFormats.Rgba32"/> type
+            </summary>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.DependencyInjection.ApplicationBuilderExtensions">
+            <summary>
+            Extension methods for <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to simplify middleware registration.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ApplicationBuilderExtensions.UseImageSharp(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Registers the ImageSharp middleware.
+            </summary>
+            <param name="app">The application with the mechanism to configure a request pipeline</param>
+            <returns><see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/></returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder">
+            <summary>
+            Defines a contract for adding ImsgeSharp services
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder.Services">
+            <summary>
+            Gets the <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> where ImageSharp services are configured.
+            </summary>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder">
+            <summary>
+            Defines a contract for adding core ImsgeSharp services
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder.Services">
+            <summary>
+            Gets the <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> where ImageSharp services are configured.
+            </summary>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilder">
+            <summary>
+            Allows fine grained configuration of ImageSharp services.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilder"/> class.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpBuilder.Services">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpConfiguration">
+            <summary>
+            Provides default configuration settings to be consumed by the middleware
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpConfiguration.Configure(SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilder">
+            <summary>
+            Allows fine grained configuration of ImageSharp services.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilder"/> class.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilder.Services">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilderExtensions">
+            <summary>
+            Extension methods for <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/> that allow configuration of services.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilderExtensions.SetRequestParser``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder)">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Web.Commands.IRequestParser"/> adding it to the service collection
+            </summary>
+            <typeparam name="TParser">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Commands.IRequestParser"/>to add.</typeparam>
+            <param name="builder">The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/></param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilderExtensions.SetRequestParser(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder,System.Func{System.IServiceProvider,SixLabors.ImageSharp.Web.Commands.IRequestParser})">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Web.Commands.IRequestParser"/> adding it to the service collection
+            </summary>
+            <param name="builder">The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/></param>
+            <param name="implementationFactory">The factory method for returning a <see cref="T:SixLabors.ImageSharp.Web.Commands.IRequestParser"/>"/></param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilderExtensions.SetBufferManager``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder)">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Web.Memory.IBufferManager"/> adding it to the service collection
+            </summary>
+            <typeparam name="TBufferManager">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Memory.IBufferManager"/>to add.</typeparam>
+            <param name="builder">The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/></param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilderExtensions.SetBufferManager(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder,System.Func{System.IServiceProvider,SixLabors.ImageSharp.Web.Memory.IBufferManager})">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Web.Memory.IBufferManager"/> adding it to the service collection
+            </summary>
+            <param name="builder">The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/></param>
+            <param name="implementationFactory">The factory method for returning a <see cref="T:SixLabors.ImageSharp.Web.Memory.IBufferManager"/>"/></param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilderExtensions.SetCache``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder)">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Web.Caching.IImageCache"/> adding it to the service collection
+            </summary>
+            <typeparam name="TCache">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Caching.IImageCache"/>to add.</typeparam>
+            <param name="builder">The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/></param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilderExtensions.SetCache(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder,System.Func{System.IServiceProvider,SixLabors.ImageSharp.Web.Caching.IImageCache})">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Web.Caching.IImageCache"/> adding it to the service collection
+            </summary>
+            <param name="builder">The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/></param>
+            <param name="implementationFactory">The factory method for returning a <see cref="T:SixLabors.ImageSharp.Web.Caching.IImageCache"/>"/></param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilderExtensions.SetCacheHash``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder)">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Web.Caching.ICacheHash"/> adding it to the service collection
+            </summary>
+            <typeparam name="TCacheHash">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Caching.ICacheHash"/>to add.</typeparam>
+            <param name="builder">The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/></param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilderExtensions.SetCacheHash(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder,System.Func{System.IServiceProvider,SixLabors.ImageSharp.Web.Caching.ICacheHash})">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Web.Caching.ICacheHash"/> adding it to the service collection
+            </summary>
+            <param name="builder">The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/></param>
+            <param name="implementationFactory">The factory method for returning a <see cref="T:SixLabors.ImageSharp.Web.Caching.ICacheHash"/>"/></param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilderExtensions.SetAsyncKeyLock``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder)">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Web.Caching.IAsyncKeyLock"/> adding it to the service collection
+            </summary>
+            <typeparam name="TLock">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Caching.IAsyncKeyLock"/>to add.</typeparam>
+            <param name="builder">The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/></param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilderExtensions.SetAsyncKeyLock(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder,System.Func{System.IServiceProvider,SixLabors.ImageSharp.Web.Caching.IAsyncKeyLock})">
+            <summary>
+            Sets the given <see cref="T:SixLabors.ImageSharp.Web.Caching.IAsyncKeyLock"/> adding it to the service collection
+            </summary>
+            <param name="builder">The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/></param>
+            <param name="implementationFactory">The factory method for returning a <see cref="T:SixLabors.ImageSharp.Web.Caching.IImageCache"/>"/></param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilderExtensions.AddResolver``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder)">
+            <summary>
+            Adds the given <see cref="T:SixLabors.ImageSharp.Web.Resolvers.IImageResolver"/> to the resolver collection within the service collection
+            </summary>
+            <typeparam name="TResolver">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Resolvers.IImageResolver"/>to add.</typeparam>
+            <param name="builder">The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/></param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilderExtensions.AddResolver(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder,System.Func{System.IServiceProvider,SixLabors.ImageSharp.Web.Resolvers.IImageResolver})">
+            <summary>
+            Adds the given <see cref="T:SixLabors.ImageSharp.Web.Resolvers.IImageResolver"/> to the resolver collection within the service collection
+            </summary>
+            <param name="builder">The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/></param>
+            <param name="implementationFactory">The factory method for returning a <see cref="T:SixLabors.ImageSharp.Web.Resolvers.IImageResolver"/>"/></param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilderExtensions.AddProcessor``1(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder)">
+            <summary>
+            Adds the given <see cref="T:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor"/> to the processor collection within the service collection
+            </summary>
+            <typeparam name="TProcessor">The type of class implementing <see cref="T:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor"/>to add.</typeparam>
+            <param name="builder">The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/></param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/>.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ImageSharpCoreBuilderExtensions.AddProcessor(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder,System.Func{System.IServiceProvider,SixLabors.ImageSharp.Web.Processors.IImageWebProcessor})">
+            <summary>
+            Adds the given <see cref="T:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor"/> to the processor collection within the service collection
+            </summary>
+            <param name="builder">The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/></param>
+            <param name="implementationFactory">The factory method for returning a <see cref="T:SixLabors.ImageSharp.Web.Resolvers.IImageResolver"/>"/></param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/>.</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.DependencyInjection.ServiceCollectionExtensions">
+            <summary>
+            Extension methods for <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to simplify middleware service registration.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ServiceCollectionExtensions.AddImageSharp(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adds ImageSharp services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> with the default options.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+            <returns>An <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/> that can be used to further configure the ImageSharp services.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ServiceCollectionExtensions.AddImageSharp(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions})">
+            <summary>
+            Adds ImageSharp services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> with the given options.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+            <param name="setupAction">An <see cref="T:System.Action`1"/> to configure the provided <see cref="T:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions"/>.</param>
+            <returns>An <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpBuilder"/> that can be used to further configure the ImageSharp services.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ServiceCollectionExtensions.AddImageSharpCore(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Provides the means to add essential ImageSharp services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> with the default options.
+            All additional services are required to be configured.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+            <returns>An <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/> that can be used to further configure the ImageSharp services.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ServiceCollectionExtensions.AddImageSharpCore(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions})">
+            <summary>
+            Provides the means to add essential ImageSharp services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> with the given options.
+            All additional services are required to be configured.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+            <param name="setupAction">An <see cref="T:System.Action`1"/> to configure the provided <see cref="T:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions"/>.</param>
+            <returns>An <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/> that can be used to further configure the ImageSharp services.</returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.DependencyInjection.ServiceCollectionExtensions.AddDefaultServices(SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder)">
+            <summary>
+            Adds the default service to the service collection
+            </summary>
+            <param name="builder">The <see cref="T:SixLabors.ImageSharp.Web.DependencyInjection.IImageSharpCoreBuilder"/> that can be used to further configure the ImageSharp services</param>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.FormattedImage">
+            <summary>
+            A class encapsulating an image with a particular file encoding
+            </summary>
+            <seealso cref="T:System.IDisposable" />
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.FormattedImage.#ctor(SixLabors.ImageSharp.Image{SixLabors.ImageSharp.PixelFormats.Rgba32},SixLabors.ImageSharp.Formats.IImageFormat)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.FormattedImage"/> class.
+            </summary>
+            <param name="image">The image.</param>
+            <param name="format">The format.</param>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.FormattedImage.Image">
+            <summary>
+            Gets the image.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.FormattedImage.Format">
+            <summary>
+            Gets or sets the format.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.FormattedImage.Save(System.IO.Stream)">
+            <summary>
+            Saves the specified destination.
+            </summary>
+            <param name="destination">The destination.</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.FormattedImage.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.FormattedImage.Load(SixLabors.ImageSharp.Configuration,System.Byte[])">
+            <summary>
+            Loads the specified source
+            </summary>
+            <param name="configuration">The configuration.</param>
+            <param name="source">The source.</param>
+            <returns>A formatted image</returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Guard">
+            <summary>
+            Provides methods to protect against invalid parameters.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Guard.NotNull(System.Object,System.String,System.String)">
+            <summary>
+            Verifies, that the method parameter with specified object value is not null
+            and throws an exception if it is found to be so.
+            </summary>
+            <param name="target">The target object, which cannot be null.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <param name="message">The error message, if any to add to the exception.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="target"/> is null</exception>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Guard.NotNullOrEmpty(System.String,System.String,System.String)">
+            <summary>
+            Verifies, that the string method parameter with specified object value and message
+            is not null, not empty and does not contain only blanks and throws an exception
+            if the object is null.
+            </summary>
+            <param name="target">The target string, which should be checked against being null or empty.</param>
+            <param name="parameterName">Name of the parameter.</param>
+            <param name="message">The error message, if any to add to the exception.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="target"/> is null.</exception>
+            <exception cref="T:System.ArgumentException"><paramref name="target"/> is empty or contains only blanks.</exception>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Guard.NotNullOrEmpty``1(System.Collections.Generic.IEnumerable{``0},System.String,System.String)">
+            <summary>
+            Verifies, that the enumeration is not null and not empty.
+            </summary>
+            <typeparam name="T">The type of objects in the <paramref name="target"/></typeparam>
+            <param name="target">The target enumeration, which should be checked against being null or empty.</param>
+            <param name="parameterName">Name of the parameter.</param>
+            <param name="message">The error message, if any to add to the exception.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="target"/> is null.</exception>
+            <exception cref="T:System.ArgumentException"><paramref name="target"/> is empty.</exception>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Guard.MustBeLessThan``1(``0,``0,System.String)">
+            <summary>
+            Verifies that the specified value is less than a maximum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Guard.MustBeLessThanOrEqualTo``1(``0,``0,System.String)">
+            <summary>
+            Verifies that the specified value is less than or equal to a maximum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            <paramref name="value"/> is greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Guard.MustBeGreaterThan``1(``0,``0,System.String)">
+            <summary>
+            Verifies that the specified value is greater than a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Guard.MustBeGreaterThanOrEqualTo``1(``0,``0,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value
+            and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            <paramref name="value"/> is less than the minimum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Guard.MustBeBetweenOrEqualTo``1(``0,``0,``0,System.String)">
+            <summary>
+            Verifies that the specified value is greater than or equal to a minimum value and less than
+            or equal to a maximum value and throws an exception if it is not.
+            </summary>
+            <param name="value">The target value, which should be validated.</param>
+            <param name="min">The minimum value.</param>
+            <param name="max">The maximum value.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            <paramref name="value"/> is less than the minimum value of greater than the maximum value.
+            </exception>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Guard.IsTrue(System.Boolean,System.String,System.String)">
+            <summary>
+            Verifies, that the method parameter with specified target value is true
+            and throws an exception if it is found to be so.
+            </summary>
+            <param name="value">
+            The target value, which cannot be false.
+            </param>
+            <param name="parameterName">
+            The name of the parameter that is to be checked.
+            </param>
+            <param name="message">
+            The error message, if any to add to the exception.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is false
+            </exception>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Guard.IsFalse(System.Boolean,System.String,System.String)">
+            <summary>
+            Verifies, that the method parameter with specified target value is false
+            and throws an exception if it is found to be so.
+            </summary>
+            <param name="value">The target value, which cannot be true.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <param name="message">The error message, if any to add to the exception.</param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="value"/> is true
+            </exception>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Guard.MustBeSizedAtLeast``1(``0[],System.Int32,System.String)">
+            <summary>
+            Verifies, that the `target` span has the length of 'minLength', or longer.
+            </summary>
+            <typeparam name="T">The element type of the spans</typeparam>
+            <param name="value">The target span.</param>
+            <param name="minLength">The minimum length.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            The length of <paramref name="value"/> is less than <paramref name="minLength"/>.
+            </exception>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Guard.MustBeSizedAtLeast``1(System.ReadOnlySpan{``0},System.Int32,System.String)">
+            <summary>
+            Verifies, that the `target` span has the length of 'minLength', or longer.
+            </summary>
+            <typeparam name="T">The element type of the spans</typeparam>
+            <param name="value">The target span.</param>
+            <param name="minLength">The minimum length.</param>
+            <param name="parameterName">The name of the parameter that is to be checked.</param>
+            <exception cref="T:System.ArgumentException">
+            The length of <paramref name="value"/> is less than <paramref name="minLength"/>.
+            </exception>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Helpers.FormatHelpers">
+            <summary>
+            Helper utilities for image formats
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Helpers.FormatHelpers.GetContentType(SixLabors.ImageSharp.Configuration,System.String)">
+            <summary>
+            Returns the correct content type (mime-type) for the given cached image key.
+            </summary>
+            <param name="configuration">The library configuration</param>
+            <param name="key">The cache key</param>
+            <returns>The <see cref="T:System.String"/></returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Helpers.FormatHelpers.GetExtension(SixLabors.ImageSharp.Configuration,System.String)">
+            <summary>
+            Gets the file extension for the given image uri
+            </summary>
+            <param name="configuration">The library configuration</param>
+            <param name="uri">The full request uri</param>
+            <returns>The <see cref="T:System.String"/></returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Helpers.FormatHelpers.GetExtensionOrDefault(SixLabors.ImageSharp.Configuration,System.String)">
+            <summary>
+            Gets the file extension for the given image uri or a default extension from the first available format.
+            </summary>
+            <param name="configuration">The library configuration</param>
+            <param name="uri">The full request uri</param>
+            <returns>The <see cref="T:System.String"/></returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Memory.IBufferManager">
+            <summary>
+            Encapsulates methods that enables managing the allocation of arrays for transporting encoded image data.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Memory.IBufferManager.Allocate(System.Int32)">
+            <summary>
+            Allocates a buffer with a backing array of size <paramref name="length"/>.
+            </summary>
+            <param name="length">The minimum length of the array to return.</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.Memory.IByteBuffer"/></returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Memory.IByteBuffer">
+            <summary>
+            Represents a buffer backed by a managed byte array.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Memory.IByteBuffer.Array">
+            <summary>
+            Gets the managed array backing this buffer instance.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Memory.IByteBuffer.Length">
+            <summary>
+            Gets the expected length of the buffer
+            </summary>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Memory.PooledBufferManager">
+            <summary>
+            Manages the allocation of reusable arrays for transporting encoded image data via a resource pool.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Memory.PooledBufferManager.DefaultMaxLength">
+            <summary>
+            The maximum length of each array in the pool (2^21).
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Memory.PooledBufferManager.DefaultMaxArraysPerBucket">
+            <summary>
+            The maximum number of array instances that may be stored in each bucket in the pool. This gives us a pool of up to 50MB.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Memory.PooledBufferManager.arrayPool">
+            <summary>
+            The <see cref="T:System.Buffers.ArrayPool`1"/> which is not kept clean.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Memory.PooledBufferManager.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Memory.PooledBufferManager"/> class.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Memory.PooledBufferManager.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Memory.PooledBufferManager"/> class.
+            </summary>
+            <param name="maxLength">The maximum length of an array instance that may be stored in the pool.</param>
+            <param name="maxArraysPerBucket">
+            The maximum number of array instances that may be stored in each bucket in the pool.
+            The pool groups arrays of similar lengths into buckets for faster access.
+            </param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Memory.PooledBufferManager.Allocate(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Memory.PooledBufferManager.Return(System.Byte[])">
+            <summary>
+            Returns the rented array back to the pool.
+            </summary>
+            <param name="array">The array to return to the buffer pool.</param>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Memory.PooledByteBuffer">
+            <summary>
+            Represents a buffer whose backing array is from a pooled source.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Memory.PooledByteBuffer.#ctor(SixLabors.ImageSharp.Web.Memory.PooledBufferManager,System.Byte[],System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Memory.PooledByteBuffer"/> class.
+            </summary>
+            <param name="manager">The buffer manager</param>
+            <param name="array">The byte array</param>
+            <param name="length">The expected minimum length of the buffer</param>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Memory.PooledByteBuffer.Array">
+            <inheritdoc />
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Memory.PooledByteBuffer.Length">
+            <inheritdoc />
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Memory.PooledByteBuffer.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Middleware.ImageContext">
+            <summary>
+            Provides information and methods regarding the current image request
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageContext.#ctor(Microsoft.AspNetCore.Http.HttpContext,SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Middleware.ImageContext"/> struct.
+            </summary>
+            <param name="context">The current HTTP request context</param>
+            <param name="options">The middleware options</param>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Middleware.ImageContext.PreconditionState">
+            <summary>
+            Enumerates the possible precondition states
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageContext.PreconditionState.Unspecified">
+            <summary>
+            Unspeciified
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageContext.PreconditionState.NotModified">
+            <summary>
+            Not modified
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageContext.PreconditionState.ShouldProcess">
+            <summary>
+            Should process
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageContext.PreconditionState.PreconditionFailed">
+            <summary>
+            Precondition Failed
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageContext.GetDisplayUrl">
+            <summary>
+            Returns the current HTTP request display url
+            </summary>
+            <returns>The </returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageContext.ComprehendRequestHeaders(System.DateTimeOffset,System.Int64)">
+            <summary>
+            Analyzes the headers for the current request.
+            </summary>
+            <param name="lastModified">The point in time when the cached file was last modified.</param>
+            <param name="length">The length of the cached file in bytes</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageContext.GetPreconditionState">
+            <summary>
+            Gets the preconditioned state of the request.
+            </summary>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Web.Middleware.ImageContext.PreconditionState"/></returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageContext.IsHeadRequest">
+            <summary>
+            Gets a value indicating whether this request is a head request
+            </summary>
+            <returns>THe <see cref="T:System.Boolean"/></returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageContext.SendStatusAsync(System.Int32,System.String)">
+            <summary>
+            Set the response status headers
+            </summary>
+            <param name="statusCode">The status code</param>
+            <param name="contentType">The content type</param>
+            <returns>The <see cref="T:System.Threading.Tasks.Task"/></returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageContext.SendAsync(System.String,SixLabors.ImageSharp.Web.Memory.IByteBuffer,System.Int64)">
+            <summary>
+            Set the response content
+            </summary>
+            <param name="contentType">The content type</param>
+            <param name="buffer">The cached image buffer</param>
+            <param name="length">The The length, in bytes, of the cached image buffer</param>
+            <returns>The <see cref="T:System.Threading.Tasks.Task"/></returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Middleware.ImageProcessingContext">
+            <summary>
+            Contains information about the current image request and processed image.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageProcessingContext.#ctor(Microsoft.AspNetCore.Http.HttpContext,System.IO.Stream,System.Collections.Generic.IDictionary{System.String,System.String},System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Middleware.ImageProcessingContext"/> class.
+            </summary>
+            <param name="context">The current HTTP request context</param>
+            <param name="stream">The stream containing the processed image bytes</param>
+            <param name="commands">The parsed collection of processing commands</param>
+            <param name="extension">The file extension for the processed image</param>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageProcessingContext.Context">
+            <summary>
+            Gets the current HTTP request context.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageProcessingContext.Stream">
+            <summary>
+            Gets the stream containing the processed image bytes.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageProcessingContext.Commands">
+            <summary>
+            Gets the parsed collection of processing commands
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageProcessingContext.Extension">
+            <summary>
+            Gets the file extension for the processed image.
+            </summary>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware">
+            <summary>
+            Middleware for handling the processing of images via image requests.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.asyncKeyLock">
+            <summary>
+            The key-lock used for limiting identical requests
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.next">
+            <summary>
+            The function processing the Http request.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.options">
+            <summary>
+            The configuration options
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.logger">
+            <summary>
+            The type used for performing logging.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.bufferManager">
+            <summary>
+            The buffer data pool.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.requestParser">
+            <summary>
+            The parser for parsing commands from the current request.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.resolvers">
+            <summary>
+            The collection of image resolvers.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.processors">
+            <summary>
+            The collection of image processors.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.cache">
+            <summary>
+            The image cache.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.cacheHash">
+            <summary>
+            The hashing implementation to use when generating cached file names.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.knownCommands">
+            <summary>
+            The collection of known commands gathered from the processors.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.Extensions.Options.IOptions{SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions},Microsoft.Extensions.Logging.ILoggerFactory,SixLabors.ImageSharp.Web.Memory.IBufferManager,SixLabors.ImageSharp.Web.Commands.IRequestParser,System.Collections.Generic.IEnumerable{SixLabors.ImageSharp.Web.Resolvers.IImageResolver},System.Collections.Generic.IEnumerable{SixLabors.ImageSharp.Web.Processors.IImageWebProcessor},SixLabors.ImageSharp.Web.Caching.IImageCache,SixLabors.ImageSharp.Web.Caching.ICacheHash,SixLabors.ImageSharp.Web.Caching.IAsyncKeyLock)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware"/> class.
+            </summary>
+            <param name="next">The next middleware in the pipeline</param>
+            <param name="options">The middleware configuration options</param>
+            <param name="loggerFactory">An <see cref="T:Microsoft.Extensions.Logging.ILoggerFactory"/> instance used to create loggers</param>
+            <param name="bufferManager">An <see cref="T:SixLabors.ImageSharp.Web.Memory.IBufferManager"/> instance used to allocate arrays transporting encoded image data</param>
+            <param name="requestParser">An <see cref="T:SixLabors.ImageSharp.Web.Commands.IRequestParser"/> instance used to parse image requests for commands</param>
+            <param name="resolvers">A collection of <see cref="T:SixLabors.ImageSharp.Web.Resolvers.IImageResolver"/> instances used to resolve images</param>
+            <param name="processors">A collection of <see cref="T:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor"/> instances used to process images</param>
+            <param name="cache">An <see cref="T:SixLabors.ImageSharp.Web.Caching.IImageCache"/> instance used for caching images</param>
+            <param name="cacheHash">An <see cref="T:SixLabors.ImageSharp.Web.Caching.ICacheHash"/>instance used for calculating cached file names</param>
+            <param name="asyncKeyLock">An <see cref="T:SixLabors.ImageSharp.Web.Caching.IAsyncKeyLock"/> instance used for providing locking during processing</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Performs operations upon the current request.
+            </summary>
+            <param name="context">The current HTTP request context</param>
+            <returns>The <see cref="T:System.Threading.Tasks.Task"/></returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions">
+            <summary>
+            Configuration options for the ImageSharp middleware.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.Configuration">
+            <summary>
+            Gets or sets the base library configuration
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.MaxBrowserCacheDays">
+            <summary>
+            Gets or sets the number of days to store images in the browser cache.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.MaxCacheDays">
+            <summary>
+            Gets or sets the number of days to store images in the image cache.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.CachedNameLength">
+            <summary>
+            Gets or sets the length of the filename to use (minus the extension) when storing images in the image cache.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.OnValidate">
+            <summary>
+            Gets or sets the additional validation method.
+            This is called once the commands have been gathered and before an <see cref="T:SixLabors.ImageSharp.Web.Resolvers.IImageResolver"/> has been assigned.
+            This can be used to used to augment commands and further validate the request.
+            Emptying the dictionary will ensure that the middleware will ignore the request.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.OnBeforeSave">
+            <summary>
+            Gets or sets the additional method that can be used for final manipulation before the image is saved.
+            This is called after image has been processed, but before the image has been saved to the output stream for caching.
+            This can be used to alter the metadata of the resultant image.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.OnProcessed">
+            <summary>
+            Gets or sets the additional processing method.
+            This is called after image has been processed, but before the result has been cached.
+            This can be used to further optimize the resultant image.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions.OnPrepareResponse">
+            <summary>
+            Gets or sets the additional response method.
+            This is called after the status code and headers have been set, but before the body has been written.
+            This can be used to add or change the response headers.
+            </summary>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Middleware.ImageValidationContext">
+            <summary>
+            Contains information about the current image request and parsed commands.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.ImageValidationContext.#ctor(Microsoft.AspNetCore.Http.HttpContext,System.Collections.Generic.IDictionary{System.String,System.String},SixLabors.ImageSharp.Web.Commands.CommandParser)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Middleware.ImageValidationContext"/> class.
+            </summary>
+            <param name="context">The current HTTP request context</param>
+            <param name="commands">The dictionary containing the collection of URI derived processing commands.</param>
+            <param name="parser">The command parser for parsing URI derived processing commands.</param>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageValidationContext.Context">
+            <summary>
+            Gets the current HTTP request context
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageValidationContext.Commands">
+            <summary>
+            Gets the dictionary containing the collection of URI derived processing commands.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Middleware.ImageValidationContext.Parser">
+            <summary>
+            Gets the command parser for parsing URI derived processing commands.
+            </summary>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Middleware.LoggerExtensions">
+            <summary>
+            Extensions methods for the <see cref="T:Microsoft.Extensions.Logging.ILogger"/> interface.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.LoggerExtensions.#cctor">
+            <summary>
+            Initializes static members of the <see cref="T:SixLabors.ImageSharp.Web.Middleware.LoggerExtensions"/> class.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.LoggerExtensions.LogImageProcessingFailed(Microsoft.Extensions.Logging.ILogger,System.String,System.Exception)">
+            <summary>
+            Logs that a given image request could not be processed.
+            </summary>
+            <param name="logger">The type used to perform logging</param>
+            <param name="uri">The full request uri</param>
+            <param name="exception">The captured exception</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.LoggerExtensions.LogImageResolveFailed(Microsoft.Extensions.Logging.ILogger,System.String)">
+            <summary>
+            Logs that a given image could not be resolved.
+            </summary>
+            <param name="logger">The type used to perform logging</param>
+            <param name="uri">The full request uri</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.LoggerExtensions.LogImageServed(Microsoft.Extensions.Logging.ILogger,System.String,System.String)">
+            <summary>
+            Logs that a given image request has been served.
+            </summary>
+            <param name="logger">The type used to perform logging</param>
+            <param name="uri">The full request uri</param>
+            <param name="key">The cached image key</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.LoggerExtensions.LogImageNotModified(Microsoft.Extensions.Logging.ILogger,System.String)">
+            <summary>
+            Logs that a given image request has not been modified.
+            </summary>
+            <param name="logger">The type used to perform logging</param>
+            <param name="uri">The full request uri</param>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Middleware.LoggerExtensions.LogImagePreconditionFailed(Microsoft.Extensions.Logging.ILogger,System.String)">
+            <summary>
+            Logs that access to a given image request has been denied.
+            </summary>
+            <param name="logger">The type used to perform logging</param>
+            <param name="uri">The full request uri</param>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Middleware.ResponseConstants">
+            <summary>
+            Contains constants related to HTTP respose codes.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ResponseConstants.Status200Ok">
+            <summary>
+            The HTTP 200 OK success status response code indicates that the request has succeeded.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ResponseConstants.Status304NotModified">
+            <summary>
+            The HTTP 304 Not Modified client redirection response code indicates that there is no need
+            to retransmit the requested resources.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ResponseConstants.Status412PreconditionFailed">
+            <summary>
+            The HTTP 412 Precondition Failed client error response code indicates that access to the target
+            resource has been denied.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Middleware.ResponseConstants.CompletedTask">
+            <summary>
+            An empty completed task
+            </summary>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Processors.BackgroundColorWebProcessor">
+            <summary>
+            Allows setting of the background color
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.BackgroundColorWebProcessor.Color">
+            <summary>
+            The command for changing the background color
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.BackgroundColorWebProcessor.ColorCommands">
+            <summary>
+            The reusable collection of commands
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Processors.BackgroundColorWebProcessor.Commands">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Processors.BackgroundColorWebProcessor.Process(SixLabors.ImageSharp.Web.FormattedImage,Microsoft.Extensions.Logging.ILogger,System.Collections.Generic.IDictionary{System.String,System.String})">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Processors.FormatWebProcessor">
+            <summary>
+            Allows the changing of image formats.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.FormatWebProcessor.Format">
+            <summary>
+            The command constant for format
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.FormatWebProcessor.FormatCommands">
+            <summary>
+            The reusable collection of commands
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.FormatWebProcessor.options">
+            <summary>
+            The middleware configuration options
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Processors.FormatWebProcessor.#ctor(Microsoft.Extensions.Options.IOptions{SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions})">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Processors.FormatWebProcessor"/> class.
+            </summary>
+            <param name="options">The middleware configuration options</param>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Processors.FormatWebProcessor.Commands">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Processors.FormatWebProcessor.Process(SixLabors.ImageSharp.Web.FormattedImage,Microsoft.Extensions.Logging.ILogger,System.Collections.Generic.IDictionary{System.String,System.String})">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor">
+            <summary>
+            Specifies the contract for processing images using a querystring URI API.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor.Commands">
+            <summary>
+            Gets the collection of recognized querystring commands.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Processors.IImageWebProcessor.Process(SixLabors.ImageSharp.Web.FormattedImage,Microsoft.Extensions.Logging.ILogger,System.Collections.Generic.IDictionary{System.String,System.String})">
+            <summary>
+            Processes the image based on the querystring commands.
+            </summary>
+            <param name="image">The image to process</param>
+            <param name="logger">The type used for performing logging</param>
+            <param name="commands">The querystring collection containing the processing commands</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Image`1"/></returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor">
+            <summary>
+            Allows the resizing of images.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Width">
+            <summary>
+            The command constant for the resize width
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Height">
+            <summary>
+            The command constant for the resize height
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Xy">
+            <summary>
+            The command constant for the resize focal point coordinates
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Mode">
+            <summary>
+            The command constant for the resize mode
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Sampler">
+            <summary>
+            The command constant for the resize sampler
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Anchor">
+            <summary>
+            The command constant for the resize sampler
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Compand">
+            <summary>
+            The command constant for the resize compand mode
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Commands">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Processors.ResizeWebProcessor.Process(SixLabors.ImageSharp.Web.FormattedImage,Microsoft.Extensions.Logging.ILogger,System.Collections.Generic.IDictionary{System.String,System.String})">
+            <inheritdoc/>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Processors.WebProcessingExtensions">
+            <summary>
+            Extends the image API to allow processing via a URI API
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Processors.WebProcessingExtensions.Process(SixLabors.ImageSharp.Web.FormattedImage,Microsoft.Extensions.Logging.ILogger,System.Collections.Generic.IEnumerable{SixLabors.ImageSharp.Web.Processors.IImageWebProcessor},System.Collections.Generic.IDictionary{System.String,System.String})">
+            <summary>
+            Loops through the available processors and updates the image if any match
+            </summary>
+            <param name="source">The image to resize.</param>
+            <param name="logger">The type used for performing logging</param>
+            <param name="processors">The collection of available processors</param>
+            <param name="commands">The parsed collection of processing commands</param>
+            <returns>The <see cref="T:SixLabors.ImageSharp.Image`1"/></returns>
+            <remarks>Passing zero for one of height or width will automatically preserve the aspect ratio of the original image</remarks>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Resolvers.IImageResolver">
+            <summary>
+            Specifies the contract for returning images from different locations.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Resolvers.IImageResolver.Match">
+            <summary>
+            Gets or sets the method used by the resolver to identify itself as the correct resolver to use.
+            </summary>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Resolvers.IImageResolver.Settings">
+            <summary>
+            Gets or sets any additional settings.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Resolvers.IImageResolver.IsValidRequestAsync(Microsoft.AspNetCore.Http.HttpContext,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Gets a value indicating whether the current request passes sanitizing rules.
+            </summary>
+            <param name="context">The current HTTP request context</param>
+            <param name="logger">The type used for performing logging.</param>
+            <returns>
+            <returns>The <see cref="T:System.Threading.Tasks.Task`1"/></returns>
+            </returns>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Resolvers.IImageResolver.ResolveImageAsync(Microsoft.AspNetCore.Http.HttpContext,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Resolves the image in an asynchronous manner.
+            </summary>
+            <param name="context">The current HTTP request context</param>
+            <param name="logger">The type used for performing logging.</param>
+            <returns>The <see cref="T:Task{IByteBuffer}"/></returns>
+        </member>
+        <member name="T:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemResolver">
+            <summary>
+            Returns images stored in the local physical file system.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemResolver.fileProvider">
+            <summary>
+            The file provider abstraction.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemResolver.bufferManager">
+            <summary>
+            The buffer manager.
+            </summary>
+        </member>
+        <member name="F:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemResolver.options">
+            <summary>
+            The middleware configuration options.
+            </summary>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemResolver.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment,SixLabors.ImageSharp.Web.Memory.IBufferManager,Microsoft.Extensions.Options.IOptions{SixLabors.ImageSharp.Web.Middleware.ImageSharpMiddlewareOptions})">
+            <summary>
+            Initializes a new instance of the <see cref="T:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemResolver"/> class.
+            </summary>
+            <param name="environment">The <see cref="T:Microsoft.AspNetCore.Hosting.IHostingEnvironment"/> used by this middleware</param>
+            <param name="bufferManager">An <see cref="T:SixLabors.ImageSharp.Web.Memory.IBufferManager"/> instance used to allocate arrays transporting encoded image data</param>
+            <param name="options">The middleware configuration options</param>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemResolver.Match">
+            <inheritdoc/>
+        </member>
+        <member name="P:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemResolver.Settings">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemResolver.IsValidRequestAsync(Microsoft.AspNetCore.Http.HttpContext,Microsoft.Extensions.Logging.ILogger)">
+            <inheritdoc/>
+        </member>
+        <member name="M:SixLabors.ImageSharp.Web.Resolvers.PhysicalFileSystemResolver.ResolveImageAsync(Microsoft.AspNetCore.Http.HttpContext,Microsoft.Extensions.Logging.ILogger)">
+            <inheritdoc/>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata minClientVersion="2.12">
+    <id>System.Private.ServiceModel</id>
+    <version>4.4.4</version>
+    <title>System.Private.ServiceModel</title>
+    <authors>Microsoft</authors>
+    <owners>microsoft,dotnetframework</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/dotnet/wcf/blob/master/LICENSE.TXT</licenseUrl>
+    <projectUrl>https://dot.net/</projectUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <description>Internal implementation package not meant for direct consumption.  Please do not reference directly.  Provides implementation of System.ServiceModel packages. 
+0cdb612ce9cc705f11132c9d162347607b45cf99 
+When using NuGet 3.x this package requires at least version 3.4.</description>
+    <releaseNotes>https://go.microsoft.com/fwlink/?LinkID=799421</releaseNotes>
+    <copyright>© Microsoft Corporation.  All rights reserved.</copyright>
+    <serviceable>true</serviceable>
+    <dependencies>
+      <group targetFramework=".NETCore5.0">
+        <dependency id="Microsoft.NETCore.Platforms" version="2.0.0" />
+        <dependency id="NETStandard.Library" version="1.6.1" />
+        <dependency id="System.Collections.NonGeneric" version="4.3.0" />
+        <dependency id="System.Collections.Specialized" version="4.3.0" />
+        <dependency id="System.ComponentModel.EventBasedAsync" version="4.3.0" />
+        <dependency id="System.Linq.Queryable" version="4.3.0" />
+        <dependency id="System.Net.WebHeaderCollection" version="4.3.0" />
+        <dependency id="System.Net.WebSockets" version="4.3.0" />
+        <dependency id="System.Net.WebSockets.Client" version="4.3.0" />
+        <dependency id="System.Reflection.DispatchProxy" version="4.4.0" />
+        <dependency id="System.Reflection.TypeExtensions" version="4.3.0" />
+        <dependency id="System.Runtime.Serialization.Primitives" version="4.3.0" />
+        <dependency id="System.Runtime.Serialization.Xml" version="4.3.0" />
+        <dependency id="System.Runtime.WindowsRuntime" version="4.3.0" />
+        <dependency id="System.Security.Claims" version="4.3.0" />
+        <dependency id="System.Security.Principal" version="4.3.0" />
+        <dependency id="System.Xml.XmlDocument" version="4.3.0" />
+        <dependency id="System.Xml.XmlSerializer" version="4.3.0" />
+      </group>
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="Microsoft.NETCore.Platforms" version="2.0.0" />
+        <dependency id="NETStandard.Library" version="1.6.1" />
+        <dependency id="System.Collections.NonGeneric" version="4.3.0" />
+        <dependency id="System.Collections.Specialized" version="4.3.0" />
+        <dependency id="System.ComponentModel.EventBasedAsync" version="4.3.0" />
+        <dependency id="System.Linq.Queryable" version="4.3.0" />
+        <dependency id="System.Net.NameResolution" version="4.3.0" />
+        <dependency id="System.Net.Security" version="4.3.0" />
+        <dependency id="System.Net.WebHeaderCollection" version="4.3.0" />
+        <dependency id="System.Net.WebSockets" version="4.3.0" />
+        <dependency id="System.Net.WebSockets.Client" version="4.3.0" />
+        <dependency id="System.Reflection.DispatchProxy" version="4.3.0" />
+        <dependency id="System.Reflection.TypeExtensions" version="4.3.0" />
+        <dependency id="System.Runtime.Serialization.Primitives" version="4.3.0" />
+        <dependency id="System.Runtime.Serialization.Xml" version="4.3.0" />
+        <dependency id="System.Security.Claims" version="4.3.0" />
+        <dependency id="System.Security.Principal" version="4.3.0" />
+        <dependency id="System.Security.Principal.Windows" version="4.3.0" />
+        <dependency id="System.Xml.XmlDocument" version="4.3.0" />
+        <dependency id="System.Xml.XmlSerializer" version="4.3.0" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.NETCore.Platforms" version="2.0.0" />
+        <dependency id="System.Net.Http.WinHttpHandler" version="4.4.0" />
+        <dependency id="System.Reflection.DispatchProxy" version="4.4.0" />
+        <dependency id="System.Security.Principal.Windows" version="4.4.0" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

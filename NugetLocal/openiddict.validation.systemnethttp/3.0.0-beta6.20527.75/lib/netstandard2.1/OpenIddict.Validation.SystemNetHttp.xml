@@ -1,0 +1,200 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OpenIddict.Validation.SystemNetHttp</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationSystemNetHttpBuilder">
+            <summary>
+            Exposes the necessary methods required to configure the OpenIddict validation/System.Net.Http integration.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationSystemNetHttpBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.
+            </summary>
+            <param name="services">The services collection.</param>
+        </member>
+        <member name="P:Microsoft.Extensions.DependencyInjection.OpenIddictValidationSystemNetHttpBuilder.Services">
+            <summary>
+            Gets the services collection.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationSystemNetHttpBuilder.Configure(System.Action{OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpOptions})">
+            <summary>
+            Amends the default OpenIddict validation/server integration configuration.
+            </summary>
+            <param name="configuration">The delegate used to configure the OpenIddict options.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationSystemNetHttpBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationSystemNetHttpBuilder.SetHttpErrorPolicy(Polly.IAsyncPolicy{System.Net.Http.HttpResponseMessage})">
+            <summary>
+            Replaces the default HTTP error policy used by the OpenIddict validation services.
+            </summary>
+            <param name="policy">The HTTP Polly error policy.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationSystemNetHttpBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationSystemNetHttpBuilder.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationSystemNetHttpBuilder.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationSystemNetHttpBuilder.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationSystemNetHttpExtensions">
+            <summary>
+            Exposes extensions allowing to register the OpenIddict validation/System.Net.Http integration services.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationSystemNetHttpExtensions.UseSystemNetHttp(Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder)">
+            <summary>
+            Registers the OpenIddict validation/System.Net.Http integration services in the DI container.
+            </summary>
+            <param name="builder">The services builder used by OpenIddict to register new services.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictValidationSystemNetHttpExtensions.UseSystemNetHttp(Microsoft.Extensions.DependencyInjection.OpenIddictValidationBuilder,System.Action{Microsoft.Extensions.DependencyInjection.OpenIddictValidationSystemNetHttpBuilder})">
+            <summary>
+            Registers the OpenIddict validation/System.Net.Http integration services in the DI container.
+            </summary>
+            <param name="builder">The services builder used by OpenIddict to register new services.</param>
+            <param name="configuration">The configuration delegate used to configure the validation services.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictBuilder"/>.</returns>
+        </member>
+        <member name="T:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpConfiguration">
+            <summary>
+            Contains the methods required to ensure that the OpenIddict validation/System.Net.Http integration configuration is valid.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlerFilters.RequireHttpMetadataAddress">
+            <summary>
+            Represents a filter that excludes the associated handlers if the metadata address of the issuer is not available.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.PrepareGetHttpRequest`1">
+            <summary>
+            Contains the logic responsible of preparing an HTTP GET request message.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.PrepareGetHttpRequest`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.PrepareGetHttpRequest`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.PreparePostHttpRequest`1">
+            <summary>
+            Contains the logic responsible of preparing an HTTP POST request message.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.PreparePostHttpRequest`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.PreparePostHttpRequest`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.AttachQueryStringParameters`1">
+            <summary>
+            Contains the logic responsible of attaching the query string parameters to the HTTP request.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.AttachQueryStringParameters`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.AttachQueryStringParameters`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.AttachFormParameters`1">
+            <summary>
+            Contains the logic responsible of attaching the form parameters to the HTTP request.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.AttachFormParameters`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.AttachFormParameters`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.SendHttpRequest`1">
+            <summary>
+            Contains the logic responsible of sending the HTTP request to the remote server.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.SendHttpRequest`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.SendHttpRequest`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.ExtractJsonHttpResponse`1">
+            <summary>
+            Contains the logic responsible of extracting the response from the JSON-encoded HTTP body.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.ExtractJsonHttpResponse`1.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.ExtractJsonHttpResponse`1.HandleAsync(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.Introspection.AttachBasicAuthenticationCredentials">
+            <summary>
+            Contains the logic responsible of attaching the client credentials to the HTTP Authorization header.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.Introspection.AttachBasicAuthenticationCredentials.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpHandlers.Introspection.AttachBasicAuthenticationCredentials.HandleAsync(OpenIddict.Validation.OpenIddictValidationEvents.PrepareIntrospectionRequestContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpOptions">
+            <summary>
+            Provides various settings needed to configure the OpenIddict validation/System.Net.Http integration.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Validation.SystemNetHttp.OpenIddictValidationSystemNetHttpOptions.HttpErrorPolicy">
+            <summary>
+            Gets or sets the HTTP Polly error policy used by the internal OpenIddict HTTP clients.
+            </summary>
+        </member>
+        <member name="T:System.Net.Http.OpenIddictValidationSystemNetHttpHelpers">
+            <summary>
+            Exposes companion extensions for the OpenIddict/System.Net.Http integration.
+            </summary>
+        </member>
+        <member name="M:System.Net.Http.OpenIddictValidationSystemNetHttpHelpers.GetHttpRequestMessage(OpenIddict.Validation.OpenIddictValidationTransaction)">
+            <summary>
+            Gets the <see cref="T:System.Net.Http.HttpRequestMessage"/> associated with the current context.
+            </summary>
+            <param name="transaction">The transaction instance.</param>
+            <returns>The <see cref="T:System.Net.Http.HttpRequestMessage"/> instance or <c>null</c> if it couldn't be found.</returns>
+        </member>
+        <member name="M:System.Net.Http.OpenIddictValidationSystemNetHttpHelpers.GetHttpResponseMessage(OpenIddict.Validation.OpenIddictValidationTransaction)">
+            <summary>
+            Gets the <see cref="T:System.Net.Http.HttpResponseMessage"/> associated with the current context.
+            </summary>
+            <param name="transaction">The transaction instance.</param>
+            <returns>The <see cref="T:System.Net.Http.HttpResponseMessage"/> instance or <c>null</c> if it couldn't be found.</returns>
+        </member>
+    </members>
+</doc>

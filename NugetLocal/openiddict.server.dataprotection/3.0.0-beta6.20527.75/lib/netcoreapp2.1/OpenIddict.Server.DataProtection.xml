@@ -1,0 +1,356 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OpenIddict.Server.DataProtection</name>
+    </assembly>
+    <members>
+        <member name="T:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionConfiguration">
+            <summary>
+            Contains the methods required to ensure that the OpenIddict ASP.NET Core Data Protection configuration is valid.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionConfiguration.#ctor(Microsoft.AspNetCore.DataProtection.IDataProtectionProvider)">
+            <summary>
+            Creates a new instance of the <see cref="T:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionConfiguration"/> class.
+            </summary>
+            <param name="dataProtectionProvider">The ASP.NET Core Data Protection provider.</param>
+        </member>
+        <member name="M:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionConfiguration.PostConfigure(System.String,OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionOptions)">
+            <summary>
+            Populates the default OpenIddict ASP.NET Core Data Protection server options
+            and ensures that the configuration is in a consistent and valid state.
+            </summary>
+            <param name="name">The name of the options instance to configure, if applicable.</param>
+            <param name="options">The options instance to initialize.</param>
+        </member>
+        <member name="T:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlerFilters">
+            <summary>
+            Contains a collection of event handler filters commonly used by the Data Protection handlers.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlerFilters.RequireDataProtectionAccessTokenFormatEnabled">
+            <summary>
+            Represents a filter that excludes the associated handlers if OpenIddict
+            was not configured to issue ASP.NET Core Data Protection access tokens.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlerFilters.RequireDataProtectionAuthorizationCodeFormatEnabled">
+            <summary>
+            Represents a filter that excludes the associated handlers if OpenIddict
+            was not configured to issue ASP.NET Core Data Protection authorization codes.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlerFilters.RequireDataProtectionDeviceCodeFormatEnabled">
+            <summary>
+            Represents a filter that excludes the associated handlers if OpenIddict
+            was not configured to issue ASP.NET Core Data Protection device codes.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlerFilters.RequireDataProtectionRefreshTokenFormatEnabled">
+            <summary>
+            Represents a filter that excludes the associated handlers if OpenIddict
+            was not configured to issue ASP.NET Core Data Protection refresh tokens.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlerFilters.RequireDataProtectionUserCodeFormatEnabled">
+            <summary>
+            Represents a filter that excludes the associated handlers if OpenIddict
+            was not configured to issue ASP.NET Core Data Protection user codes.
+            </summary>
+        </member>
+        <member name="T:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.ValidateDataProtectionToken">
+            <summary>
+            Contains the logic responsible of validating tokens generated using Data Protection.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.ValidateDataProtectionToken.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.ValidateDataProtectionToken.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ProcessAuthenticationContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.GenerateDataProtectionAccessToken">
+            <summary>
+            Contains the logic responsible of generating an access token using Data Protection.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.GenerateDataProtectionAccessToken.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.GenerateDataProtectionAccessToken.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ProcessSignInContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.GenerateDataProtectionAuthorizationCode">
+            <summary>
+            Contains the logic responsible of generating an authorization code using Data Protection.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.GenerateDataProtectionAuthorizationCode.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.GenerateDataProtectionAuthorizationCode.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ProcessSignInContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.GenerateDataProtectionDeviceCode">
+            <summary>
+            Contains the logic responsible of generating a device code using Data Protection.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.GenerateDataProtectionDeviceCode.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.GenerateDataProtectionDeviceCode.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ProcessSignInContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.GenerateDataProtectionRefreshToken">
+            <summary>
+            Contains the logic responsible of generating a refresh token using Data Protection.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.GenerateDataProtectionRefreshToken.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.GenerateDataProtectionRefreshToken.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ProcessSignInContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.GenerateDataProtectionUserCode">
+            <summary>
+            Contains the logic responsible of generating a user code using Data Protection.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.GenerateDataProtectionUserCode.Descriptor">
+            <summary>
+            Gets the default descriptor definition assigned to this handler.
+            </summary>
+        </member>
+        <member name="M:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionHandlers.GenerateDataProtectionUserCode.HandleAsync(OpenIddict.Server.OpenIddictServerEvents.ProcessSignInContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionOptions">
+            <summary>
+            Provides various settings needed to configure the OpenIddict
+            ASP.NET Core Data Protection server integration.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionOptions.DataProtectionProvider">
+            <summary>
+            Gets or sets the data protection provider used to create the default
+            data protectors used by the OpenIddict Data Protection server services.
+            When this property is set to <c>null</c>, the data protection provider
+            is directly retrieved from the dependency injection container.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionOptions.Formatter">
+            <summary>
+            Gets or sets the formatter used to read and write Data Protection tokens.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionOptions.PreferDefaultAccessTokenFormat">
+            <summary>
+            Gets or sets a boolean indicating whether the default access token format should be
+            used when issuing new access tokens. This property is set to <c>false</c> by default.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionOptions.PreferDefaultAuthorizationCodeFormat">
+            <summary>
+            Gets or sets a boolean indicating whether the default authorization code format should be
+            used when issuing new authorization codes. This property is set to <c>false</c> by default.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionOptions.PreferDefaultDeviceCodeFormat">
+            <summary>
+            Gets or sets a boolean indicating whether the default device code format should be
+            used when issuing new device codes. This property is set to <c>false</c> by default.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionOptions.PreferDefaultRefreshTokenFormat">
+            <summary>
+            Gets or sets a boolean indicating whether the default refresh token format should be
+            used when issuing new refresh tokens. This property is set to <c>false</c> by default.
+            </summary>
+        </member>
+        <member name="P:OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionOptions.PreferDefaultUserCodeFormat">
+            <summary>
+            Gets or sets a boolean indicating whether the default user code format should be
+            used when issuing new user codes. This property is set to <c>false</c> by default.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder">
+            <summary>
+            Exposes the necessary methods required to configure the
+            OpenIddict ASP.NET Core Data Protection integration.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder"/>.
+            </summary>
+            <param name="services">The services collection.</param>
+        </member>
+        <member name="P:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder.Services">
+            <summary>
+            Gets the services collection.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder.Configure(System.Action{OpenIddict.Server.DataProtection.OpenIddictServerDataProtectionOptions})">
+            <summary>
+            Amends the default OpenIddict server ASP.NET Core Data Protection configuration.
+            </summary>
+            <param name="configuration">The delegate used to configure the OpenIddict options.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder.UseDataProtectionProvider(Microsoft.AspNetCore.DataProtection.IDataProtectionProvider)">
+            <summary>
+            Configures OpenIddict to use a specific data protection provider
+            instead of relying on the default instance provided by the DI container.
+            </summary>
+            <param name="provider">The data protection provider used to create token protectors.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder.UseFormatter(OpenIddict.Server.DataProtection.IOpenIddictServerDataProtectionFormatter)">
+            <summary>
+            Configures OpenIddict to use a specific formatter instead of relying on the default instance.
+            </summary>
+            <param name="formatter">The formatter used to read and write tokens.</param>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder.PreferDefaultAccessTokenFormat">
+            <summary>
+            Configures OpenIddict to use the default token format (JWT) when issuing new access tokens.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder.PreferDefaultAuthorizationCodeFormat">
+            <summary>
+            Configures OpenIddict to use the default token format (JWT) when issuing new authorization codes.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder.PreferDefaultDeviceCodeFormat">
+            <summary>
+            Configures OpenIddict to use the default token format (JWT) when issuing new device codes.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder.PreferDefaultRefreshTokenFormat">
+            <summary>
+            Configures OpenIddict to use the default token format (JWT) when issuing new refresh tokens.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder.PreferDefaultUserCodeFormat">
+            <summary>
+            Configures OpenIddict to use the default token format (JWT) when issuing new user codes.
+            </summary>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionExtensions">
+            <summary>
+            Exposes extensions allowing to register the OpenIddict ASP.NET Core Data Protection server services.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionExtensions.UseDataProtection(Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder)">
+            <summary>
+            Registers the OpenIddict ASP.NET Core Data Protection server services in the DI container
+            and configures OpenIddict to validate and issue ASP.NET Data Protection-based tokens.
+            </summary>
+            <param name="builder">The services builder used by OpenIddict to register new services.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionExtensions.UseDataProtection(Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder,System.Action{Microsoft.Extensions.DependencyInjection.OpenIddictServerDataProtectionBuilder})">
+            <summary>
+            Registers the OpenIddict ASP.NET Core Data Protection server services in the DI container
+            and configures OpenIddict to validate and issue ASP.NET Data Protection-based tokens.
+            </summary>
+            <param name="builder">The services builder used by OpenIddict to register new services.</param>
+            <param name="configuration">The configuration delegate used to configure the server services.</param>
+            <remarks>This extension can be safely called multiple times.</remarks>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.OpenIddictServerBuilder"/>.</returns>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.AllowNullAttribute">
+            <summary>Specifies that null is allowed as an input even if the corresponding type disallows it.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DisallowNullAttribute">
+            <summary>Specifies that null is disallowed as an input even if the corresponding type allows it.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MaybeNullAttribute">
+            <summary>Specifies that an output may be null even if the corresponding type disallows it.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullAttribute">
+            <summary>Specifies that an output will not be null even if the corresponding type allows it.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute">
+            <summary>Specifies that when a method returns <see cref="P:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.ReturnValue"/>, the parameter may be null even if the corresponding type disallows it.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.#ctor(System.Boolean)">
+            <summary>Initializes the attribute with the specified return value condition.</summary>
+            <param name="returnValue">
+            The return value condition. If the method returns this value, the associated parameter may be null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.ReturnValue">
+            <summary>Gets the return value condition.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute">
+            <summary>Specifies that when a method returns <see cref="P:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.ReturnValue"/>, the parameter will not be null even if the corresponding type allows it.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.#ctor(System.Boolean)">
+            <summary>Initializes the attribute with the specified return value condition.</summary>
+            <param name="returnValue">
+            The return value condition. If the method returns this value, the associated parameter will not be null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.ReturnValue">
+            <summary>Gets the return value condition.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute">
+            <summary>Specifies that the output will be non-null if the named parameter is non-null.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute.#ctor(System.String)">
+            <summary>Initializes the attribute with the associated parameter name.</summary>
+            <param name="parameterName">
+            The associated parameter name.  The output will be non-null if the argument to the parameter specified is non-null.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute.ParameterName">
+            <summary>Gets the associated parameter name.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute">
+            <summary>Applied to a method that will never return under any circumstance.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute">
+            <summary>Specifies that the method will not return if the associated Boolean parameter is passed the specified value.</summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute.#ctor(System.Boolean)">
+            <summary>Initializes the attribute with the specified parameter value.</summary>
+            <param name="parameterValue">
+            The condition parameter value. Code after the method will be considered unreachable by diagnostics if the argument to
+            the associated parameter matches this value.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute.ParameterValue">
+            <summary>Gets the condition parameter value.</summary>
+        </member>
+    </members>
+</doc>

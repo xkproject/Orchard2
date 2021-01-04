@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Markdig</id>
+    <version>0.15.2</version>
+    <authors>Alexandre Mutel</authors>
+    <owners>Alexandre Mutel</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/lunet-io/markdig/blob/master/license.txt</licenseUrl>
+    <projectUrl>https://github.com/lunet-io/markdig</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/lunet-io/markdig/master/img/markdig.png</iconUrl>
+    <description>A fast, powerful, CommonMark compliant, extensible Markdown processor for .NET with 20+ builtin extensions (pipetables, footnotes, definition lists... etc.)</description>
+    <releaseNotes>https://github.com/lunet-io/markdig/blob/master/changelog.md</releaseNotes>
+    <copyright>Alexandre Mutel</copyright>
+    <tags>Markdown CommonMark md html md2html</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework3.5" />
+      <group targetFramework=".NETFramework4.0" />
+      <group targetFramework=".NETPortable4.0-Profile328" />
+      <group targetFramework=".NETStandard1.1">
+        <dependency id="NETStandard.Library" version="1.6.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework="UAP10.0">
+        <dependency id="Microsoft.NETCore.UniversalWindowsPlatform" version="5.2.2" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0" />
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="mscorlib" targetFramework=".NETFramework3.5, .NETFramework4.0, .NETPortable4.0-Profile328" />
+      <frameworkAssembly assemblyName="System.Core" targetFramework=".NETFramework3.5, .NETFramework4.0, .NETPortable4.0-Profile328" />
+      <frameworkAssembly assemblyName="System" targetFramework=".NETFramework3.5, .NETFramework4.0, .NETPortable4.0-Profile328" />
+      <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework=".NETFramework4.0" />
+    </frameworkAssemblies>
+  </metadata>
+</package>

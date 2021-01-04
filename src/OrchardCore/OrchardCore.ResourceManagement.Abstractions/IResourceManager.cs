@@ -23,12 +23,7 @@ namespace OrchardCore.ResourceManagement
         /// <summary>
         /// Registers a specific resource url.
         /// </summary>
-        RequireSettings Include(string resourceType, string resourcePath, string resourceDebugPath);
-
-        /// <summary>
-        /// Registers a custom url.
-        /// </summary>
-        RequireSettings RegisterUrl(string resourceType, string resourcePath, string resourceDebugPath, string relativeFromPath);
+        RequireSettings RegisterUrl(string resourceType, string resourcePath, string resourceDebugPath);
 
         /// <summary>
         /// Registers a named resource.
@@ -36,15 +31,21 @@ namespace OrchardCore.ResourceManagement
         RequireSettings RegisterResource(string resourceType, string resourceName);
 
         /// <summary>
-        /// Registers a custom script tag on at the head.
+        /// Registers a custom script tag at the head.
         /// </summary>
         void RegisterHeadScript(IHtmlContent script);
 
         /// <summary>
-        /// Registers a custom script tag on at the foot.
+        /// Registers a custom script tag at the foot.
         /// </summary>
         /// <param name="script"></param>
         void RegisterFootScript(IHtmlContent script);
+
+        /// <summary>
+        /// Registers a custom style tag at the head.
+        /// </summary>
+        /// <param name="style"></param>
+        void RegisterStyle(IHtmlContent style);
 
         /// <summary>
         /// Registers a link tag.
@@ -85,6 +86,11 @@ namespace OrchardCore.ResourceManagement
         /// Returns the registered footer script resources.
         /// </summary>
         IEnumerable<IHtmlContent> GetRegisteredFootScripts();
+
+        /// <summary>
+        /// Returns the registered style resources.
+        /// </summary>
+        IEnumerable<IHtmlContent> GetRegisteredStyles();
 
         /// <summary>
         /// Renders the registered meta tags.
