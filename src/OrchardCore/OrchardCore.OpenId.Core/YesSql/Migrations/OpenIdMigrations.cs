@@ -94,61 +94,76 @@ namespace OrchardCore.OpenId.YesSql.Migrations
         {
             SchemaBuilder.AlterTable(nameof(OpenIdApplicationIndex), table =>
             {
-                table.CreateIndex($"IX_{nameof(OpenIdApplicationIndex)}_{nameof(OpenIdApplicationIndex.ApplicationId)}", nameof(OpenIdApplicationIndex.ApplicationId));
-                table.CreateIndex($"IX_{nameof(OpenIdApplicationIndex)}_{nameof(OpenIdApplicationIndex.ClientId)}", nameof(OpenIdApplicationIndex.ClientId));
+                table.CreateIndex($"IX_{nameof(OpenIdApplicationIndex)}_{nameof(OpenIdApplicationIndex.ApplicationId)}", "DocumentId", nameof(OpenIdApplicationIndex.ApplicationId));
+                table.CreateIndex($"IX_{nameof(OpenIdApplicationIndex)}_{nameof(OpenIdApplicationIndex.ClientId)}", "DocumentId", nameof(OpenIdApplicationIndex.ClientId));
             });
             SchemaBuilder.AlterTable(nameof(OpenIdAppByLogoutUriIndex), table =>
             {
                 table.CreateIndex($"IX_{nameof(OpenIdAppByLogoutUriIndex)}_{nameof(OpenIdAppByLogoutUriIndex.LogoutRedirectUri)}", nameof(OpenIdAppByLogoutUriIndex.LogoutRedirectUri));
             });
+            SchemaBuilder.AlterTable($"{nameof(OpenIdAppByLogoutUriIndex)}_Document", table =>
+            {
+                table.CreateIndex($"IX_{nameof(OpenIdAppByLogoutUriIndex)}_Document_{nameof(OpenIdAppByLogoutUriIndex.LogoutRedirectUri)}", "DocumentId", $"{nameof(OpenIdAppByLogoutUriIndex)}Id");
+            });
             SchemaBuilder.AlterTable(nameof(OpenIdAppByRedirectUriIndex), table =>
             {
                 table.CreateIndex($"IX_{nameof(OpenIdAppByRedirectUriIndex)}_{nameof(OpenIdAppByRedirectUriIndex.RedirectUri)}", nameof(OpenIdAppByRedirectUriIndex.RedirectUri));
+            });
+            SchemaBuilder.AlterTable($"{nameof(OpenIdAppByRedirectUriIndex)}_Document", table =>
+            {
+                table.CreateIndex($"IX_{nameof(OpenIdAppByRedirectUriIndex)}_Document_{nameof(OpenIdAppByRedirectUriIndex.RedirectUri)}", "DocumentId", $"{nameof(OpenIdAppByRedirectUriIndex)}Id");
             });
             SchemaBuilder.AlterTable(nameof(OpenIdAppByRoleNameIndex), table =>
             {
                 table.CreateIndex($"IX_{nameof(OpenIdAppByRoleNameIndex)}_{nameof(OpenIdAppByRoleNameIndex.RoleName)}", nameof(OpenIdAppByRoleNameIndex.RoleName));
             });
-
+            SchemaBuilder.AlterTable($"{nameof(OpenIdAppByRoleNameIndex)}_Document", table =>
+            {
+                table.CreateIndex($"IX_{nameof(OpenIdAppByRoleNameIndex)}_Document_{nameof(OpenIdAppByRoleNameIndex.RoleName)}", "DocumentId", $"{nameof(OpenIdAppByRoleNameIndex)}Id");
+            });
             SchemaBuilder.AlterTable(nameof(OpenIdAuthorizationIndex), table =>
             {
-                table.CreateIndex($"IX_{nameof(OpenIdAuthorizationIndex)}_{nameof(OpenIdAuthorizationIndex.Subject)}", nameof(OpenIdAuthorizationIndex.Subject));
-                table.CreateIndex($"IX_{nameof(OpenIdAuthorizationIndex)}_{nameof(OpenIdAuthorizationIndex.AuthorizationId)}", nameof(OpenIdAuthorizationIndex.AuthorizationId));
-                table.CreateIndex($"IX_{nameof(OpenIdAuthorizationIndex)}_{nameof(OpenIdAuthorizationIndex.ApplicationId)}", nameof(OpenIdAuthorizationIndex.ApplicationId));
+                table.CreateIndex($"IX_{nameof(OpenIdAuthorizationIndex)}_{nameof(OpenIdAuthorizationIndex.Subject)}", "DocumentId", nameof(OpenIdAuthorizationIndex.Subject));
+                table.CreateIndex($"IX_{nameof(OpenIdAuthorizationIndex)}_{nameof(OpenIdAuthorizationIndex.AuthorizationId)}", "DocumentId", nameof(OpenIdAuthorizationIndex.AuthorizationId));
+                table.CreateIndex($"IX_{nameof(OpenIdAuthorizationIndex)}_{nameof(OpenIdAuthorizationIndex.ApplicationId)}", "DocumentId", nameof(OpenIdAuthorizationIndex.ApplicationId));
                 table.CreateIndex($"IX_{nameof(OpenIdAuthorizationIndex)}_{nameof(OpenIdAuthorizationIndex.ApplicationId)}_{nameof(OpenIdAuthorizationIndex.Subject)}",
-                    new[] { nameof(OpenIdAuthorizationIndex.ApplicationId), nameof(OpenIdAuthorizationIndex.Subject) });
+                    new[] { "DocumentId", nameof(OpenIdAuthorizationIndex.ApplicationId), nameof(OpenIdAuthorizationIndex.Subject) });
                 table.CreateIndex($"IX_{nameof(OpenIdAuthorizationIndex)}_{nameof(OpenIdAuthorizationIndex.ApplicationId)}_{nameof(OpenIdAuthorizationIndex.Subject)}_{nameof(OpenIdAuthorizationIndex.Status)}",
-                    new[] { nameof(OpenIdAuthorizationIndex.ApplicationId), nameof(OpenIdAuthorizationIndex.Subject), nameof(OpenIdAuthorizationIndex.Status) });
+                    new[] { "DocumentId", nameof(OpenIdAuthorizationIndex.ApplicationId), nameof(OpenIdAuthorizationIndex.Subject), nameof(OpenIdAuthorizationIndex.Status) });
                 table.CreateIndex($"IX_{nameof(OpenIdAuthorizationIndex)}_{nameof(OpenIdAuthorizationIndex.Status)}_{nameof(OpenIdAuthorizationIndex.Type)}_{nameof(OpenIdAuthorizationIndex.AuthorizationId)}",
-                    new[] { nameof(OpenIdAuthorizationIndex.Status), nameof(OpenIdAuthorizationIndex.Type), nameof(OpenIdAuthorizationIndex.AuthorizationId) });
+                    new[] { "DocumentId", nameof(OpenIdAuthorizationIndex.Status), nameof(OpenIdAuthorizationIndex.Type), nameof(OpenIdAuthorizationIndex.AuthorizationId) });
                 table.CreateIndex($"IX_{nameof(OpenIdAuthorizationIndex)}_{nameof(OpenIdAuthorizationIndex.ApplicationId)}_{nameof(OpenIdAuthorizationIndex.Subject)}_{nameof(OpenIdAuthorizationIndex.Status)}_{nameof(OpenIdAuthorizationIndex.Type)}",
-                    new[] { nameof(OpenIdAuthorizationIndex.ApplicationId), nameof(OpenIdAuthorizationIndex.Subject), nameof(OpenIdAuthorizationIndex.Status), nameof(OpenIdAuthorizationIndex.Type) });
+                    new[] { "DocumentId", nameof(OpenIdAuthorizationIndex.ApplicationId), nameof(OpenIdAuthorizationIndex.Subject), nameof(OpenIdAuthorizationIndex.Status), nameof(OpenIdAuthorizationIndex.Type) });
             });
 
             SchemaBuilder.AlterTable(nameof(OpenIdScopeIndex), table =>
             {
-                table.CreateIndex($"IX_{nameof(OpenIdScopeIndex)}_{nameof(OpenIdScopeIndex.ScopeId)}", nameof(OpenIdScopeIndex.ScopeId));
-                table.CreateIndex($"IX_{nameof(OpenIdScopeIndex)}_{nameof(OpenIdScopeIndex.Name)}", nameof(OpenIdScopeIndex.Name));
+                table.CreateIndex($"IX_{nameof(OpenIdScopeIndex)}_{nameof(OpenIdScopeIndex.ScopeId)}", "DocumentId", nameof(OpenIdScopeIndex.ScopeId));
+                table.CreateIndex($"IX_{nameof(OpenIdScopeIndex)}_{nameof(OpenIdScopeIndex.Name)}", "DocumentId", nameof(OpenIdScopeIndex.Name));
             });
             SchemaBuilder.AlterTable(nameof(OpenIdScopeByResourceIndex), table =>
             {
                 table.CreateIndex($"IX_{nameof(OpenIdScopeByResourceIndex)}_{nameof(OpenIdScopeByResourceIndex.Resource)}", nameof(OpenIdScopeByResourceIndex.Resource));
             });
+            SchemaBuilder.AlterTable($"{nameof(OpenIdScopeByResourceIndex)}_Document", table =>
+            {
+                table.CreateIndex($"IX_{nameof(OpenIdScopeByResourceIndex)}_Document_{nameof(OpenIdScopeByResourceIndex.Resource)}", "DocumentId", $"{nameof(OpenIdScopeByResourceIndex)}Id");
+            });
             SchemaBuilder.AlterTable(nameof(OpenIdTokenIndex), table =>
             {
-                table.CreateIndex($"IX_{nameof(OpenIdTokenIndex)}_{nameof(OpenIdTokenIndex.ApplicationId)}", nameof(OpenIdTokenIndex.ApplicationId));
-                table.CreateIndex($"IX_{nameof(OpenIdTokenIndex)}_{nameof(OpenIdTokenIndex.AuthorizationId)}", nameof(OpenIdTokenIndex.AuthorizationId));
-                table.CreateIndex($"IX_{nameof(OpenIdTokenIndex)}_{nameof(OpenIdTokenIndex.ReferenceId)}", nameof(OpenIdTokenIndex.ReferenceId));
-                table.CreateIndex($"IX_{nameof(OpenIdTokenIndex)}_{nameof(OpenIdTokenIndex.TokenId)}", nameof(OpenIdTokenIndex.TokenId));
-                table.CreateIndex($"IX_{nameof(OpenIdTokenIndex)}_{nameof(OpenIdTokenIndex.Subject)}", nameof(OpenIdTokenIndex.Subject));
+                table.CreateIndex($"IX_{nameof(OpenIdTokenIndex)}_{nameof(OpenIdTokenIndex.ApplicationId)}", "DocumentId", nameof(OpenIdTokenIndex.ApplicationId));
+                table.CreateIndex($"IX_{nameof(OpenIdTokenIndex)}_{nameof(OpenIdTokenIndex.AuthorizationId)}", "DocumentId", nameof(OpenIdTokenIndex.AuthorizationId));
+                table.CreateIndex($"IX_{nameof(OpenIdTokenIndex)}_{nameof(OpenIdTokenIndex.ReferenceId)}", "DocumentId", nameof(OpenIdTokenIndex.ReferenceId));
+                table.CreateIndex($"IX_{nameof(OpenIdTokenIndex)}_{nameof(OpenIdTokenIndex.TokenId)}", "DocumentId", nameof(OpenIdTokenIndex.TokenId));
+                table.CreateIndex($"IX_{nameof(OpenIdTokenIndex)}_{nameof(OpenIdTokenIndex.Subject)}", "DocumentId", nameof(OpenIdTokenIndex.Subject));
                 table.CreateIndex($"IX_{nameof(OpenIdTokenIndex)}_{nameof(OpenIdTokenIndex.ApplicationId)}_{nameof(OpenIdTokenIndex.Subject)}",
-                    new[] { nameof(OpenIdTokenIndex.ApplicationId), nameof(OpenIdTokenIndex.Subject) });
+                    new[] { "DocumentId", nameof(OpenIdTokenIndex.ApplicationId), nameof(OpenIdTokenIndex.Subject) });
                 table.CreateIndex($"IX_{nameof(OpenIdTokenIndex)}_{nameof(OpenIdTokenIndex.ApplicationId)}_{nameof(OpenIdTokenIndex.Subject)}_{nameof(OpenIdTokenIndex.Status)}",
-                    new[] { nameof(OpenIdTokenIndex.ApplicationId), nameof(OpenIdTokenIndex.Subject), nameof(OpenIdTokenIndex.Status) });
+                    new[] { "DocumentId", nameof(OpenIdTokenIndex.ApplicationId), nameof(OpenIdTokenIndex.Subject), nameof(OpenIdTokenIndex.Status) });
                 table.CreateIndex($"IX_{nameof(OpenIdTokenIndex)}_{nameof(OpenIdTokenIndex.Status)}_{nameof(OpenIdTokenIndex.ExpirationDate)}",
-                    new[] { nameof(OpenIdTokenIndex.Status), nameof(OpenIdTokenIndex.ExpirationDate) });
+                    new[] { "DocumentId", nameof(OpenIdTokenIndex.Status), nameof(OpenIdTokenIndex.ExpirationDate) });
                 table.CreateIndex($"IX_{nameof(OpenIdTokenIndex)}_{nameof(OpenIdTokenIndex.ApplicationId)}_{nameof(OpenIdTokenIndex.Subject)}_{nameof(OpenIdTokenIndex.Status)}_{nameof(OpenIdTokenIndex.Type)}",
-                new[] { nameof(OpenIdTokenIndex.ApplicationId), nameof(OpenIdTokenIndex.Subject), nameof(OpenIdTokenIndex.Status), nameof(OpenIdTokenIndex.Type) });
+                new[] { "DocumentId", nameof(OpenIdTokenIndex.ApplicationId), nameof(OpenIdTokenIndex.Subject), nameof(OpenIdTokenIndex.Status), nameof(OpenIdTokenIndex.Type) });
             });
             return 4;
         }
