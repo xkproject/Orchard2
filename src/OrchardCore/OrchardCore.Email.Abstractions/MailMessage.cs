@@ -51,13 +51,23 @@ namespace OrchardCore.Email
         public string Body { get; set; }
 
         /// <summary>
+        /// Gets or sets the message content as plain text.
+        /// </summary>
+        public string BodyText { get; set; }
+
+        /// <summary>
         /// Gets or sets whether the message body is an HTML.
         /// </summary>
         public bool IsBodyHtml { get; set; }
 
         /// <summary>
-        /// Gets or sets the message attachments.
+        /// Gets or sets whether the message body is plain text.
         /// </summary>
-        public IEnumerable<MailMessageAttachment> Attachments { get; set; }
+        public bool IsBodyText { get; set; }
+
+        /// <summary>
+        /// The collection of message attachments.
+        /// </summary>
+        public List<MailMessageAttachment> Attachments { get; } = new List<MailMessageAttachment>();
     }
 }
