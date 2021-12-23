@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\OrchardCore.Build\OrchardCore.Commons.props" />
   <PropertyGroup>
-    <TargetFramework>$(AspNetCoreTargetFramework)</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <IncludeBuildOutput>False</IncludeBuildOutput>
     <IncludeSource>False</IncludeSource>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
