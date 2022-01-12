@@ -23,6 +23,7 @@ using OrchardCore.Users.Models;
 using OrchardCore.Users.Services;
 using OrchardCore.Users.ViewModels;
 using YesSql;
+using YesSql.Filters.Query;
 using YesSql.Services;
 using YesSql.Filters.Query;
 

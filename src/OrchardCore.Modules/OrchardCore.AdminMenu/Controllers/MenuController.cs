@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using OrchardCore.Admin;
+using OrchardCore.AdminMenu.Services;
 using OrchardCore.AdminMenu.ViewModels;
 using OrchardCore.AdminMenu.Services;
 using OrchardCore.DisplayManagement;
