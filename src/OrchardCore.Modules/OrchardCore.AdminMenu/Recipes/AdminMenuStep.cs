@@ -5,7 +5,6 @@ using Newtonsoft.Json.Linq;
 using OrchardCore.AdminMenu.Services;
 using OrchardCore.Recipes.Models;
 using OrchardCore.Recipes.Services;
-using OrchardCore.AdminMenu.Services;
 
 namespace OrchardCore.AdminMenu.Recipes
 {

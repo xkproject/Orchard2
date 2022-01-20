@@ -25,7 +25,6 @@ using OrchardCore.Users.ViewModels;
 using YesSql;
 using YesSql.Filters.Query;
 using YesSql.Services;
-using YesSql.Filters.Query;
 
 namespace OrchardCore.Users.Controllers
 {
