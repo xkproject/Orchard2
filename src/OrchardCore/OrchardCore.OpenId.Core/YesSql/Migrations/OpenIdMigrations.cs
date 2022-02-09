@@ -1,6 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using OrchardCore.Data.Migration;
+using OrchardCore.Environment.Shell;
 using OrchardCore.OpenId.YesSql.Indexes;
 using OrchardCore.OpenId.YesSql.Models;
 using YesSql;
@@ -16,10 +21,12 @@ namespace OrchardCore.OpenId.YesSql.Migrations
         private const string OpenIdScopeCollection = OpenIdScope.OpenIdCollection;
 
         private readonly ISession _session;
+        private readonly ShellSettings _shellSettings;
 
-        public OpenIdMigrations(ISession session)
+        public OpenIdMigrations(ISession session, ShellSettings shellSettings)
         {
             _session = session;
+            _shellSettings = shellSettings;
         }
 
         public int Create()
@@ -216,6 +223,9 @@ namespace OrchardCore.OpenId.YesSql.Migrations
         // This code can be removed in a later version.
         public int UpdateFrom4()
         {
+            //TODO PONER AQUI MIGRACIONES SCRIPTS A PELO
+            FixOrchardCoreOpenIdForeignKeysErrors();
+
             SchemaBuilder.AlterIndexTable<OpenIdApplicationIndex>(table => table
                 .CreateIndex("IDX_OpenIdApplicationIndex_DocumentId",
                     "DocumentId",
@@ -520,6 +530,66 @@ namespace OrchardCore.OpenId.YesSql.Migrations
             SchemaBuilder.DropReduceIndexTable<OpenIdScopeByResourceIndex>();
 
             return 8;
+        }
+
+        [Obsolete("PCCOM: ESTO ARREGLA FALLOS EN MIGRACIONES DE OPENID. Cuando esten todos los clientes migrados o se actualice" +
+            "la version de Orchard eliminar este código")]
+        private bool FixOrchardCoreOpenIdForeignKeysErrors()
+        {
+            //Hotfix orphaned foreign keys using https://github.com/OrchardCMS/OrchardCore/discussions/9119#discussioncomment-595932
+            //Ensure OpenId migrations run first so tables are not locked
+            var connectionString = _shellSettings["ConnectionString"];
+            StringBuilder sb = new StringBuilder();
+
+            List<string> contraintsSQL = new List<string>();
+            bool hasSucceded = true;
+
+            contraintsSQL.Add(string.Format(@"ALTER TABLE [dbo].[{0}_OpenIdAppByRoleNameIndex_Document] DROP CONSTRAINT 
+	            [{0}_FK_OpenIdAppByRoleNameIndex_Document_DocumentId]", _shellSettings["TablePrefix"]));
+            contraintsSQL.Add(string.Format(@"ALTER TABLE [dbo].[{0}_OpenIdAppByRoleNameIndex_Document] ADD CONSTRAINT
+	            [{0}_FK_OpenIdAppByRoleNameIndex_Document_DocumentId] CHECK (DocumentId > 0)", _shellSettings["TablePrefix"]));
+            contraintsSQL.Add(string.Format(@"ALTER TABLE [dbo].[{0}_OpenIdAppByRoleNameIndex_Document] DROP CONSTRAINT 
+	            [{0}_FK_OpenIdAppByRoleNameIndex_Document_Id]", _shellSettings["TablePrefix"]));
+            contraintsSQL.Add(string.Format(@"ALTER TABLE [dbo].[{0}_OpenIdAppByRoleNameIndex_Document] ADD CONSTRAINT
+	            [{0}_FK_OpenIdAppByRoleNameIndex_Document_Id] CHECK (DocumentId > 0)", _shellSettings["TablePrefix"]));
+            contraintsSQL.Add(string.Format(@"ALTER TABLE [dbo].[{0}_OpenIdApplicationIndex] DROP CONSTRAINT 
+	            [{0}_FK_OpenIdApplicationIndex]", _shellSettings["TablePrefix"]));
+            contraintsSQL.Add(string.Format(@"ALTER TABLE [dbo].[{0}_OpenIdApplicationIndex] ADD CONSTRAINT
+	            [{0}_FK_OpenIdApplicationIndex] CHECK (DocumentId > 0)", _shellSettings["TablePrefix"]));
+            contraintsSQL.Add(string.Format(@"ALTER TABLE [dbo].[{0}_OpenIdAppByRedirectUriIndex_Document] DROP CONSTRAINT 
+	            [{0}_FK_OpenIdAppByRedirectUriIndex_Document_DocumentId]", _shellSettings["TablePrefix"]));
+            contraintsSQL.Add(string.Format(@"ALTER TABLE [dbo].[{0}_OpenIdAppByRedirectUriIndex_Document] ADD CONSTRAINT
+	            [{0}_FK_OpenIdAppByRedirectUriIndex_Document_DocumentId] CHECK (DocumentId > 0)", _shellSettings["TablePrefix"]));
+            contraintsSQL.Add(string.Format(@"ALTER TABLE [dbo].[{0}_OpenIdScopeIndex] DROP CONSTRAINT 
+	            [{0}_FK_OpenIdScopeIndex]", _shellSettings["TablePrefix"]));
+            contraintsSQL.Add(string.Format(@"ALTER TABLE [dbo].[{0}_OpenIdScopeIndex] ADD CONSTRAINT
+	            [{0}_FK_OpenIdScopeIndex] CHECK (DocumentId > 0)", _shellSettings["TablePrefix"]));
+            contraintsSQL.Add(string.Format(@"ALTER TABLE [dbo].[{0}_OpenIdScopeByResourceIndex_Document] DROP CONSTRAINT 
+	            [{0}_FK_OpenIdScopeByResourceIndex_Document_DocumentId]", _shellSettings["TablePrefix"]));
+            contraintsSQL.Add(string.Format(@"ALTER TABLE [dbo].[{0}_OpenIdScopeByResourceIndex_Document] ADD CONSTRAINT
+	            [{0}_FK_OpenIdScopeByResourceIndex_Document_DocumentId] CHECK (DocumentId > 0)", _shellSettings["TablePrefix"]));
+
+
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction(IsolationLevel.ReadUncommitted))
+                {
+
+                    foreach (var constraintSQL in contraintsSQL)
+                    {
+                        using (SqlCommand command = new SqlCommand(constraintSQL, connection))
+                        {
+                            command.Transaction = transaction;
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                    transaction.Commit();
+                }
+                connection.Close();
+            }
+            return hasSucceded;
         }
     }
 }
