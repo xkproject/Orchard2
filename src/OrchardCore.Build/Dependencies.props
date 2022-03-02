@@ -48,11 +48,11 @@
     <PackageManagement Include="xunit.analyzers" Version="0.10.0" />
     <PackageManagement Include="xunit" Version="2.4.1" />
     <PackageManagement Include="xunit.runner.visualstudio" Version="2.4.3" />
-    <PackageManagement Include="YesSql" Version="3.0.12" />
-    <PackageManagement Include="YesSql.Core" Version="3.0.12" />
-    <PackageManagement Include="YesSql.Abstractions" Version="3.0.12" />
-    <PackageManagement Include="YesSql.Filters.Abstractions" Version="3.0.12" />
-    <PackageManagement Include="YesSql.Filters.Query" Version="3.0.12" />
+    <PackageManagement Include="YesSql" Version="1.0.0-1.3.0-rc3.distribwebapi" />
+    <PackageManagement Include="YesSql.Core" Version="1.0.0-1.3.0-rc3.distribwebapi" />
+    <PackageManagement Include="YesSql.Abstractions" Version="1.0.0-1.3.0-rc3.distribwebapi" />
+    <PackageManagement Include="YesSql.Filters.Abstractions" Version="1.0.0-1.3.0-rc3.distribwebapi" />
+    <PackageManagement Include="YesSql.Filters.Query" Version="1.0.0-1.3.0-rc3.distribwebapi" />
     <PackageManagement Include="ZString" Version="2.4.4" />
   </ItemGroup>
 
