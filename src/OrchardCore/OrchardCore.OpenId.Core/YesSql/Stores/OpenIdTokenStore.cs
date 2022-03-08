@@ -441,7 +441,11 @@ namespace OrchardCore.OpenId.YesSql.Stores
                              token.AuthorizationId.IsNotIn<OpenIdAuthorizationIndex>(
                                 authorization => authorization.AuthorizationId,
                                 authorization => authorization.Status == Statuses.Valid) ||
-                             token.ExpirationDate < DateTime.UtcNow), collection: OpenIdCollection).Skip(offset).Take(1_000).ListAsync();
+                             token.ExpirationDate < DateTime.UtcNow), collection: OpenIdCollection).Take(1_000).ListAsync();
+                if (!tokens.Any())
+                {
+                    return;
+                }
 
                 foreach (var token in tokens)
                 {

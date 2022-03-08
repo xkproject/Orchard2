@@ -388,7 +388,12 @@ namespace OrchardCore.OpenId.YesSql.Stores
                                      authorization.AuthorizationId.IsNotIn<OpenIdTokenIndex>(
                                          token => token.AuthorizationId,
                                          token => token.Id != 0))),
-                    collection: OpenIdCollection).Skip(offset).Take(1_000).ListAsync();
+                    collection: OpenIdCollection).Take(1_000).ListAsync();
+
+                if (!authorizations.Any())
+                {
+                    return;
+                }
 
                 foreach (var authorization in authorizations)
                 {
