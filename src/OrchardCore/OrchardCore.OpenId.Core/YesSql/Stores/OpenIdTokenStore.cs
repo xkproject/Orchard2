@@ -431,7 +431,7 @@ namespace OrchardCore.OpenId.YesSql.Stores
 
             IList<Exception> exceptions = null;
 
-            for (var offset = 0; offset < 100_000; offset += 1_000)
+            for (var i = 0; i < 1000; i++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -441,7 +441,7 @@ namespace OrchardCore.OpenId.YesSql.Stores
                              token.AuthorizationId.IsNotIn<OpenIdAuthorizationIndex>(
                                 authorization => authorization.AuthorizationId,
                                 authorization => authorization.Status == Statuses.Valid) ||
-                             token.ExpirationDate < DateTime.UtcNow), collection: OpenIdCollection).Take(1_000).ListAsync();
+                             token.ExpirationDate < DateTime.UtcNow), collection: OpenIdCollection).Take(100).ListAsync();
                 if (!tokens.Any())
                 {
                     return;
