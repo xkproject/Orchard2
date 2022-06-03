@@ -49,10 +49,10 @@
     <PackageManagement Include="ZString" Version="2.4.2" />
   </ItemGroup>
   <ItemGroup Condition="'$(SolutionFileName)' == 'OrchardCore.sln' Or '$(SolutionFileName)' == 'KeTePongoServer.sln'">
-    <PackageManagement Include="YesSql" Version="1.0.0-rc1.private.14" />
-    <PackageManagement Include="YesSql.Core" Version="2.0.0-rc1.private.14" />
-    <PackageManagement Include="YesSql.Abstractions" Version="2.0.0-rc1.private.14" />
-    <PackageManagement Include="YesSql.Filters.Abstractions" Version="1.0.0-rc1.private.14" />
-    <PackageManagement Include="YesSql.Filters.Query" Version="1.0.0-rc1.private.14" />
+    <PackageManagement Include="YesSql" Version="1.0.0-rc1.private.15" />
+    <PackageManagement Include="YesSql.Core" Version="1.0.0-rc1.private.15" />
+    <PackageManagement Include="YesSql.Abstractions" Version="1.0.0-rc1.private.15" />
+    <PackageManagement Include="YesSql.Filters.Abstractions" Version="1.0.0-rc1.private.15" />
+    <PackageManagement Include="YesSql.Filters.Query" Version="1.0.0-rc1.private.15" />
   </ItemGroup>
 </Project>
