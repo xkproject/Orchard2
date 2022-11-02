@@ -8,6 +8,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapper;
 using Newtonsoft.Json.Linq;
 using OpenIddict.Abstractions;
 using OrchardCore.OpenId.Abstractions.Stores;
@@ -435,13 +436,44 @@ namespace OrchardCore.OpenId.YesSql.Stores
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var tokens = await _session.Query<TToken, OpenIdTokenIndex>(
-                    token => token.CreationDate < threshold.UtcDateTime &&
-                           ((token.Status != Statuses.Inactive && token.Status != Statuses.Valid) ||
-                             token.AuthorizationId.IsNotIn<OpenIdAuthorizationIndex>(
-                                authorization => authorization.AuthorizationId,
-                                authorization => authorization.Status == Statuses.Valid) ||
-                             token.ExpirationDate < DateTime.UtcNow), collection: OpenIdCollection).Take(100).ListAsync();
+                //var tokens = await _session.Query<TToken, OpenIdTokenIndex>(
+                //    token => token.CreationDate < threshold.UtcDateTime &&
+                //           ((token.Status != Statuses.Inactive && token.Status != Statuses.Valid) ||
+                //             token.AuthorizationId.IsNotIn<OpenIdAuthorizationIndex>(
+                //                authorization => authorization.AuthorizationId,
+                //                authorization => authorization.Status == Statuses.Valid) ||
+                //             token.ExpirationDate < DateTime.UtcNow), collection: OpenIdCollection).Take(100).ListAsync();
+
+
+                var parameters = new Dictionary<string, object> {
+                    { "@threshold_UtcDateTime", threshold.UtcDateTime },
+                    { "@Statuses_Inactive", Statuses.Inactive },
+                    { "@Statuses_Valid", Statuses.Valid },
+                    { "@DateTime_UtcNow", DateTime.UtcNow }
+                };
+                IEnumerable<dynamic> rows = null;
+                try
+                {
+                    rows = await (await _session.CreateConnectionAsync()).QueryAsync(
+                        "SELECT TOP 100 " + OpenIdCollection + "_OpenIdTokenIndex.DocumentId " +
+                        "FROM " + OpenIdCollection + "_OpenIdTokenIndex " +
+                        "LEFT JOIN " + OpenIdCollection + "_OpenIdAuthorizationIndex ON " + OpenIdCollection + "_OpenIdTokenIndex.AuthorizationId = " + OpenIdCollection + "_OpenIdAuthorizationIndex.AuthorizationId AND " + OpenIdCollection + "_OpenIdAuthorizationIndex.Status = @Statuses_Valid " +
+                        "WHERE " + OpenIdCollection + "_OpenIdTokenIndex.CreationDate < @threshold_UtcDateTime and ((" + OpenIdCollection + "_OpenIdTokenIndex.status <> @Statuses_Inactive and " + OpenIdCollection + "_OpenIdTokenIndex.status <> @Statuses_Valid) " +
+                        "OR (ExpirationDate < @DateTime_UtcNow ) " +
+                        "OR (" + OpenIdCollection + "_OpenIdAuthorizationIndex.Id IS NULL))"
+                        , parameters);
+
+                    if (!rows.Any())
+                    {
+                        return;
+                    }
+                }catch( Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+                var tokens = await _session.GetAsync<TToken>(rows.Select(r => (int)r.DocumentId).ToArray(), OpenIdCollection);
+
                 if (!tokens.Any())
                 {
                     return;
