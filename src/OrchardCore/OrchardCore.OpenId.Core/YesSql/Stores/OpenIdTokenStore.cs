@@ -452,26 +452,21 @@ namespace OrchardCore.OpenId.YesSql.Stores
                     { "@DateTime_UtcNow", DateTime.UtcNow }
                 };
                 IEnumerable<dynamic> rows = null;
-                try
-                {
-                    rows = await (await _session.CreateConnectionAsync()).QueryAsync(
-                        "SELECT TOP 100 " + OpenIdCollection + "_OpenIdTokenIndex.DocumentId " +
-                        "FROM " + OpenIdCollection + "_OpenIdTokenIndex " +
-                        "LEFT JOIN " + OpenIdCollection + "_OpenIdAuthorizationIndex ON " + OpenIdCollection + "_OpenIdTokenIndex.AuthorizationId = " + OpenIdCollection + "_OpenIdAuthorizationIndex.AuthorizationId AND " + OpenIdCollection + "_OpenIdAuthorizationIndex.Status = @Statuses_Valid " +
-                        "WHERE " + OpenIdCollection + "_OpenIdTokenIndex.CreationDate < @threshold_UtcDateTime and ((" + OpenIdCollection + "_OpenIdTokenIndex.status <> @Statuses_Inactive and " + OpenIdCollection + "_OpenIdTokenIndex.status <> @Statuses_Valid) " +
-                        "OR (ExpirationDate < @DateTime_UtcNow ) " +
-                        "OR (" + OpenIdCollection + "_OpenIdAuthorizationIndex.Id IS NULL))"
-                        , parameters);
 
-                    if (!rows.Any())
-                    {
-                        return;
-                    }
-                }catch( Exception e)
+                rows = await (await _session.CreateConnectionAsync()).QueryAsync(
+                    "SELECT TOP 100 " + OpenIdCollection + "_OpenIdTokenIndex.DocumentId " +
+                    "FROM " + OpenIdCollection + "_OpenIdTokenIndex " +
+                    "LEFT JOIN " + OpenIdCollection + "_OpenIdAuthorizationIndex ON " + OpenIdCollection + "_OpenIdTokenIndex.AuthorizationId = " + OpenIdCollection + "_OpenIdAuthorizationIndex.AuthorizationId AND " + OpenIdCollection + "_OpenIdAuthorizationIndex.Status = @Statuses_Valid " +
+                    "WHERE " + OpenIdCollection + "_OpenIdTokenIndex.CreationDate < @threshold_UtcDateTime and ((" + OpenIdCollection + "_OpenIdTokenIndex.status <> @Statuses_Inactive and " + OpenIdCollection + "_OpenIdTokenIndex.status <> @Statuses_Valid) " +
+                    "OR (ExpirationDate < @DateTime_UtcNow ) " +
+                    "OR (" + OpenIdCollection + "_OpenIdAuthorizationIndex.Id IS NULL))"
+                    , parameters);
+
+                if (!rows.Any())
                 {
-                    Console.WriteLine(e.Message);
+                    return;
                 }
-
+                
                 var tokens = await _session.GetAsync<TToken>(rows.Select(r => (int)r.DocumentId).ToArray(), OpenIdCollection);
 
                 if (!tokens.Any())
