@@ -336,6 +336,10 @@ namespace OrchardCore.Tenants.Controllers
                 SetConfigurationShellValues(model);
                 shellSettings["Description"] = model.Description;
                 shellSettings["ConnectionString"] = model.ConnectionString;
+                if (model.TablePrefix.Length > 25)
+                {
+                    model.TablePrefix = model.TablePrefix.Substring(0, 25);
+                }
                 shellSettings["TablePrefix"] = model.TablePrefix;
                 shellSettings["DatabaseProvider"] = model.DatabaseProvider;
                 shellSettings["Secret"] = Guid.NewGuid().ToString();
