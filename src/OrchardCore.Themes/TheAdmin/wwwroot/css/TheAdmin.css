@@ -5301,6 +5301,12 @@ a > :root[data-theme=default] code {
   border-top-left-radius: 0.2rem;
   border-bottom-left-radius: 0.2rem;
 }
+html[data-theme=default] .tag-container {
+  margin-top: 10px;
+}
+html[data-theme=default] .tag {
+  margin-right: 5px;
+}
 :root[data-theme=default] .badge {
   display: inline-block;
   font-size: 75%;

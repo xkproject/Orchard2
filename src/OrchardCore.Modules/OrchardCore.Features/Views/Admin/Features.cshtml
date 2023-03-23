@@ -68,8 +68,10 @@
                             .Where(d => !Model.Features.Any(f => f.Descriptor.Id == d.Id));
                             var showDisable = !feature.IsAlwaysEnabled && categoryName != "Core" && feature.Descriptor.Name != Application.ModuleName;
                             var showEnable = !missingDependencies.Any() && feature.Descriptor.Id != "OrchardCore.Setup" && feature.Descriptor.Id != "OrchardCore.AutoSetup";
+                            var featureTags = string.Join(" ", feature.Descriptor.Extension.Manifest.Tags);
+                            var featureTagsWithCommas = string.Join(", ", feature.Descriptor.Extension.Manifest.Tags);
 
-                            <li class="list-group-item" data-filter-value="@categoryName @dependenciesNames @featureName">
+                            <li class="list-group-item" data-filter-value="@categoryName @dependenciesNames @featureName @featureTags">
                                 <div class="row">
                                     <div class="col-md-10">
                                         @* Display the checkbox ?*@
@@ -103,6 +105,12 @@
                                                 }
                                             }
                                         </div>
+                                        @if (feature.Descriptor.Extension.Manifest.Tags.Any())
+                                        {
+                                            <div class="tag-container">
+                                                <i class="fa fa-tags fa-fw tag" aria-hidden="true"></i>@featureTagsWithCommas
+                                            </div>
+                                        }
                                     </div>
                                     <div class="col-md-2 text-right">
                                         @if (showEnable && !feature.IsEnabled)
@@ -152,6 +160,10 @@
 
                     if (found)
                     {
+                        if ($(this).hasClass("list-group-item")) {
+                            $(this).parent().removeClass("d-none");
+                            $(this).parent().prev().removeClass("d-none");
+                        }
                         $(this).removeClass("d-none first-child-visible last-child-visible");
                     }
                     else
