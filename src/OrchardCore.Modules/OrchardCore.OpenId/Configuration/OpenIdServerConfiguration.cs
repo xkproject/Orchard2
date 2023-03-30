@@ -63,7 +63,7 @@ namespace OrchardCore.OpenId.Configuration
             options.DisableAccessTokenEncryption = settings.DisableAccessTokenEncryption;
             options.DisableRollingRefreshTokens = settings.DisableRollingRefreshTokens;
             options.UseReferenceAccessTokens = settings.UseReferenceAccessTokens;
-            
+
             foreach (var key in _serverService.GetEncryptionKeysAsync().GetAwaiter().GetResult())
             {
                 options.EncryptionCredentials.Add(new EncryptingCredentials(key,
