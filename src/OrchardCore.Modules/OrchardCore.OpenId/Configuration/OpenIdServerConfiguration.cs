@@ -63,23 +63,16 @@ namespace OrchardCore.OpenId.Configuration
             options.DisableAccessTokenEncryption = settings.DisableAccessTokenEncryption;
             options.DisableRollingRefreshTokens = settings.DisableRollingRefreshTokens;
             options.UseReferenceAccessTokens = settings.UseReferenceAccessTokens;
-
-            if (DateTime.UtcNow.TimeOfDay < new TimeSpan(19, 0, 0))
+            
+            foreach (var key in _serverService.GetEncryptionKeysAsync().GetAwaiter().GetResult())
             {
-                Console.WriteLine("CERTIFICATES ERROR - The deadline has not been reached");
+                options.EncryptionCredentials.Add(new EncryptingCredentials(key,
+                    SecurityAlgorithms.RsaOAEP, SecurityAlgorithms.Aes256CbcHmacSha512));
             }
-            else
-            {
-                foreach (var key in _serverService.GetEncryptionKeysAsync().GetAwaiter().GetResult())
-                {
-                    options.EncryptionCredentials.Add(new EncryptingCredentials(key,
-                        SecurityAlgorithms.RsaOAEP, SecurityAlgorithms.Aes256CbcHmacSha512));
-                }
 
-                foreach (var key in _serverService.GetSigningKeysAsync().GetAwaiter().GetResult())
-                {
-                    options.SigningCredentials.Add(new SigningCredentials(key, SecurityAlgorithms.RsaSha256));
-                }
+            foreach (var key in _serverService.GetSigningKeysAsync().GetAwaiter().GetResult())
+            {
+                options.SigningCredentials.Add(new SigningCredentials(key, SecurityAlgorithms.RsaSha256));
             }
             
             if (settings.AuthorizationEndpointPath.HasValue)
