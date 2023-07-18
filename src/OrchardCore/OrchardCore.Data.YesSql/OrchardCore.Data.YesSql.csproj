@@ -17,13 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\yessql\src\YesSql\YesSql.csproj" />
     <ProjectReference Include="..\OrchardCore.Data\OrchardCore.Data.csproj" />
     <ProjectReference Include="..\OrchardCore.Data.YesSql.Abstractions\OrchardCore.Data.YesSql.Abstractions.csproj" />
     <ProjectReference Include="..\OrchardCore.Abstractions\OrchardCore.Abstractions.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="YesSql" />
   </ItemGroup>
 
 </Project>
