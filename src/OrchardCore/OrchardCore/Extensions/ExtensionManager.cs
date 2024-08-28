@@ -331,6 +331,9 @@ namespace OrchardCore.Environment.Extensions
                 _extensions = _extensionsInfos.ToDictionary(e => e.Id, e => loadedExtensions[e.Id]);
 
                 _isInitialized = true;
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
             finally
             {

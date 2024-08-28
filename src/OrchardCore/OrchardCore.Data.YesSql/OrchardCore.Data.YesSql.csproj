@@ -17,13 +17,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\yessql\src\YesSql.Core\YesSql.Core.csproj" />
+    <ProjectReference Include="..\..\..\..\yessql\src\YesSql.Provider.MySql\YesSql.Provider.MySql.csproj" />
+    <ProjectReference Include="..\..\..\..\yessql\src\YesSql.Provider.PostgreSql\YesSql.Provider.PostgreSql.csproj" />
+    <ProjectReference Include="..\..\..\..\yessql\src\YesSql.Provider.Sqlite\YesSql.Provider.Sqlite.csproj" />
+    <ProjectReference Include="..\..\..\..\yessql\src\YesSql.Provider.SqlServer\YesSql.Provider.SqlServer.csproj" />
     <ProjectReference Include="..\OrchardCore.Data\OrchardCore.Data.csproj" />
     <ProjectReference Include="..\OrchardCore.Data.YesSql.Abstractions\OrchardCore.Data.YesSql.Abstractions.csproj" />
     <ProjectReference Include="..\OrchardCore.Abstractions\OrchardCore.Abstractions.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="YesSql" />
   </ItemGroup>
 
 </Project>
