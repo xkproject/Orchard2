@@ -332,6 +332,12 @@ namespace OrchardCore.Environment.Extensions
 
                 _isInitialized = true;
             }
+            catch (Exception ex)
+            {
+                L.LogError(ex.Message);
+                L.LogError(ex.Message);
+                throw;
+            }
             finally
             {
                 _semaphore.Release();
