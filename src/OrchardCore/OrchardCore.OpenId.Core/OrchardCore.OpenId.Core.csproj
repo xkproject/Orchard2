@@ -14,12 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\OpenId\OpenIddict.Core\OpenIddict.Core.csproj" />
     <ProjectReference Include="..\..\OrchardCore\OrchardCore.Data.YesSql\OrchardCore.Data.YesSql.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" />
-    <PackageReference Include="OpenIddict.Core" />
   </ItemGroup>
 
 </Project>
