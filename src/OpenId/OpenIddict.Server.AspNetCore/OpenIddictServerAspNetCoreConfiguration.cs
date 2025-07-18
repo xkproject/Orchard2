@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -35,7 +35,7 @@ namespace OpenIddict.Server.AspNetCore
             if (options.SchemeMap.TryGetValue(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, out var builder) &&
                 builder.HandlerType != typeof(OpenIddictServerAspNetCoreHandler))
             {
-                throw new InvalidOperationException(SR.GetResourceString(SR.ID0108));
+                throw new InvalidOperationException((SR.ID0108));
             }
 
             options.AddScheme<OpenIddictServerAspNetCoreHandler>(
@@ -72,7 +72,7 @@ namespace OpenIddict.Server.AspNetCore
                 !TryValidate(options.SchemeMap, options.DefaultSignInScheme) ||
                 !TryValidate(options.SchemeMap, options.DefaultSignOutScheme))
             {
-                throw new InvalidOperationException(SR.GetResourceString(SR.ID0109));
+                throw new InvalidOperationException((SR.ID0109));
             }
 
             static bool TryValidate(IDictionary<string, AuthenticationSchemeBuilder> map, string? scheme)
@@ -102,7 +102,7 @@ namespace OpenIddict.Server.AspNetCore
 
             if (options.EnableErrorPassthrough && options.EnableStatusCodePagesIntegration)
             {
-                throw new InvalidOperationException(SR.GetResourceString(SR.ID0110));
+                throw new InvalidOperationException((SR.ID0110));
             }
         }
     }

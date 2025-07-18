@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -49,14 +49,13 @@ namespace OpenIddict.Server
 
                 catch (Exception exception) when (_logger.IsEnabled(LogLevel.Debug))
                 {
-                    _logger.LogDebug(exception, SR.GetResourceString(SR.ID6132), handler.GetType().FullName, typeof(TContext).FullName);
 
                     throw;
                 }
 
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
-                    _logger.LogDebug(SR.GetResourceString(SR.ID6133), typeof(TContext).FullName, handler.GetType().FullName);
+                    _logger.LogDebug((SR.ID6133), typeof(TContext).FullName, handler.GetType().FullName);
                 }
 
                 switch (context)
@@ -64,21 +63,21 @@ namespace OpenIddict.Server
                     case BaseRequestContext { IsRequestHandled: true }:
                         if (_logger.IsEnabled(LogLevel.Debug))
                         {
-                            _logger.LogDebug(SR.GetResourceString(SR.ID6134), typeof(TContext).FullName, handler.GetType().FullName);
+                            _logger.LogDebug((SR.ID6134), typeof(TContext).FullName, handler.GetType().FullName);
                         }
                         return;
 
                     case BaseRequestContext { IsRequestSkipped: true }:
                         if (_logger.IsEnabled(LogLevel.Debug))
                         {
-                            _logger.LogDebug(SR.GetResourceString(SR.ID6135), typeof(TContext).FullName, handler.GetType().FullName);
+                            _logger.LogDebug((SR.ID6135), typeof(TContext).FullName, handler.GetType().FullName);
                         }
                         return;
 
                     case BaseValidatingContext { IsRejected: true }:
                         if (_logger.IsEnabled(LogLevel.Debug))
                         {
-                            _logger.LogDebug(SR.GetResourceString(SR.ID6136), typeof(TContext).FullName, handler.GetType().FullName);
+                            _logger.LogDebug((SR.ID6136), typeof(TContext).FullName, handler.GetType().FullName);
                         }
                         return;
 
@@ -109,7 +108,7 @@ namespace OpenIddict.Server
 
                     if (handler is null)
                     {
-                        throw new InvalidOperationException(SR.FormatID0098(descriptor.ServiceDescriptor.ServiceType));
+                        throw new InvalidOperationException();
                     }
 
                     yield return handler;
@@ -122,7 +121,7 @@ namespace OpenIddict.Server
                 {
                     if (!(_provider.GetService(descriptor.FilterTypes[index]) is IOpenIddictServerHandlerFilter<TContext> filter))
                     {
-                        throw new InvalidOperationException(SR.FormatID0099(descriptor.FilterTypes[index]));
+                        throw new InvalidOperationException();
                     }
 
                     if (!await filter.IsActiveAsync(context))

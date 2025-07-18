@@ -112,7 +112,7 @@ namespace OrchardCore.OpenId.YesSql.Stores
         {
             if (string.IsNullOrEmpty(address))
             {
-                throw new ArgumentException("The address cannot be null or empty.", nameof(address));
+                throw new ArgumentException("The address cannot be null or empty.");
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -127,7 +127,7 @@ namespace OrchardCore.OpenId.YesSql.Stores
         {
             if (string.IsNullOrEmpty(address))
             {
-                throw new ArgumentException("The address cannot be null or empty.", nameof(address));
+                throw new ArgumentException("The address cannot be null or empty.");
             }
 
             cancellationToken.ThrowIfCancellationRequested();

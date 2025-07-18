@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -80,7 +80,7 @@ namespace OpenIddict.Server
             {
                 if (string.IsNullOrEmpty(address))
                 {
-                    throw new ArgumentException(SR.GetResourceString(SR.ID0100), nameof(address));
+                    throw new ArgumentException(SR.ID0100);
                 }
 
                 // Don't allow validation to alter the redirect_uri parameter extracted
@@ -88,7 +88,7 @@ namespace OpenIddict.Server
                 if (!string.IsNullOrEmpty(Request?.RedirectUri) &&
                     !string.Equals(Request.RedirectUri, address, StringComparison.Ordinal))
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0101));
+                    throw new InvalidOperationException((SR.ID0101));
                 }
 
                 RedirectUri = address;

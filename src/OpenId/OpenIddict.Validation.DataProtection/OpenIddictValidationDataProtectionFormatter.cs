@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -60,7 +60,7 @@ namespace OpenIddict.Validation.DataProtection
                 var version = reader.ReadInt32();
                 if (version != 5)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0287));
+                    throw new InvalidOperationException((SR.ID0287));
                 }
 
                 // Read the authentication scheme associated to the ticket.
@@ -142,7 +142,7 @@ namespace OpenIddict.Validation.DataProtection
                 var version = reader.ReadInt32();
                 if (version != 1)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0287));
+                    throw new InvalidOperationException((SR.ID0287));
                 }
 
                 var count = reader.ReadInt32();

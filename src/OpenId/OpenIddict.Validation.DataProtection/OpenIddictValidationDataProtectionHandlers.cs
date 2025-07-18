@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -77,14 +77,14 @@ namespace OpenIddict.Validation.DataProtection
                 // Create a Data Protection protector using the provider registered in the options.
                 var protector = _options.CurrentValue.DataProtectionProvider.CreateProtector(context.TokenType switch
                 {
-                    null => throw new InvalidOperationException(SR.GetResourceString(SR.ID0167)),
+                    null => throw new InvalidOperationException((SR.ID0167)),
 
                     TokenTypeHints.AccessToken when context.Transaction.Properties.ContainsKey(Properties.ReferenceTokenIdentifier)
                         => new[] { Handlers.Server, Formats.AccessToken, Features.ReferenceTokens, Schemes.Server },
 
                     TokenTypeHints.AccessToken => new[] { Handlers.Server, Formats.AccessToken, Schemes.Server },
 
-                    _ => throw new InvalidOperationException(SR.GetResourceString(SR.ID0003))
+                    _ => throw new InvalidOperationException((SR.ID0003))
                 });
 
                 try
@@ -99,20 +99,20 @@ namespace OpenIddict.Validation.DataProtection
 
                 catch (Exception exception)
                 {
-                    context.Logger.LogTrace(exception, SR.GetResourceString(SR.ID6153), context.Token);
+                    context.Logger.LogTrace(exception, (SR.ID6153), context.Token);
                 }
 
                 if (context.Principal is null)
                 {
                     context.Reject(
                         error: Errors.InvalidToken,
-                        description: SR.GetResourceString(SR.ID2004),
-                        uri: SR.FormatID8000(SR.ID2004));
+                        description: (SR.ID2004),
+                        uri: (SR.ID2004));
 
                     return default;
                 }
 
-                context.Logger.LogTrace(SR.GetResourceString(SR.ID6152), context.Token, context.Principal.Claims);
+                context.Logger.LogTrace((SR.ID6152), context.Token, context.Principal.Claims);
 
                 return default;
             }

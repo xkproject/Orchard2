@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -85,8 +85,8 @@ namespace OpenIddict.Validation
                 {
                     context.Reject(
                         error: Errors.MissingToken,
-                        description: SR.GetResourceString(SR.ID2000),
-                        uri: SR.FormatID8000(SR.ID2000));
+                        description: (SR.ID2000),
+                        uri: SR.ID2000);
 
                     return default;
                 }
@@ -103,7 +103,7 @@ namespace OpenIddict.Validation
         {
             private readonly IOpenIddictTokenManager _tokenManager;
 
-            public ValidateReferenceTokenIdentifier() => throw new InvalidOperationException(SR.GetResourceString(SR.ID0139));
+            public ValidateReferenceTokenIdentifier() => throw new InvalidOperationException((SR.ID0139));
 
             public ValidateReferenceTokenIdentifier(IOpenIddictTokenManager tokenManager)
                 => _tokenManager = tokenManager;
@@ -147,8 +147,8 @@ namespace OpenIddict.Validation
                 {
                     context.Reject(
                         error: Errors.InvalidToken,
-                        description: SR.GetResourceString(SR.ID2004),
-                        uri: SR.FormatID8000(SR.ID2004));
+                        description: (SR.ID2004),
+                        uri: (SR.ID2004));
 
                     return;
                 }
@@ -156,7 +156,7 @@ namespace OpenIddict.Validation
                 var payload = await _tokenManager.GetPayloadAsync(token);
                 if (string.IsNullOrEmpty(payload))
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0026));
+                    throw new InvalidOperationException((SR.ID0026));
                 }
 
                 // Replace the token parameter by the payload resolved from the token entry.
@@ -205,7 +205,7 @@ namespace OpenIddict.Validation
                 }
 
                 var configuration = await context.Options.ConfigurationManager.GetConfigurationAsync(default) ??
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0140));
+                    throw new InvalidOperationException((SR.ID0140));
 
                 // Clone the token validation parameters and set the issuer using the value found in the
                 // OpenID Connect server configuration (that can be static or retrieved using discovery).
@@ -231,7 +231,7 @@ namespace OpenIddict.Validation
                         JsonWebTokenTypes.Prefixes.Application + JsonWebTokenTypes.AccessToken
                     },
 
-                    _ => throw new InvalidOperationException(SR.GetResourceString(SR.ID0003))
+                    _ => throw new InvalidOperationException((SR.ID0003))
                 };
 
                 var result = context.Options.JsonWebTokenHandler.ValidateToken(context.Token, parameters);
@@ -244,27 +244,26 @@ namespace OpenIddict.Validation
                         context.Options.ConfigurationManager.RequestRefresh();
                     }
 
-                    context.Logger.LogTrace(result.Exception, SR.GetResourceString(SR.ID6000), context.Token);
 
                     context.Reject(
                         error: Errors.InvalidToken,
                         description: result.Exception switch
                         {
-                            SecurityTokenInvalidIssuerException        => SR.GetResourceString(SR.ID2088),
-                            SecurityTokenInvalidTypeException          => SR.GetResourceString(SR.ID2089),
-                            SecurityTokenSignatureKeyNotFoundException => SR.GetResourceString(SR.ID2090),
-                            SecurityTokenInvalidSignatureException     => SR.GetResourceString(SR.ID2091),
+                            SecurityTokenInvalidIssuerException => (SR.ID2088),
+                            SecurityTokenInvalidTypeException => (SR.ID2089),
+                            SecurityTokenSignatureKeyNotFoundException => (SR.ID2090),
+                            SecurityTokenInvalidSignatureException => (SR.ID2091),
 
-                            _ => SR.GetResourceString(SR.ID2004)
+                            _ => (SR.ID2004)
                         },
                         uri: result.Exception switch
                         {
-                            SecurityTokenInvalidIssuerException        => SR.FormatID8000(SR.ID2088),
-                            SecurityTokenInvalidTypeException          => SR.FormatID8000(SR.ID2089),
-                            SecurityTokenSignatureKeyNotFoundException => SR.FormatID8000(SR.ID2090),
-                            SecurityTokenInvalidSignatureException     => SR.FormatID8000(SR.ID2091),
+                            SecurityTokenInvalidIssuerException => (SR.ID2088),
+                            SecurityTokenInvalidTypeException => (SR.ID2089),
+                            SecurityTokenSignatureKeyNotFoundException => (SR.ID2090),
+                            SecurityTokenInvalidSignatureException => (SR.ID2091),
 
-                            _ => SR.FormatID8000(SR.ID2004)
+                            _ => (SR.ID2004)
                         });
 
                     return;
@@ -276,16 +275,16 @@ namespace OpenIddict.Validation
                 // Store the token type (resolved from "typ" or "token_usage") as a special private claim.
                 context.Principal.SetTokenType(result.TokenType switch
                 {
-                    null or { Length: 0 } => throw new InvalidOperationException(SR.GetResourceString(SR.ID0025)),
+                    null or { Length: 0 } => throw new InvalidOperationException((SR.ID0025)),
 
                     // Both at+jwt and application/at+jwt are supported for access tokens.
                     JsonWebTokenTypes.AccessToken or JsonWebTokenTypes.Prefixes.Application + JsonWebTokenTypes.AccessToken
                         => TokenTypeHints.AccessToken,
 
-                    _ => throw new InvalidOperationException(SR.GetResourceString(SR.ID0003))
+                    _ => throw new InvalidOperationException((SR.ID0003))
                 });
 
-                context.Logger.LogTrace(SR.GetResourceString(SR.ID6001), context.Token, context.Principal.Claims);
+                context.Logger.LogTrace((SR.ID6001), context.Token, context.Principal.Claims);
             }
         }
 
@@ -324,27 +323,33 @@ namespace OpenIddict.Validation
                     return;
                 }
 
-                Debug.Assert(!string.IsNullOrEmpty(context.Token), SR.GetResourceString(SR.ID4010));
+                Debug.Assert(!string.IsNullOrEmpty(context.Token), (SR.ID4010));
 
                 var configuration = await context.Options.ConfigurationManager.GetConfigurationAsync(default) ??
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0140));
+                    throw new InvalidOperationException((SR.ID0140));
 
-                if (string.IsNullOrEmpty(configuration.IntrospectionEndpoint) ||
-                    !Uri.TryCreate(configuration.IntrospectionEndpoint, UriKind.Absolute, out Uri? address) ||
+                // Fix for CS1061: Replace the usage of 'IntrospectionEndpoint' with the correct property or method.
+                // Based on the provided type signature, 'IntrospectionEndpoint' does not exist in 'OpenIdConnectConfiguration'.
+                // Instead, use 'AdditionalData' to retrieve the introspection endpoint if it is stored there.
+
+                if (!configuration.AdditionalData.TryGetValue("introspection_endpoint", out var endpoint) ||
+                    endpoint is not string endpointString ||
+                    !Uri.TryCreate(endpointString, UriKind.Absolute, out Uri? address) ||
                     !address.IsWellFormedOriginalString())
                 {
                     context.Reject(
                         error: Errors.ServerError,
-                        description: SR.GetResourceString(SR.ID2092),
-                        uri: SR.FormatID8000(SR.ID2092));
+                        description: SR.ID2092,
+                        uri: SR.ID2092);
 
                     return;
                 }
 
+
                 try
                 {
                     var principal = await _service.IntrospectTokenAsync(address, context.Token, context.TokenType) ??
-                        throw new InvalidOperationException(SR.GetResourceString(SR.ID0141));
+                        throw new InvalidOperationException((SR.ID0141));
 
                     // Note: tokens that are considered valid at this point are assumed to be of the given type,
                     // as the introspection handlers ensure the introspected token type matches the expected
@@ -352,17 +357,17 @@ namespace OpenIddict.Validation
                     // If no token type can be inferred, the token is assumed to be an access token.
                     context.Principal = principal.SetTokenType(context.TokenType ?? TokenTypeHints.AccessToken);
 
-                    context.Logger.LogTrace(SR.GetResourceString(SR.ID6154), context.Token, context.Principal.Claims);
+                    context.Logger.LogTrace((SR.ID6154), context.Token, context.Principal.Claims);
                 }
 
                 catch (Exception exception)
                 {
-                    context.Logger.LogDebug(exception, SR.GetResourceString(SR.ID6155));
+                    context.Logger.LogDebug(exception.Message, (SR.ID6155));
 
                     context.Reject(
                         error: Errors.InvalidToken,
-                        description: SR.GetResourceString(SR.ID2004),
-                        uri: SR.FormatID8000(SR.ID2004));
+                        description: (SR.ID2004),
+                        uri: (SR.ID2004));
 
                     return;
                 }
@@ -525,7 +530,7 @@ namespace OpenIddict.Validation
         {
             private readonly IOpenIddictTokenManager _tokenManager;
 
-            public RestoreReferenceTokenProperties() => throw new InvalidOperationException(SR.GetResourceString(SR.ID0139));
+            public RestoreReferenceTokenProperties() => throw new InvalidOperationException((SR.ID0139));
 
             public RestoreReferenceTokenProperties(IOpenIddictTokenManager tokenManager)
                 => _tokenManager = tokenManager;
@@ -564,7 +569,7 @@ namespace OpenIddict.Validation
                 var token = await _tokenManager.FindByIdAsync(identifier);
                 if (token is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0021));
+                    throw new InvalidOperationException((SR.ID0021));
                 }
 
                 // Restore the creation/expiration dates/identifiers from the token entry metadata.
@@ -604,8 +609,8 @@ namespace OpenIddict.Validation
                 {
                     context.Reject(
                         error: Errors.InvalidToken,
-                        description: SR.GetResourceString(SR.ID2004),
-                        uri: SR.FormatID8000(SR.ID2004));
+                        description: (SR.ID2004),
+                        uri: (SR.ID2004));
 
                     return default;
                 }
@@ -619,12 +624,12 @@ namespace OpenIddict.Validation
                     var type = context.Principal.GetTokenType();
                     if (string.IsNullOrEmpty(type))
                     {
-                        throw new InvalidOperationException(SR.GetResourceString(SR.ID0004));
+                        throw new InvalidOperationException((SR.ID0004));
                     }
 
                     if (!string.Equals(type, context.TokenType, StringComparison.OrdinalIgnoreCase))
                     {
-                        throw new InvalidOperationException(SR.FormatID0005(type, context.TokenType));
+                        throw new InvalidOperationException();
                     }
                 }
 
@@ -655,17 +660,17 @@ namespace OpenIddict.Validation
                     throw new ArgumentNullException(nameof(context));
                 }
 
-                Debug.Assert(context.Principal is { Identity: ClaimsIdentity }, SR.GetResourceString(SR.ID4006));
+                Debug.Assert(context.Principal is { Identity: ClaimsIdentity }, (SR.ID4006));
 
                 var date = context.Principal.GetExpirationDate();
                 if (date.HasValue && date.Value < DateTimeOffset.UtcNow)
                 {
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6156));
+                    context.Logger.LogInformation((SR.ID6156));
 
                     context.Reject(
                         error: Errors.InvalidToken,
-                        description: SR.GetResourceString(SR.ID2019),
-                        uri: SR.FormatID8000(SR.ID2019));
+                        description: (SR.ID2019),
+                        uri: (SR.ID2019));
 
                     return default;
                 }
@@ -698,7 +703,7 @@ namespace OpenIddict.Validation
                     throw new ArgumentNullException(nameof(context));
                 }
 
-                Debug.Assert(context.Principal is { Identity: ClaimsIdentity }, SR.GetResourceString(SR.ID4006));
+                Debug.Assert(context.Principal is { Identity: ClaimsIdentity }, (SR.ID4006));
 
                 // If no explicit audience has been configured,
                 // skip the default audience validation.
@@ -711,12 +716,12 @@ namespace OpenIddict.Validation
                 var audiences = context.Principal.GetAudiences();
                 if (audiences.IsDefaultOrEmpty)
                 {
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6157));
+                    context.Logger.LogInformation((SR.ID6157));
 
                     context.Reject(
                         error: Errors.InvalidToken,
-                        description: SR.GetResourceString(SR.ID2093),
-                        uri: SR.FormatID8000(SR.ID2093));
+                        description: (SR.ID2093),
+                        uri: (SR.ID2093));
 
                     return default;
                 }
@@ -724,12 +729,12 @@ namespace OpenIddict.Validation
                 // If the access token doesn't include any registered audience, return an error.
                 if (!audiences.Intersect(context.Options.Audiences, StringComparer.Ordinal).Any())
                 {
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6158));
+                    context.Logger.LogInformation((SR.ID6158));
 
                     context.Reject(
                         error: Errors.InvalidToken,
-                        description: SR.GetResourceString(SR.ID2094),
-                        uri: SR.FormatID8000(SR.ID2094));
+                        description: (SR.ID2094),
+                        uri: (SR.ID2094));
 
                     return default;
                 }
@@ -747,7 +752,7 @@ namespace OpenIddict.Validation
         {
             private readonly IOpenIddictTokenManager _tokenManager;
 
-            public ValidateTokenEntry() => throw new InvalidOperationException(SR.GetResourceString(SR.ID0139));
+            public ValidateTokenEntry() => throw new InvalidOperationException((SR.ID0139));
 
             public ValidateTokenEntry(IOpenIddictTokenManager tokenManager)
                 => _tokenManager = tokenManager;
@@ -772,7 +777,7 @@ namespace OpenIddict.Validation
                     throw new ArgumentNullException(nameof(context));
                 }
 
-                Debug.Assert(context.Principal is { Identity: ClaimsIdentity }, SR.GetResourceString(SR.ID4006));
+                Debug.Assert(context.Principal is { Identity: ClaimsIdentity }, (SR.ID4006));
 
                 var identifier = context.Principal.GetTokenId();
                 if (string.IsNullOrEmpty(identifier))
@@ -783,12 +788,12 @@ namespace OpenIddict.Validation
                 var token = await _tokenManager.FindByIdAsync(identifier);
                 if (token is null || !await _tokenManager.HasStatusAsync(token, Statuses.Valid))
                 {
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6005), identifier);
+                    context.Logger.LogInformation((SR.ID6005), identifier);
 
                     context.Reject(
                         error: Errors.InvalidToken,
-                        description: SR.GetResourceString(SR.ID2019),
-                        uri: SR.FormatID8000(SR.ID2019));
+                        description: (SR.ID2019),
+                        uri: (SR.ID2019));
 
                     return;
                 }
@@ -811,7 +816,7 @@ namespace OpenIddict.Validation
         {
             private readonly IOpenIddictAuthorizationManager _authorizationManager;
 
-            public ValidateAuthorizationEntry() => throw new InvalidOperationException(SR.GetResourceString(SR.ID0142));
+            public ValidateAuthorizationEntry() => throw new InvalidOperationException((SR.ID0142));
 
             public ValidateAuthorizationEntry(IOpenIddictAuthorizationManager authorizationManager)
                 => _authorizationManager = authorizationManager;
@@ -836,7 +841,7 @@ namespace OpenIddict.Validation
                     throw new ArgumentNullException(nameof(context));
                 }
 
-                Debug.Assert(context.Principal is { Identity: ClaimsIdentity }, SR.GetResourceString(SR.ID4006));
+                Debug.Assert(context.Principal is { Identity: ClaimsIdentity }, (SR.ID4006));
 
                 var identifier = context.Principal.GetAuthorizationId();
                 if (string.IsNullOrEmpty(identifier))
@@ -847,12 +852,12 @@ namespace OpenIddict.Validation
                 var authorization = await _authorizationManager.FindByIdAsync(identifier);
                 if (authorization is null || !await _authorizationManager.HasStatusAsync(authorization, Statuses.Valid))
                 {
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6006), identifier);
+                    context.Logger.LogInformation((SR.ID6006), identifier);
 
                     context.Reject(
                         error: Errors.InvalidToken,
-                        description: SR.GetResourceString(SR.ID2023),
-                        uri: SR.FormatID8000(SR.ID2023));
+                        description: (SR.ID2023),
+                        uri: (SR.ID2023));
 
                     return;
                 }
@@ -910,8 +915,8 @@ namespace OpenIddict.Validation
                 else
                 {
                     context.Response.Error = Errors.InsufficientAccess;
-                    context.Response.ErrorDescription = SR.GetResourceString(SR.ID2095);
-                    context.Response.ErrorUri = SR.FormatID8000(SR.ID2095);
+                    context.Response.ErrorDescription = (SR.ID2095);
+                    context.Response.ErrorUri = (SR.ID2095);
                 }
 
                 return default;

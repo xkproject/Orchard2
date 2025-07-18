@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -72,7 +72,7 @@ namespace OpenIddict.Server
             {
                 if (string.IsNullOrEmpty(address))
                 {
-                    throw new ArgumentException(SR.GetResourceString(SR.ID0102), nameof(address));
+                    throw new ArgumentException(SR.ID0102);
                 }
 
                 // Don't allow validation to alter the post_logout_redirect_uri parameter extracted
@@ -80,7 +80,7 @@ namespace OpenIddict.Server
                 if (!string.IsNullOrEmpty(Request?.PostLogoutRedirectUri) &&
                     !string.Equals(Request.PostLogoutRedirectUri, address, StringComparison.Ordinal))
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0103));
+                    throw new InvalidOperationException((SR.ID0103));
                 }
 
                 PostLogoutRedirectUri = address;

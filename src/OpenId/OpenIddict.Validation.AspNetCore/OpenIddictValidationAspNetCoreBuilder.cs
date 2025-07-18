@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -57,7 +57,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (string.IsNullOrEmpty(realm))
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0107), nameof(realm));
+                throw new ArgumentException((SR.ID0107), nameof(realm));
             }
 
             return Configure(options => options.Realm = realm);

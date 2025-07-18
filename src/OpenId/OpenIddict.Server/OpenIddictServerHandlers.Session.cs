@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -99,10 +99,10 @@ namespace OpenIddict.Server
 
                     if (notification.Request is null)
                     {
-                        throw new InvalidOperationException(SR.GetResourceString(SR.ID0050));
+                        throw new InvalidOperationException((SR.ID0050));
                     }
 
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6124), notification.Request);
+                    context.Logger.LogInformation((SR.ID6124), notification.Request);
                 }
             }
 
@@ -163,7 +163,7 @@ namespace OpenIddict.Server
                         return;
                     }
 
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6125));
+                    context.Logger.LogInformation((SR.ID6125));
                 }
             }
 
@@ -251,7 +251,7 @@ namespace OpenIddict.Server
                         }
                     }
 
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0051));
+                    throw new InvalidOperationException((SR.ID0051));
                 }
             }
 
@@ -299,7 +299,7 @@ namespace OpenIddict.Server
                         return;
                     }
 
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0052));
+                    throw new InvalidOperationException((SR.ID0052));
                 }
             }
 
@@ -334,24 +334,24 @@ namespace OpenIddict.Server
                     // If an optional post_logout_redirect_uri was provided, validate it.
                     if (!Uri.TryCreate(context.PostLogoutRedirectUri, UriKind.Absolute, out Uri? uri) || !uri.IsWellFormedOriginalString())
                     {
-                        context.Logger.LogInformation(SR.GetResourceString(SR.ID6126), Parameters.PostLogoutRedirectUri, context.PostLogoutRedirectUri);
+                        context.Logger.LogInformation((SR.ID6126), Parameters.PostLogoutRedirectUri, context.PostLogoutRedirectUri);
 
                         context.Reject(
                             error: Errors.InvalidRequest,
-                            description: SR.FormatID2030(Parameters.PostLogoutRedirectUri),
-                            uri: SR.FormatID8000(SR.ID2030));
+                            description: (Parameters.PostLogoutRedirectUri),
+                            uri: (SR.ID2030));
 
                         return default;
                     }
 
                     if (!string.IsNullOrEmpty(uri.Fragment))
                     {
-                        context.Logger.LogInformation(SR.GetResourceString(SR.ID6127), Parameters.PostLogoutRedirectUri, context.PostLogoutRedirectUri);
+                        context.Logger.LogInformation((SR.ID6127), Parameters.PostLogoutRedirectUri, context.PostLogoutRedirectUri);
 
                         context.Reject(
                             error: Errors.InvalidRequest,
-                            description: SR.FormatID2031(Parameters.PostLogoutRedirectUri),
-                            uri: SR.FormatID8000(SR.ID2031));
+                            description: (Parameters.PostLogoutRedirectUri),
+                            uri: (SR.ID2031));
 
                         return default;
                     }
@@ -368,7 +368,7 @@ namespace OpenIddict.Server
             {
                 private readonly IOpenIddictApplicationManager _applicationManager;
 
-                public ValidateClientPostLogoutRedirectUri() => throw new InvalidOperationException(SR.GetResourceString(SR.ID0016));
+                public ValidateClientPostLogoutRedirectUri() => throw new InvalidOperationException((SR.ID0016));
 
                 public ValidateClientPostLogoutRedirectUri(IOpenIddictApplicationManager applicationManager)
                     => _applicationManager = applicationManager;
@@ -393,16 +393,16 @@ namespace OpenIddict.Server
                         throw new ArgumentNullException(nameof(context));
                     }
 
-                    Debug.Assert(!string.IsNullOrEmpty(context.PostLogoutRedirectUri), SR.FormatID4000(Parameters.PostLogoutRedirectUri));
+                    Debug.Assert(!string.IsNullOrEmpty(context.PostLogoutRedirectUri), (Parameters.PostLogoutRedirectUri));
 
                     if (!await ValidatePostLogoutRedirectUriAsync(context.PostLogoutRedirectUri))
                     {
-                        context.Logger.LogInformation(SR.GetResourceString(SR.ID6128), context.PostLogoutRedirectUri);
+                        context.Logger.LogInformation((SR.ID6128), context.PostLogoutRedirectUri);
 
                         context.Reject(
                             error: Errors.InvalidRequest,
-                            description: SR.FormatID2052(Parameters.PostLogoutRedirectUri),
-                            uri: SR.FormatID8000(SR.ID2052));
+                            description: (Parameters.PostLogoutRedirectUri),
+                            uri: (SR.ID2052));
 
                         return;
                     }

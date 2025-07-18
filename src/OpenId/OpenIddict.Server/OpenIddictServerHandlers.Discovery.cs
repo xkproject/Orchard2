@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -121,10 +121,10 @@ namespace OpenIddict.Server
 
                     if (notification.Request is null)
                     {
-                        throw new InvalidOperationException(SR.GetResourceString(SR.ID0037));
+                        throw new InvalidOperationException((SR.ID0037));
                     }
 
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6066), notification.Request);
+                    context.Logger.LogInformation((SR.ID6066), notification.Request);
                 }
             }
 
@@ -181,7 +181,7 @@ namespace OpenIddict.Server
                         return;
                     }
 
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6067));
+                    context.Logger.LogInformation((SR.ID6067));
                 }
             }
 
@@ -315,7 +315,7 @@ namespace OpenIddict.Server
                         return;
                     }
 
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0272));
+                    throw new InvalidOperationException((SR.ID0272));
                 }
             }
 
@@ -388,7 +388,7 @@ namespace OpenIddict.Server
                         // At this stage, throw an exception if the issuer cannot be retrieved.
                         if (issuer is null || !issuer.IsAbsoluteUri)
                         {
-                            throw new InvalidOperationException(SR.GetResourceString(SR.ID0023));
+                            throw new InvalidOperationException((SR.ID0023));
                         }
 
                         // Ensure the issuer ends with a trailing slash, as it is necessary
@@ -814,10 +814,10 @@ namespace OpenIddict.Server
 
                     if (notification.Request is null)
                     {
-                        throw new InvalidOperationException(SR.GetResourceString(SR.ID0038));
+                        throw new InvalidOperationException((SR.ID0038));
                     }
 
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6068), notification.Request);
+                    context.Logger.LogInformation((SR.ID6068), notification.Request);
                 }
             }
 
@@ -874,7 +874,7 @@ namespace OpenIddict.Server
                         return;
                     }
 
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6069));
+                    context.Logger.LogInformation((SR.ID6069));
                 }
             }
 
@@ -942,7 +942,7 @@ namespace OpenIddict.Server
                         // See https://tools.ietf.org/html/rfc7517#section-4.1
                         if (string.IsNullOrEmpty(key.Kty))
                         {
-                            context.Logger.LogWarning(SR.GetResourceString(SR.ID6070), JsonWebKeyParameterNames.Kty);
+                            context.Logger.LogWarning((SR.ID6070), JsonWebKeyParameterNames.Kty);
 
                             continue;
                         }
@@ -1050,7 +1050,7 @@ namespace OpenIddict.Server
                         return;
                     }
 
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0039));
+                    throw new InvalidOperationException((SR.ID0039));
                 }
             }
 
@@ -1086,7 +1086,7 @@ namespace OpenIddict.Server
                             !credentials.Key.IsSupportedAlgorithm(SecurityAlgorithms.EcdsaSha384) &&
                             !credentials.Key.IsSupportedAlgorithm(SecurityAlgorithms.EcdsaSha512))
                         {
-                            context.Logger.LogInformation(SR.GetResourceString(SR.ID6071), credentials.Key.GetType().Name);
+                            context.Logger.LogInformation((SR.ID6071), credentials.Key.GetType().Name);
 
                             continue;
                         }
@@ -1094,7 +1094,7 @@ namespace OpenIddict.Server
                         if (!credentials.Key.IsSupportedAlgorithm(SecurityAlgorithms.RsaSha256) &&
                             !credentials.Key.IsSupportedAlgorithm(SecurityAlgorithms.RsaSsaPssSha256))
                         {
-                            context.Logger.LogInformation(SR.GetResourceString(SR.ID6072), credentials.Key.GetType().Name);
+                            context.Logger.LogInformation((SR.ID6072), credentials.Key.GetType().Name);
 
                             continue;
                         }
@@ -1156,13 +1156,13 @@ namespace OpenIddict.Server
 
                             if (parameters is null)
                             {
-                                context.Logger.LogWarning(SR.GetResourceString(SR.ID6073), credentials.Key.GetType().Name);
+                                context.Logger.LogWarning((SR.ID6073), credentials.Key.GetType().Name);
 
                                 continue;
                             }
 
                             Debug.Assert(parameters.Value.Exponent is not null &&
-                                         parameters.Value.Modulus is not null, SR.GetResourceString(SR.ID4003));
+                                         parameters.Value.Modulus is not null, (SR.ID4003));
 
                             key.Kty = JsonWebAlgorithmsKeyTypes.RSA;
 
@@ -1188,7 +1188,7 @@ namespace OpenIddict.Server
 
                             if (parameters is null)
                             {
-                                context.Logger.LogWarning(SR.GetResourceString(SR.ID6074), credentials.Key.GetType().Name);
+                                context.Logger.LogWarning((SR.ID6074), credentials.Key.GetType().Name);
 
                                 continue;
                             }
@@ -1199,16 +1199,16 @@ namespace OpenIddict.Server
 
                             if (string.IsNullOrEmpty(curve))
                             {
-                                context.Logger.LogWarning(SR.GetResourceString(SR.ID6167), credentials.Key.GetType().Name);
+                                context.Logger.LogWarning((SR.ID6167), credentials.Key.GetType().Name);
 
                                 continue;
                             }
 
                             Debug.Assert(parameters.Value.Q.X is not null &&
-                                         parameters.Value.Q.Y is not null, SR.GetResourceString(SR.ID4004));
+                                         parameters.Value.Q.Y is not null, (SR.ID4004));
 
-                            Debug.Assert(parameters.Value.Curve.Oid is not null, SR.GetResourceString(SR.ID4011));
-                            Debug.Assert(parameters.Value.Curve.IsNamed, SR.GetResourceString(SR.ID4005));
+                            Debug.Assert(parameters.Value.Curve.Oid is not null, (SR.ID4011));
+                            Debug.Assert(parameters.Value.Curve.IsNamed, (SR.ID4005));
 
                             key.Kty = JsonWebAlgorithmsKeyTypes.EllipticCurve;
                             key.Crv = curve;
@@ -1247,8 +1247,8 @@ namespace OpenIddict.Server
 #if SUPPORTS_ECDSA
                     static bool IsCurve(ECParameters parameters, ECCurve curve)
                     {
-                        Debug.Assert(parameters.Curve.Oid is not null, SR.GetResourceString(SR.ID4011));
-                        Debug.Assert(curve.Oid is not null, SR.GetResourceString(SR.ID4011));
+                        Debug.Assert(parameters.Curve.Oid is not null, (SR.ID4011));
+                        Debug.Assert(curve.Oid is not null, (SR.ID4011));
 
                         // Warning: on .NET Framework 4.x and .NET Core 2.1, exported ECParameters generally have
                         // a null OID value attached. To work around this limitation, both the raw OID values and
@@ -1263,7 +1263,7 @@ namespace OpenIddict.Server
                             return string.Equals(parameters.Curve.Oid.FriendlyName, curve.Oid.FriendlyName, StringComparison.Ordinal);
                         }
 
-                        Debug.Fail(SR.GetResourceString(SR.ID4012));
+                        Debug.Fail((SR.ID4012));
                         return false;
                     }
 #endif
@@ -1276,7 +1276,7 @@ namespace OpenIddict.Server
                         using var hash = CryptoConfig.CreateFromName(algorithm.Name!) as HashAlgorithm;
                         if (hash is null || hash is KeyedHashAlgorithm)
                         {
-                            throw new InvalidOperationException(SR.GetResourceString(SR.ID0217));
+                            throw new InvalidOperationException((SR.ID0217));
                         }
 
                         return hash.ComputeHash(certificate.RawData);

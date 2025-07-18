@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -139,15 +139,15 @@ namespace OpenIddict.Validation.SystemNetHttp
                     throw new ArgumentNullException(nameof(context));
                 }
 
-                Debug.Assert(context.Transaction.Request is not null, SR.GetResourceString(SR.ID4008));
-                Debug.Assert(context.Transaction.Request is not null, SR.GetResourceString(SR.ID4008));
+                Debug.Assert(context.Transaction.Request is not null, (SR.ID4008));
+                Debug.Assert(context.Transaction.Request is not null, (SR.ID4008));
 
                 // This handler only applies to System.Net.Http requests. If the HTTP request cannot be resolved,
                 // this may indicate that the request was incorrectly processed by another client stack.
                 var request = context.Transaction.GetHttpRequestMessage();
                 if (request is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0173));
+                    throw new InvalidOperationException((SR.ID0173));
                 }
 
                 if (request.RequestUri is null || context.Transaction.Request.Count == 0)
@@ -206,14 +206,14 @@ namespace OpenIddict.Validation.SystemNetHttp
                     throw new ArgumentNullException(nameof(context));
                 }
 
-                Debug.Assert(context.Transaction.Request is not null, SR.GetResourceString(SR.ID4008));
+                Debug.Assert(context.Transaction.Request is not null, (SR.ID4008));
 
                 // This handler only applies to System.Net.Http requests. If the HTTP request cannot be resolved,
                 // this may indicate that the request was incorrectly processed by another client stack.
                 var request = context.Transaction.GetHttpRequestMessage();
                 if (request is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0173));
+                    throw new InvalidOperationException((SR.ID0173));
                 }
 
                 request.Content = new FormUrlEncodedContent(
@@ -262,20 +262,20 @@ namespace OpenIddict.Validation.SystemNetHttp
                 var request = context.Transaction.GetHttpRequestMessage();
                 if (request is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0173));
+                    throw new InvalidOperationException((SR.ID0173));
                 }
 
                 var assembly = typeof(OpenIddictValidationSystemNetHttpOptions).Assembly.GetName();
                 using var client = _factory.CreateClient(assembly.Name);
                 if (client is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0174));
+                    throw new InvalidOperationException((SR.ID0174));
                 }
 
                 var response = await client.SendAsync(request, HttpCompletionOption.ResponseContentRead);
                 if (response is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0175));
+                    throw new InvalidOperationException((SR.ID0175));
                 }
 
                 // Store the HttpResponseMessage in the transaction properties.
@@ -312,7 +312,7 @@ namespace OpenIddict.Validation.SystemNetHttp
                 var request = context.Transaction.GetHttpRequestMessage();
                 if (request is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0173));
+                    throw new InvalidOperationException((SR.ID0173));
                 }
 
                 request.Dispose();
@@ -353,7 +353,7 @@ namespace OpenIddict.Validation.SystemNetHttp
                 var response = context.Transaction.GetHttpResponseMessage();
                 if (response is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0173));
+                    throw new InvalidOperationException((SR.ID0173));
                 }
 
                 // The status code is deliberately not validated to ensure even errored responses
@@ -394,7 +394,7 @@ namespace OpenIddict.Validation.SystemNetHttp
                 var response = context.Transaction.GetHttpResponseMessage();
                 if (response is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0173));
+                    throw new InvalidOperationException((SR.ID0173));
                 }
 
                 response.Dispose();

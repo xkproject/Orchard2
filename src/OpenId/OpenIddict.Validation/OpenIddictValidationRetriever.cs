@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -35,26 +35,26 @@ namespace OpenIddict.Validation
         {
             if (string.IsNullOrEmpty(address))
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0143), nameof(address));
+                throw new ArgumentException(SR.ID0143);
             }
 
             if (!Uri.TryCreate(address, UriKind.Absolute, out Uri? uri) || !uri.IsWellFormedOriginalString())
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0144), nameof(address));
+                throw new ArgumentException(SR.ID0144);
             }
 
             cancel.ThrowIfCancellationRequested();
 
             var configuration = await _service.GetConfigurationAsync(uri, cancel) ??
-                throw new InvalidOperationException(SR.GetResourceString(SR.ID0145));
+                throw new InvalidOperationException((SR.ID0145));
 
             if (!Uri.TryCreate(configuration.JwksUri, UriKind.Absolute, out uri) || !uri.IsWellFormedOriginalString())
             {
-                throw new InvalidOperationException(SR.GetResourceString(SR.ID0146));
+                throw new InvalidOperationException((SR.ID0146));
             }
 
             configuration.JsonWebKeySet = await _service.GetSecurityKeysAsync(uri, cancel) ??
-                throw new InvalidOperationException(SR.GetResourceString(SR.ID0147));
+                throw new InvalidOperationException((SR.ID0147));
 
             // Copy the signing keys found in the JSON Web Key Set to the SigningKeys collection.
             foreach (var key in configuration.JsonWebKeySet.GetSigningKeys())

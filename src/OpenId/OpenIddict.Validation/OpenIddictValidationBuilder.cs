@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Validation;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SR = OpenIddict.Abstractions.OpenIddictResources;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -95,8 +96,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(descriptor));
             }
 
-            Services.RemoveAll(descriptor.ServiceDescriptor.ServiceType);
+            foreach(var service in Services.Where(service => service.ServiceType == descriptor.ServiceDescriptor.ServiceType).ToList())
+            {
+                Services.Remove(service);
+            }
 
+            /*
             Services.PostConfigure<OpenIddictValidationOptions>(options =>
             {
                 for (var index = options.Handlers.Count - 1; index >= 0; index--)
@@ -106,7 +111,7 @@ namespace Microsoft.Extensions.DependencyInjection
                         options.Handlers.RemoveAt(index);
                     }
                 }
-            });
+            });*/
 
             return this;
         }
@@ -124,7 +129,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(configuration));
             }
 
-            Services.Configure(configuration);
+           // Services.Configure(configuration);
 
             return this;
         }
@@ -160,7 +165,7 @@ namespace Microsoft.Extensions.DependencyInjection
             if (key is AsymmetricSecurityKey asymmetricSecurityKey &&
                 asymmetricSecurityKey.PrivateKeyStatus == PrivateKeyStatus.DoesNotExist)
             {
-                throw new InvalidOperationException(SR.GetResourceString(SR.ID0055));
+                throw new InvalidOperationException((SR.ID0055));
             }
 
             if (key.IsSupportedAlgorithm(SecurityAlgorithms.Aes256KW))
@@ -175,7 +180,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     SecurityAlgorithms.RsaOAEP, SecurityAlgorithms.Aes256CbcHmacSha512));
             }
 
-            throw new InvalidOperationException(SR.GetResourceString(SR.ID0056));
+            throw new InvalidOperationException((SR.ID0056));
         }
 
         /// <summary>
@@ -197,13 +202,13 @@ namespace Microsoft.Extensions.DependencyInjection
                 var extensions = certificate.Extensions.OfType<X509KeyUsageExtension>().ToList();
                 if (extensions.Count != 0 && !extensions.Any(extension => extension.KeyUsages.HasFlag(X509KeyUsageFlags.KeyEncipherment)))
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0060));
+                    throw new InvalidOperationException((SR.ID0060));
                 }
             }
 
             if (!certificate.HasPrivateKey)
             {
-                throw new InvalidOperationException(SR.GetResourceString(SR.ID0061));
+                throw new InvalidOperationException((SR.ID0061));
             }
 
             return AddEncryptionKey(new X509SecurityKey(certificate));
@@ -246,18 +251,18 @@ namespace Microsoft.Extensions.DependencyInjection
 
             if (string.IsNullOrEmpty(resource))
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0062), nameof(resource));
+                throw new ArgumentException((SR.ID0062), nameof(resource));
             }
 
             if (string.IsNullOrEmpty(password))
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0063), nameof(password));
+                throw new ArgumentException((SR.ID0063), nameof(password));
             }
 
             using var stream = assembly.GetManifestResourceStream(resource);
             if (stream is null)
             {
-                throw new InvalidOperationException(SR.GetResourceString(SR.ID0064));
+                throw new InvalidOperationException((SR.ID0064));
             }
 
             return AddEncryptionCertificate(stream, password, flags);
@@ -301,7 +306,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             if (string.IsNullOrEmpty(password))
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0063), nameof(password));
+                throw new ArgumentException((SR.ID0063), nameof(password));
             }
 
             using var buffer = new MemoryStream();
@@ -319,13 +324,13 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (string.IsNullOrEmpty(thumbprint))
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0065), nameof(thumbprint));
+                throw new ArgumentException((SR.ID0065), nameof(thumbprint));
             }
 
             var certificate = GetCertificate(StoreLocation.CurrentUser, thumbprint) ?? GetCertificate(StoreLocation.LocalMachine, thumbprint);
             if (certificate is null)
             {
-                throw new InvalidOperationException(SR.GetResourceString(SR.ID0066));
+                throw new InvalidOperationException((SR.ID0066));
             }
 
             return AddEncryptionCertificate(certificate);
@@ -353,7 +358,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (string.IsNullOrEmpty(thumbprint))
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0065), nameof(thumbprint));
+                throw new ArgumentException((SR.ID0065), nameof(thumbprint));
             }
 
             using var store = new X509Store(name, location);
@@ -365,7 +370,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             if (certificate is null)
             {
-                throw new InvalidOperationException(SR.GetResourceString(SR.ID0066));
+                throw new InvalidOperationException((SR.ID0066));
             }
 
             return AddEncryptionCertificate(certificate);
@@ -386,7 +391,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             if (audiences.Any(audience => string.IsNullOrEmpty(audience)))
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0123), nameof(audiences));
+                throw new ArgumentException((SR.ID0123), nameof(audiences));
             }
 
             return Configure(options => options.Audiences.UnionWith(audiences));
@@ -438,7 +443,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (string.IsNullOrEmpty(identifier))
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0124), nameof(identifier));
+                throw new ArgumentException((SR.ID0124), nameof(identifier));
             }
 
             return Configure(options => options.ClientId = identifier);
@@ -454,7 +459,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (string.IsNullOrEmpty(secret))
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0125), nameof(secret));
+                throw new ArgumentException((SR.ID0125), nameof(secret));
             }
 
             return Configure(options => options.ClientSecret = secret);
@@ -486,12 +491,12 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (string.IsNullOrEmpty(address))
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0126), nameof(address));
+                throw new ArgumentException(SR.ID0126);
             }
 
             if (!Uri.TryCreate(address, UriKind.Absolute, out Uri? uri) || !uri.IsWellFormedOriginalString())
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0127), nameof(address));
+                throw new ArgumentException(SR.ID0127);
             }
 
             return SetIssuer(uri);

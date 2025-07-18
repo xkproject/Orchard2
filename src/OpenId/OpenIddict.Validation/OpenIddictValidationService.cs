@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -45,7 +45,7 @@ namespace OpenIddict.Validation
 
             if (!address.IsAbsoluteUri)
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0144), nameof(address));
+                throw new ArgumentException(SR.ID0144);
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -71,7 +71,7 @@ namespace OpenIddict.Validation
                 var configuration = await HandleConfigurationResponseAsync();
                 if (configuration is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0145));
+                    throw new InvalidOperationException((SR.ID0145));
                 }
 
                 return configuration;
@@ -88,9 +88,7 @@ namespace OpenIddict.Validation
 
                     if (context.IsRejected)
                     {
-                        throw new OpenIddictExceptions.GenericException(
-                            SR.FormatID0148(context.Error, context.ErrorDescription, context.ErrorUri),
-                            context.Error, context.ErrorDescription, context.ErrorUri);
+                        throw new OpenIddictExceptions.GenericException("");
                     }
 
                     return context.Request;
@@ -107,9 +105,7 @@ namespace OpenIddict.Validation
 
                     if (context.IsRejected)
                     {
-                        throw new OpenIddictExceptions.GenericException(
-                            SR.FormatID0149(context.Error, context.ErrorDescription, context.ErrorUri),
-                            context.Error, context.ErrorDescription, context.ErrorUri);
+                        throw new OpenIddictExceptions.GenericException("");
                     }
 
                     return context.Request;
@@ -126,12 +122,10 @@ namespace OpenIddict.Validation
 
                     if (context.IsRejected)
                     {
-                        throw new OpenIddictExceptions.GenericException(
-                            SR.FormatID0150(context.Error, context.ErrorDescription, context.ErrorUri),
-                            context.Error, context.ErrorDescription, context.ErrorUri);
+                        throw new OpenIddictExceptions.GenericException("");
                     }
 
-                    Debug.Assert(context.Response is not null, SR.GetResourceString(SR.ID4007));
+                    Debug.Assert(context.Response is not null, (SR.ID4007));
 
                     return context.Response;
                 }
@@ -148,9 +142,7 @@ namespace OpenIddict.Validation
 
                     if (context.IsRejected)
                     {
-                        throw new OpenIddictExceptions.GenericException(
-                            SR.FormatID0151(context.Error, context.ErrorDescription, context.ErrorUri),
-                            context.Error, context.ErrorDescription, context.ErrorUri);
+                        throw new OpenIddictExceptions.GenericException("");
                     }
 
                     return context.Configuration;
@@ -186,7 +178,7 @@ namespace OpenIddict.Validation
 
             if (!address.IsAbsoluteUri)
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0144), nameof(address));
+                throw new ArgumentException(SR.ID0144);
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -213,7 +205,7 @@ namespace OpenIddict.Validation
                 var keys = await HandleCryptographyResponseAsync();
                 if (keys is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0147));
+                    throw new InvalidOperationException((SR.ID0147));
                 }
 
                 return keys;
@@ -230,9 +222,7 @@ namespace OpenIddict.Validation
 
                     if (context.IsRejected)
                     {
-                        throw new OpenIddictExceptions.GenericException(
-                            SR.FormatID0152(context.Error, context.ErrorDescription, context.ErrorUri),
-                            context.Error, context.ErrorDescription, context.ErrorUri);
+                        throw new OpenIddictExceptions.GenericException("");
                     }
 
                     return context.Request;
@@ -249,9 +239,7 @@ namespace OpenIddict.Validation
 
                     if (context.IsRejected)
                     {
-                        throw new OpenIddictExceptions.GenericException(
-                            SR.FormatID0153(context.Error, context.ErrorDescription, context.ErrorUri),
-                            context.Error, context.ErrorDescription, context.ErrorUri);
+                        throw new OpenIddictExceptions.GenericException("");
                     }
 
                     return context.Request;
@@ -268,12 +256,10 @@ namespace OpenIddict.Validation
 
                     if (context.IsRejected)
                     {
-                        throw new OpenIddictExceptions.GenericException(
-                            SR.FormatID0154(context.Error, context.ErrorDescription, context.ErrorUri),
-                            context.Error, context.ErrorDescription, context.ErrorUri);
+                        throw new OpenIddictExceptions.GenericException("");
                     }
 
-                    Debug.Assert(context.Response is not null, SR.GetResourceString(SR.ID4007));
+                    Debug.Assert(context.Response is not null, (SR.ID4007));
 
                     return context.Response;
                 }
@@ -290,9 +276,7 @@ namespace OpenIddict.Validation
 
                     if (context.IsRejected)
                     {
-                        throw new OpenIddictExceptions.GenericException(
-                            SR.FormatID0155(context.Error, context.ErrorDescription, context.ErrorUri),
-                            context.Error, context.ErrorDescription, context.ErrorUri);
+                        throw new OpenIddictExceptions.GenericException("");
                     }
 
                     return context.SecurityKeys;
@@ -341,12 +325,12 @@ namespace OpenIddict.Validation
 
             if (!address.IsAbsoluteUri)
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0144), nameof(address));
+                throw new ArgumentException(SR.ID0144);
             }
 
             if (string.IsNullOrEmpty(token))
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0156), nameof(token));
+                throw new ArgumentException((SR.ID0156), nameof(token));
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -372,7 +356,7 @@ namespace OpenIddict.Validation
                 var principal = await HandleIntrospectionResponseAsync();
                 if (principal is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0157));
+                    throw new InvalidOperationException((SR.ID0157));
                 }
 
                 return principal;
@@ -392,8 +376,7 @@ namespace OpenIddict.Validation
                     if (context.IsRejected)
                     {
                         throw new OpenIddictExceptions.GenericException(
-                            SR.FormatID0158(context.Error, context.ErrorDescription, context.ErrorUri),
-                            context.Error, context.ErrorDescription, context.ErrorUri);
+                           context.Error + " " + context.ErrorDescription + " " + context.ErrorUri);
                     }
 
                     return context.Request;
@@ -410,9 +393,7 @@ namespace OpenIddict.Validation
 
                     if (context.IsRejected)
                     {
-                        throw new OpenIddictExceptions.GenericException(
-                            SR.FormatID0159(context.Error, context.ErrorDescription, context.ErrorUri),
-                            context.Error, context.ErrorDescription, context.ErrorUri);
+                        throw new OpenIddictExceptions.GenericException("");
                     }
 
                     return context.Request;
@@ -429,12 +410,10 @@ namespace OpenIddict.Validation
 
                     if (context.IsRejected)
                     {
-                        throw new OpenIddictExceptions.GenericException(
-                            SR.FormatID0160(context.Error, context.ErrorDescription, context.ErrorUri),
-                            context.Error, context.ErrorDescription, context.ErrorUri);
+                        throw new OpenIddictExceptions.GenericException("");
                     }
 
-                    Debug.Assert(context.Response is not null, SR.GetResourceString(SR.ID4007));
+                    Debug.Assert(context.Response is not null, (SR.ID4007));
 
                     return context.Response;
                 }
@@ -453,12 +432,10 @@ namespace OpenIddict.Validation
 
                     if (context.IsRejected)
                     {
-                        throw new OpenIddictExceptions.GenericException(
-                            SR.FormatID0161(context.Error, context.ErrorDescription, context.ErrorUri),
-                            context.Error, context.ErrorDescription, context.ErrorUri);
+                        throw new OpenIddictExceptions.GenericException("");
                     }
 
-                    Debug.Assert(context.Principal is { Identity: ClaimsIdentity }, SR.GetResourceString(SR.ID4006));
+                    Debug.Assert(context.Principal is { Identity: ClaimsIdentity }, (SR.ID4006));
 
                     return context.Principal;
                 }
@@ -488,7 +465,7 @@ namespace OpenIddict.Validation
         {
             if (string.IsNullOrEmpty(token))
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0162), nameof(token));
+                throw new ArgumentException((SR.ID0162), nameof(token));
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -516,12 +493,10 @@ namespace OpenIddict.Validation
 
                 if (context.IsRejected)
                 {
-                    throw new OpenIddictExceptions.GenericException(
-                        SR.FormatID0163(context.Error, context.ErrorDescription, context.ErrorUri),
-                        context.Error, context.ErrorDescription, context.ErrorUri);
+                    throw new OpenIddictExceptions.GenericException("");
                 }
 
-                Debug.Assert(context.Principal is { Identity: ClaimsIdentity }, SR.GetResourceString(SR.ID4006));
+                Debug.Assert(context.Principal is { Identity: ClaimsIdentity }, (SR.ID4006));
 
                 return context.Principal;
             }

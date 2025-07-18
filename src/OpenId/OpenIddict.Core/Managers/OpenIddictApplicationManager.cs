@@ -23,7 +23,7 @@ using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 using SR = OpenIddict.Abstractions.OpenIddictResources;
-
+using Org.BouncyCastle.Utilities;
 
 namespace OpenIddict.Core
 {
@@ -79,7 +79,7 @@ namespace OpenIddict.Core
         /// whose result returns the number of applications in the database.
         /// </returns>
         public virtual ValueTask<long> CountAsync(CancellationToken cancellationToken = default)
-            => Store.CountAsync(cancellationToken));
+            => Store.CountAsync(cancellationToken);
 
         /// <summary>
         /// Determines the number of applications that match the specified query.
@@ -99,7 +99,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(query));
             }
 
-            return Store.CountAsync(query, cancellationToken));
+            return Store.CountAsync(query, cancellationToken);
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace OpenIddict.Core
         /// A <see cref="ValueTask"/> that can be used to monitor the asynchronous operation.
         /// </returns>
         public virtual ValueTask CreateAsync(TApplication application, CancellationToken cancellationToken = default)
-            => CreateAsync(application, secret: null, cancellationToken));
+            => CreateAsync(application, secret: null, cancellationToken);
 
         /// <summary>
         /// Creates a new application.
@@ -133,57 +133,57 @@ namespace OpenIddict.Core
 
             if (!string.IsNullOrEmpty(await Store.GetClientSecretAsync(application, cancellationToken)))
             {
-                throw new ArgumentException(SR.ID0206));
+                throw new ArgumentException(SR.ID0206);
             }
 
             // If no client type was specified, assume it's a public application if no secret was provided.
-            var type = await Store.GetClientTypeAsync(application, cancellationToken));
+            var type = await Store.GetClientTypeAsync(application, cancellationToken);
             if (string.IsNullOrEmpty(type))
             {
                 await Store.SetClientTypeAsync(application, string.IsNullOrEmpty(secret) ?
-                    ClientTypes.Public : ClientTypes.Confidential, cancellationToken));
+                    ClientTypes.Public : ClientTypes.Confidential, cancellationToken);
             }
 
             // If a client secret was provided, obfuscate it.
             if (!string.IsNullOrEmpty(secret))
             {
-                secret = await ObfuscateClientSecretAsync(secret, cancellationToken));
-                await Store.SetClientSecretAsync(application, secret, cancellationToken));
+                secret = await ObfuscateClientSecretAsync(secret, cancellationToken);
+                await Store.SetClientSecretAsync(application, secret, cancellationToken);
             }
 
-            var results = await GetValidationResultsAsync(application, cancellationToken));
+            var results = await GetValidationResultsAsync(application, cancellationToken);
             if (results.Any(result => result != ValidationResult.Success))
             {
-                var builder = new StringBuilder());
-                builder.AppendLine(SR.ID0207));
-                builder.AppendLine());
+                var builder = new StringBuilder();
+                builder.AppendLine(SR.ID0207);
+                builder.AppendLine();
 
                 foreach (var result in results)
                 {
-                    builder.AppendLine(result.ErrorMessage));
+                    builder.AppendLine(result.ErrorMessage);
                 }
 
-                throw new OpenIddictExceptions.ValidationException(builder.ToString(), results));
+                throw new OpenIddictExceptions.ValidationException(builder.ToString(), results);
             }
 
-            await Store.CreateAsync(application, cancellationToken));
+            await Store.CreateAsync(application, cancellationToken);
 
             if (!Options.CurrentValue.DisableEntityCaching)
             {
-                await Cache.AddAsync(application, cancellationToken));
+                await Cache.AddAsync(application, cancellationToken);
             }
 
             async Task<ImmutableArray<ValidationResult>> GetValidationResultsAsync(
                 TApplication application, CancellationToken cancellationToken)
             {
-                var builder = ImmutableArray.CreateBuilder<ValidationResult>());
+                var builder = ImmutableArray.CreateBuilder<ValidationResult>();
 
                 await foreach (var result in ValidateAsync(application, cancellationToken))
                 {
-                    builder.Add(result));
+                    builder.Add(result);
                 }
 
-                return builder.ToImmutable());
+                return builder.ToImmutable();
             }
         }
 
@@ -206,23 +206,23 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(descriptor));
             }
 
-            var application = await Store.InstantiateAsync(cancellationToken));
+            var application = await Store.InstantiateAsync(cancellationToken);
             if (application is null)
             {
-                throw new InvalidOperationException(SR.ID0208));
+                throw new InvalidOperationException(SR.ID0208);
             }
 
-            await PopulateAsync(application, descriptor, cancellationToken));
+            await PopulateAsync(application, descriptor, cancellationToken);
 
-            var secret = await Store.GetClientSecretAsync(application, cancellationToken));
+            var secret = await Store.GetClientSecretAsync(application, cancellationToken);
             if (!string.IsNullOrEmpty(secret))
             {
-                await Store.SetClientSecretAsync(application, secret: null, cancellationToken));
-                await CreateAsync(application, secret, cancellationToken));
+                await Store.SetClientSecretAsync(application, secret: null, cancellationToken);
+                await CreateAsync(application, secret, cancellationToken);
             }
             else
             {
-                await CreateAsync(application, cancellationToken));
+                await CreateAsync(application, cancellationToken);
             }
 
             return application;
@@ -245,10 +245,10 @@ namespace OpenIddict.Core
 
             if (!Options.CurrentValue.DisableEntityCaching)
             {
-                await Cache.RemoveAsync(application, cancellationToken));
+                await Cache.RemoveAsync(application, cancellationToken);
             }
 
-            await Store.DeleteAsync(application, cancellationToken));
+            await Store.DeleteAsync(application, cancellationToken);
         }
 
         /// <summary>
@@ -265,12 +265,12 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(identifier))
             {
-                throw new ArgumentException(SR.ID0195), nameof(identifier));
+                throw new ArgumentException(SR.ID0195);
             }
 
             var application = Options.CurrentValue.DisableEntityCaching ?
                 await Store.FindByClientIdAsync(identifier, cancellationToken) :
-                await Cache.FindByClientIdAsync(identifier, cancellationToken));
+                await Cache.FindByClientIdAsync(identifier, cancellationToken);
 
             if (application is null)
             {
@@ -302,12 +302,12 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(identifier))
             {
-                throw new ArgumentException(SR.ID0195), nameof(identifier));
+                throw new ArgumentException(SR.ID0195);
             }
 
             var application = Options.CurrentValue.DisableEntityCaching ?
                 await Store.FindByIdAsync(identifier, cancellationToken) :
-                await Cache.FindByIdAsync(identifier, cancellationToken));
+                await Cache.FindByIdAsync(identifier, cancellationToken);
 
             if (application is null)
             {
@@ -337,19 +337,19 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(address))
             {
-                throw new ArgumentException(SR.ID0143), nameof(address));
+                throw new ArgumentException(SR.ID0143);
             }
 
             var applications = Options.CurrentValue.DisableEntityCaching ?
                 Store.FindByPostLogoutRedirectUriAsync(address, cancellationToken) :
-                Cache.FindByPostLogoutRedirectUriAsync(address, cancellationToken));
+                Cache.FindByPostLogoutRedirectUriAsync(address, cancellationToken);
 
             if (Options.CurrentValue.DisableAdditionalFiltering)
             {
                 return applications;
             }
 
-            return ExecuteAsync(cancellationToken));
+            return ExecuteAsync(cancellationToken);
 
             // SQL engines like Microsoft SQL Server or MySQL are known to use case-insensitive lookups by default.
             // To ensure a case-sensitive comparison is enforced independently of the database/table/query collation
@@ -359,7 +359,7 @@ namespace OpenIddict.Core
             {
                 await foreach (var application in applications)
                 {
-                    var addresses = await Store.GetPostLogoutRedirectUrisAsync(application, cancellationToken));
+                    var addresses = await Store.GetPostLogoutRedirectUrisAsync(application, cancellationToken);
                     if (addresses.Contains(address, StringComparer.Ordinal))
                     {
                         yield return application;
@@ -379,12 +379,12 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(address))
             {
-                throw new ArgumentException(SR.ID0143), nameof(address));
+                throw new ArgumentException(SR.ID0143);
             }
 
             var applications = Options.CurrentValue.DisableEntityCaching ?
                 Store.FindByRedirectUriAsync(address, cancellationToken) :
-                Cache.FindByRedirectUriAsync(address, cancellationToken));
+                Cache.FindByRedirectUriAsync(address, cancellationToken);
 
             if (Options.CurrentValue.DisableAdditionalFiltering)
             {
@@ -395,13 +395,13 @@ namespace OpenIddict.Core
             // To ensure a case-sensitive comparison is enforced independently of the database/table/query collation
             // used by the store, a second pass using string.Equals(StringComparison.Ordinal) is manually made here.
 
-            return ExecuteAsync(cancellationToken));
+            return ExecuteAsync(cancellationToken);
 
             async IAsyncEnumerable<TApplication> ExecuteAsync([EnumeratorCancellation] CancellationToken cancellationToken)
             {
                 await foreach (var application in applications)
                 {
-                    var addresses = await Store.GetRedirectUrisAsync(application, cancellationToken));
+                    var addresses = await Store.GetRedirectUrisAsync(application, cancellationToken);
                     if (addresses.Contains(address, StringComparer.Ordinal))
                     {
                         yield return application;
@@ -428,7 +428,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(query));
             }
 
-            return GetAsync(static (applications, query) => query(applications), query, cancellationToken));
+            return GetAsync(static (applications, query) => query(applications), query, cancellationToken);
         }
 
         /// <summary>
@@ -452,7 +452,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(query));
             }
 
-            return Store.GetAsync(query, state, cancellationToken));
+            return Store.GetAsync(query, state, cancellationToken);
         }
 
         /// <summary>
@@ -472,7 +472,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(application));
             }
 
-            return Store.GetClientIdAsync(application, cancellationToken));
+            return Store.GetClientIdAsync(application, cancellationToken);
         }
 
         /// <summary>
@@ -492,7 +492,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(application));
             }
 
-            return Store.GetClientTypeAsync(application, cancellationToken));
+            return Store.GetClientTypeAsync(application, cancellationToken);
         }
 
         /// <summary>
@@ -512,7 +512,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(application));
             }
 
-            var type = await Store.GetConsentTypeAsync(application, cancellationToken));
+            var type = await Store.GetConsentTypeAsync(application, cancellationToken);
             if (string.IsNullOrEmpty(type))
             {
                 return ConsentTypes.Explicit;
@@ -538,7 +538,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(application));
             }
 
-            return Store.GetDisplayNameAsync(application, cancellationToken));
+            return Store.GetDisplayNameAsync(application, cancellationToken);
         }
 
         /// <summary>
@@ -558,10 +558,10 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(application));
             }
 
-            var names = await Store.GetDisplayNamesAsync(application, cancellationToken));
+            var names = await Store.GetDisplayNamesAsync(application, cancellationToken);
             if (names is null || names.Count == 0)
             {
-                return ImmutableDictionary.Create<CultureInfo, string>());
+                return ImmutableDictionary.Create<CultureInfo, string>();
             }
 
             return names;
@@ -583,7 +583,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(application));
             }
 
-            return Store.GetIdAsync(application, cancellationToken));
+            return Store.GetIdAsync(application, cancellationToken);
         }
 
         /// <summary>
@@ -599,7 +599,7 @@ namespace OpenIddict.Core
         /// </returns>
         public virtual ValueTask<string?> GetLocalizedDisplayNameAsync(
             TApplication application, CancellationToken cancellationToken = default)
-            => GetLocalizedDisplayNameAsync(application, CultureInfo.CurrentUICulture, cancellationToken));
+            => GetLocalizedDisplayNameAsync(application, CultureInfo.CurrentUICulture, cancellationToken);
 
         /// <summary>
         /// Retrieves the localized display name associated with an application
@@ -626,10 +626,10 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(culture));
             }
 
-            var names = await Store.GetDisplayNamesAsync(application, cancellationToken));
+            var names = await Store.GetDisplayNamesAsync(application, cancellationToken);
             if (names is null || names.IsEmpty)
             {
-                return await Store.GetDisplayNameAsync(application, cancellationToken));
+                return await Store.GetDisplayNameAsync(application, cancellationToken);
             }
 
             do
@@ -642,9 +642,9 @@ namespace OpenIddict.Core
                 culture = culture.Parent;
             }
 
-            while (culture != CultureInfo.InvariantCulture));
+            while (culture != CultureInfo.InvariantCulture);
 
-            return await Store.GetDisplayNameAsync(application, cancellationToken));
+            return await Store.GetDisplayNameAsync(application, cancellationToken);
         }
 
         /// <summary>
@@ -664,7 +664,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(application));
             }
 
-            return Store.GetPermissionsAsync(application, cancellationToken));
+            return Store.GetPermissionsAsync(application, cancellationToken);
         }
 
         /// <summary>
@@ -684,7 +684,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(application));
             }
 
-            return Store.GetPostLogoutRedirectUrisAsync(application, cancellationToken));
+            return Store.GetPostLogoutRedirectUrisAsync(application, cancellationToken);
         }
 
         /// <summary>
@@ -704,7 +704,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(application));
             }
 
-            return Store.GetPropertiesAsync(application, cancellationToken));
+            return Store.GetPropertiesAsync(application, cancellationToken);
         }
 
         /// <summary>
@@ -724,7 +724,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(application));
             }
 
-            return Store.GetRedirectUrisAsync(application, cancellationToken));
+            return Store.GetRedirectUrisAsync(application, cancellationToken);
         }
 
         /// <summary>
@@ -744,7 +744,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(application));
             }
 
-            return Store.GetRequirementsAsync(application, cancellationToken));
+            return Store.GetRequirementsAsync(application, cancellationToken);
         }
 
         /// <summary>
@@ -764,10 +764,10 @@ namespace OpenIddict.Core
 
             if (string.IsNullOrEmpty(type))
             {
-                throw new ArgumentException(SR.ID0209), nameof(type));
+                throw new ArgumentException(SR.ID0209);
             }
 
-            return string.Equals(await GetClientTypeAsync(application, cancellationToken), type, StringComparison.OrdinalIgnoreCase));
+            return string.Equals(await GetClientTypeAsync(application, cancellationToken), type, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -787,10 +787,10 @@ namespace OpenIddict.Core
 
             if (string.IsNullOrEmpty(type))
             {
-                throw new ArgumentException(SR.ID0210), nameof(type));
+                throw new ArgumentException(SR.ID0210);
             }
 
-            return string.Equals(await GetConsentTypeAsync(application, cancellationToken), type, StringComparison.OrdinalIgnoreCase));
+            return string.Equals(await GetConsentTypeAsync(application, cancellationToken), type, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -810,10 +810,10 @@ namespace OpenIddict.Core
 
             if (string.IsNullOrEmpty(permission))
             {
-                throw new ArgumentException(SR.ID0211), nameof(permission));
+                throw new ArgumentException(SR.ID0211);
             }
 
-            return (await GetPermissionsAsync(application, cancellationToken)).Contains(permission, StringComparer.Ordinal));
+            return (await GetPermissionsAsync(application, cancellationToken)).Contains(permission, StringComparer.Ordinal);
         }
 
         /// <summary>
@@ -833,10 +833,10 @@ namespace OpenIddict.Core
 
             if (string.IsNullOrEmpty(requirement))
             {
-                throw new ArgumentException(SR.ID0212), nameof(requirement));
+                throw new ArgumentException(SR.ID0212);
             }
 
-            return (await GetRequirementsAsync(application, cancellationToken)).Contains(requirement, StringComparer.Ordinal));
+            return (await GetRequirementsAsync(application, cancellationToken)).Contains(requirement, StringComparer.Ordinal);
         }
 
         /// <summary>
@@ -848,7 +848,7 @@ namespace OpenIddict.Core
         /// <returns>All the elements returned when executing the specified query.</returns>
         public virtual IAsyncEnumerable<TApplication> ListAsync(
             int? count = null, int? offset = null, CancellationToken cancellationToken = default)
-            => Store.ListAsync(count, offset, cancellationToken));
+            => Store.ListAsync(count, offset, cancellationToken);
 
         /// <summary>
         /// Executes the specified query and returns all the corresponding elements.
@@ -865,7 +865,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(query));
             }
 
-            return ListAsync(static (applications, query) => query(applications), query, cancellationToken));
+            return ListAsync(static (applications, query) => query(applications), query, cancellationToken);
         }
 
         /// <summary>
@@ -886,7 +886,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(query));
             }
 
-            return Store.ListAsync(query, state, cancellationToken));
+            return Store.ListAsync(query, state, cancellationToken);
         }
 
         /// <summary>
@@ -911,19 +911,19 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(descriptor));
             }
 
-            await Store.SetClientIdAsync(application, descriptor.ClientId, cancellationToken));
-            await Store.SetClientSecretAsync(application, descriptor.ClientSecret, cancellationToken));
-            await Store.SetClientTypeAsync(application, descriptor.Type, cancellationToken));
-            await Store.SetConsentTypeAsync(application, descriptor.ConsentType, cancellationToken));
-            await Store.SetDisplayNameAsync(application, descriptor.DisplayName, cancellationToken));
-            await Store.SetDisplayNamesAsync(application, descriptor.DisplayNames.ToImmutableDictionary(), cancellationToken));
-            await Store.SetPermissionsAsync(application, descriptor.Permissions.ToImmutableArray(), cancellationToken));
+            await Store.SetClientIdAsync(application, descriptor.ClientId, cancellationToken);
+            await Store.SetClientSecretAsync(application, descriptor.ClientSecret, cancellationToken);
+            await Store.SetClientTypeAsync(application, descriptor.Type, cancellationToken);
+            await Store.SetConsentTypeAsync(application, descriptor.ConsentType, cancellationToken);
+            await Store.SetDisplayNameAsync(application, descriptor.DisplayName, cancellationToken);
+            await Store.SetDisplayNamesAsync(application, descriptor.DisplayNames.ToImmutableDictionary(), cancellationToken);
+            await Store.SetPermissionsAsync(application, descriptor.Permissions.ToImmutableArray(), cancellationToken);
             await Store.SetPostLogoutRedirectUrisAsync(application, ImmutableArray.CreateRange(
-                descriptor.PostLogoutRedirectUris.Select(address => address.OriginalString)), cancellationToken));
-            await Store.SetPropertiesAsync(application, descriptor.Properties.ToImmutableDictionary(), cancellationToken));
+                descriptor.PostLogoutRedirectUris.Select(address => address.OriginalString)), cancellationToken);
+            await Store.SetPropertiesAsync(application, descriptor.Properties.ToImmutableDictionary(), cancellationToken);
             await Store.SetRedirectUrisAsync(application, ImmutableArray.CreateRange(
-                descriptor.RedirectUris.Select(address => address.OriginalString)), cancellationToken));
-            await Store.SetRequirementsAsync(application, descriptor.Requirements.ToImmutableArray(), cancellationToken));
+                descriptor.RedirectUris.Select(address => address.OriginalString)), cancellationToken);
+            await Store.SetRequirementsAsync(application, descriptor.Requirements.ToImmutableArray(), cancellationToken);
         }
 
         /// <summary>
@@ -949,62 +949,62 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(application));
             }
 
-            descriptor.ClientId = await Store.GetClientIdAsync(application, cancellationToken));
-            descriptor.ClientSecret = await Store.GetClientSecretAsync(application, cancellationToken));
-            descriptor.ConsentType = await Store.GetConsentTypeAsync(application, cancellationToken));
-            descriptor.DisplayName = await Store.GetDisplayNameAsync(application, cancellationToken));
-            descriptor.Type = await Store.GetClientTypeAsync(application, cancellationToken));
-            descriptor.Permissions.Clear());
+            descriptor.ClientId = await Store.GetClientIdAsync(application, cancellationToken);
+            descriptor.ClientSecret = await Store.GetClientSecretAsync(application, cancellationToken);
+            descriptor.ConsentType = await Store.GetConsentTypeAsync(application, cancellationToken);
+            descriptor.DisplayName = await Store.GetDisplayNameAsync(application, cancellationToken);
+            descriptor.Type = await Store.GetClientTypeAsync(application, cancellationToken);
+            descriptor.Permissions.Clear();
             descriptor.Permissions.UnionWith(await Store.GetPermissionsAsync(application, cancellationToken));
-            descriptor.Requirements.Clear());
+            descriptor.Requirements.Clear();
             descriptor.Requirements.UnionWith(await Store.GetRequirementsAsync(application, cancellationToken));
 
-            descriptor.DisplayNames.Clear());
+            descriptor.DisplayNames.Clear();
             foreach (var pair in await Store.GetDisplayNamesAsync(application, cancellationToken))
             {
-                descriptor.DisplayNames.Add(pair.Key, pair.Value));
+                descriptor.DisplayNames.Add(pair.Key, pair.Value);
             }
 
-            descriptor.PostLogoutRedirectUris.Clear());
+            descriptor.PostLogoutRedirectUris.Clear();
             foreach (var address in await Store.GetPostLogoutRedirectUrisAsync(application, cancellationToken))
             {
                 // Ensure the address is not null or empty.
                 if (string.IsNullOrEmpty(address))
                 {
-                    throw new ArgumentException(SR.ID0213));
+                    throw new ArgumentException(SR.ID0213);
                 }
 
                 // Ensure the address is a valid absolute URL.
                 if (!Uri.TryCreate(address, UriKind.Absolute, out Uri? uri) || !uri.IsWellFormedOriginalString())
                 {
-                    throw new ArgumentException(SR.ID0214));
+                    throw new ArgumentException(SR.ID0214);
                 }
 
-                descriptor.PostLogoutRedirectUris.Add(uri));
+                descriptor.PostLogoutRedirectUris.Add(uri);
             }
 
-            descriptor.Properties.Clear());
+            descriptor.Properties.Clear();
             foreach (var pair in await Store.GetPropertiesAsync(application, cancellationToken))
             {
-                descriptor.Properties.Add(pair.Key, pair.Value));
+                descriptor.Properties.Add(pair.Key, pair.Value);
             }
 
-            descriptor.RedirectUris.Clear());
+            descriptor.RedirectUris.Clear();
             foreach (var address in await Store.GetRedirectUrisAsync(application, cancellationToken))
             {
                 // Ensure the address is not null or empty.
                 if (string.IsNullOrEmpty(address))
                 {
-                    throw new ArgumentException(SR.ID0213));
+                    throw new ArgumentException(SR.ID0213);
                 }
 
                 // Ensure the address is a valid absolute URL.
                 if (!Uri.TryCreate(address, UriKind.Absolute, out Uri? uri) || !uri.IsWellFormedOriginalString())
                 {
-                    throw new ArgumentException(SR.ID0214));
+                    throw new ArgumentException(SR.ID0214);
                 }
 
-                descriptor.RedirectUris.Add(uri));
+                descriptor.RedirectUris.Add(uri);
             }
         }
 
@@ -1023,40 +1023,40 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(application));
             }
 
-            var results = await GetValidationResultsAsync(application, cancellationToken));
+            var results = await GetValidationResultsAsync(application, cancellationToken);
             if (results.Any(result => result != ValidationResult.Success))
             {
-                var builder = new StringBuilder());
-                builder.AppendLine(SR.ID0215));
-                builder.AppendLine());
+                var builder = new StringBuilder();
+                builder.AppendLine(SR.ID0215);
+                builder.AppendLine();
 
                 foreach (var result in results)
                 {
-                    builder.AppendLine(result.ErrorMessage));
+                    builder.AppendLine(result.ErrorMessage);
                 }
 
-                throw new OpenIddictExceptions.ValidationException(builder.ToString(), results));
+                throw new OpenIddictExceptions.ValidationException(builder.ToString(), results);
             }
 
-            await Store.UpdateAsync(application, cancellationToken));
+            await Store.UpdateAsync(application, cancellationToken);
 
             if (!Options.CurrentValue.DisableEntityCaching)
             {
-                await Cache.RemoveAsync(application, cancellationToken));
-                await Cache.AddAsync(application, cancellationToken));
+                await Cache.RemoveAsync(application, cancellationToken);
+                await Cache.AddAsync(application, cancellationToken);
             }
 
             async Task<ImmutableArray<ValidationResult>> GetValidationResultsAsync(
                 TApplication application, CancellationToken cancellationToken)
             {
-                var builder = ImmutableArray.CreateBuilder<ValidationResult>());
+                var builder = ImmutableArray.CreateBuilder<ValidationResult>();
 
                 await foreach (var result in ValidateAsync(application, cancellationToken))
                 {
-                    builder.Add(result));
+                    builder.Add(result);
                 }
 
-                return builder.ToImmutable());
+                return builder.ToImmutable();
             }
         }
 
@@ -1080,16 +1080,16 @@ namespace OpenIddict.Core
 
             if (string.IsNullOrEmpty(secret))
             {
-                await Store.SetClientSecretAsync(application, null, cancellationToken));
+                await Store.SetClientSecretAsync(application, null, cancellationToken);
             }
 
             else
             {
-                secret = await ObfuscateClientSecretAsync(secret, cancellationToken));
-                await Store.SetClientSecretAsync(application, secret, cancellationToken));
+                secret = await ObfuscateClientSecretAsync(secret, cancellationToken);
+                await Store.SetClientSecretAsync(application, secret, cancellationToken);
             }
 
-            await UpdateAsync(application, cancellationToken));
+            await UpdateAsync(application, cancellationToken);
         }
 
         /// <summary>
@@ -1115,19 +1115,19 @@ namespace OpenIddict.Core
             }
 
             // Store the original client secret for later comparison.
-            var comparand = await Store.GetClientSecretAsync(application, cancellationToken));
-            await PopulateAsync(application, descriptor, cancellationToken));
+            var comparand = await Store.GetClientSecretAsync(application, cancellationToken);
+            await PopulateAsync(application, descriptor, cancellationToken);
 
             // If the client secret was updated, use the overload accepting a secret parameter.
-            var secret = await Store.GetClientSecretAsync(application, cancellationToken));
+            var secret = await Store.GetClientSecretAsync(application, cancellationToken);
             if (!string.Equals(secret, comparand, StringComparison.Ordinal))
             {
-                await UpdateAsync(application, secret, cancellationToken));
+                await UpdateAsync(application, secret, cancellationToken);
 
                 return;
             }
 
-            await UpdateAsync(application, cancellationToken));
+            await UpdateAsync(application, cancellationToken);
         }
 
         /// <summary>
@@ -1145,10 +1145,10 @@ namespace OpenIddict.Core
             }
 
             // Ensure the client_id is not null or empty and is not already used for a different application.
-            var identifier = await Store.GetClientIdAsync(application, cancellationToken));
+            var identifier = await Store.GetClientIdAsync(application, cancellationToken);
             if (string.IsNullOrEmpty(identifier))
             {
-                yield return new ValidationResult(SR.ID2036));
+                yield return new ValidationResult(SR.ID2036);
             }
 
             else
@@ -1157,19 +1157,19 @@ namespace OpenIddict.Core
                 // whose client_id doesn't exactly match the specified value may be returned (e.g because
                 // the casing is different). To avoid issues when the client identifier is part of an index
                 // using the same collation, an error is added even if the two identifiers don't exactly match.
-                var other = await Store.FindByClientIdAsync(identifier, cancellationToken));
+                var other = await Store.FindByClientIdAsync(identifier, cancellationToken);
                 if (other is not null && !string.Equals(
                     await Store.GetIdAsync(other, cancellationToken),
                     await Store.GetIdAsync(application, cancellationToken), StringComparison.Ordinal))
                 {
-                    yield return new ValidationResult(SR.ID2111));
+                    yield return new ValidationResult(SR.ID2111);
                 }
             }
 
-            var type = await Store.GetClientTypeAsync(application, cancellationToken));
+            var type = await Store.GetClientTypeAsync(application, cancellationToken);
             if (string.IsNullOrEmpty(type))
             {
-                yield return new ValidationResult(SR.ID2050));
+                yield return new ValidationResult(SR.ID2050);
             }
 
             else
@@ -1178,20 +1178,20 @@ namespace OpenIddict.Core
                 if (!string.Equals(type, ClientTypes.Confidential, StringComparison.OrdinalIgnoreCase) &&
                     !string.Equals(type, ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
                 {
-                    yield return new ValidationResult(SR.ID2112));
+                    yield return new ValidationResult(SR.ID2112);
                 }
 
                 // Ensure a client secret was specified if the client is a confidential application.
-                var secret = await Store.GetClientSecretAsync(application, cancellationToken));
+                var secret = await Store.GetClientSecretAsync(application, cancellationToken);
                 if (string.IsNullOrEmpty(secret) && string.Equals(type, ClientTypes.Confidential, StringComparison.OrdinalIgnoreCase))
                 {
-                    yield return new ValidationResult(SR.ID2113));
+                    yield return new ValidationResult(SR.ID2113);
                 }
 
                 // Ensure no client secret was specified if the client is a public application.
                 else if (!string.IsNullOrEmpty(secret) && string.Equals(type, ClientTypes.Public, StringComparison.OrdinalIgnoreCase))
                 {
-                    yield return new ValidationResult(SR.ID2114));
+                    yield return new ValidationResult(SR.ID2114);
                 }
             }
 
@@ -1204,7 +1204,7 @@ namespace OpenIddict.Core
                 // Ensure the address is not null or empty.
                 if (string.IsNullOrEmpty(address))
                 {
-                    yield return new ValidationResult(SR.ID2061));
+                    yield return new ValidationResult(SR.ID2061);
 
                     break;
                 }
@@ -1212,7 +1212,7 @@ namespace OpenIddict.Core
                 // Ensure the address is a valid absolute URL.
                 if (!Uri.TryCreate(address, UriKind.Absolute, out Uri? uri) || !uri.IsWellFormedOriginalString())
                 {
-                    yield return new ValidationResult(SR.ID2062));
+                    yield return new ValidationResult(SR.ID2062);
 
                     break;
                 }
@@ -1220,7 +1220,7 @@ namespace OpenIddict.Core
                 // Ensure the address doesn't contain a fragment.
                 if (!string.IsNullOrEmpty(uri.Fragment))
                 {
-                    yield return new ValidationResult(SR.ID2115));
+                    yield return new ValidationResult(SR.ID2115);
 
                     break;
                 }
@@ -1247,27 +1247,29 @@ namespace OpenIddict.Core
             }
             if (string.IsNullOrEmpty(secret))
             {
-                throw new ArgumentException(SR.ID0216), nameof(secret));
+                throw new ArgumentException(SR.ID0216);
             }
 
             if (await HasClientTypeAsync(application, ClientTypes.Public, cancellationToken))
             {
-                Logger.LogWarning(SR.ID6159));
+                Logger.LogWarning(SR.ID6159);
 
                 return false;
             }
 
-            var value = await Store.GetClientSecretAsync(application, cancellationToken));
+            var value = await Store.GetClientSecretAsync(application, cancellationToken);
             if (string.IsNullOrEmpty(value))
             {
-                Logger.LogError(SR.ID6160), await GetClientIdAsync(application, cancellationToken));
+                Logger.LogError(SR.ID6160);
+                await GetClientIdAsync(application, cancellationToken);
 
                 return false;
             }
 
             if (!await ValidateClientSecretAsync(secret, value, cancellationToken))
             {
-                Logger.LogInformation(SR.ID6161), await GetClientIdAsync(application, cancellationToken));
+                Logger.LogInformation(SR.ID6161);
+                await GetClientIdAsync(application, cancellationToken);
 
                 return false;
             }
@@ -1295,7 +1297,7 @@ namespace OpenIddict.Core
 
             if (string.IsNullOrEmpty(address))
             {
-                throw new ArgumentException(SR.ID0143), nameof(address));
+                throw new ArgumentException(SR.ID0143);
             }
 
             foreach (var uri in await Store.GetRedirectUrisAsync(application, cancellationToken))
@@ -1308,7 +1310,6 @@ namespace OpenIddict.Core
                 }
             }
 
-            Logger.LogInformation(SR.ID6162), address, await GetClientIdAsync(application, cancellationToken));
 
             return false;
         }
@@ -1326,7 +1327,7 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(secret))
             {
-                throw new ArgumentException(SR.ID0216), nameof(secret));
+                throw new ArgumentException(SR.ID0216);
             }
 
             // Note: the PRF, iteration count, salt length and key length currently all match the default values
@@ -1337,11 +1338,11 @@ namespace OpenIddict.Core
 #if SUPPORTS_STATIC_RANDOM_NUMBER_GENERATOR_METHODS
             RandomNumberGenerator.Fill(salt));
 #else
-            using var generator = RandomNumberGenerator.Create());
-            generator.GetBytes(salt));
+            using var generator = RandomNumberGenerator.Create();
+            generator.GetBytes(salt);
 #endif
 
-            var hash = HashSecret(secret, salt, HashAlgorithmName.SHA256, iterations: 10_000, length: 256 / 8));
+            var hash = HashSecret(secret, salt, HashAlgorithmName.SHA256, iterations: 10_000, length: 256 / 8);
 
             return new ValueTask<string>(
 #if SUPPORTS_BASE64_SPAN_CONVERSION
@@ -1349,7 +1350,7 @@ namespace OpenIddict.Core
 #else
                 Convert.ToBase64String(hash.ToArray())
 #endif
-            ));
+            );
 
             // Note: the following logic deliberately uses the same format as CryptoHelper (used in OpenIddict 1.x/2.x),
             // which was itself based on ASP.NET Core Identity's latest hashed password format. This guarantees that
@@ -1358,8 +1359,8 @@ namespace OpenIddict.Core
             static ReadOnlySpan<byte> HashSecret(string secret, ReadOnlySpan<byte> salt,
                 HashAlgorithmName algorithm, int iterations, int length)
             {
-                var key = DeriveKey(secret, salt, algorithm, iterations, length));
-                var payload = new Span<byte>(new byte[13 + salt.Length + key.Length]));
+                var key = DeriveKey(secret, salt, algorithm, iterations, length);
+                var payload = new Span<byte>(new byte[13 + salt.Length + key.Length]);
 
                 // Write the format marker.
                 payload[0] = 0x01;
@@ -1367,18 +1368,18 @@ namespace OpenIddict.Core
                 // Write the hashing algorithm version.
                 BinaryPrimitives.WriteUInt32BigEndian(payload.Slice(1, 4), algorithm switch
                 {
-                    var name when name == HashAlgorithmName.SHA1   => 0,
+                    var name when name == HashAlgorithmName.SHA1 => 0,
                     var name when name == HashAlgorithmName.SHA256 => 1,
                     var name when name == HashAlgorithmName.SHA512 => 2,
 
-                    _ => throw new InvalidOperationException(SR.ID0217))
-                }));
+                    _ => throw new InvalidOperationException(SR.ID0217)
+                });
 
                 // Write the iteration count of the algorithm.
-                BinaryPrimitives.WriteUInt32BigEndian(payload.Slice(5, 8), (uint) iterations));
+                BinaryPrimitives.WriteUInt32BigEndian(payload.Slice(5, 8), (uint)iterations);
 
                 // Write the size of the salt.
-                BinaryPrimitives.WriteUInt32BigEndian(payload.Slice(9, 12), (uint) salt.Length));
+                BinaryPrimitives.WriteUInt32BigEndian(payload.Slice(9, 12), (uint)salt.Length);
 
                 // Write the salt.
                 salt.CopyTo(payload.Slice(13));
@@ -1406,12 +1407,12 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(secret))
             {
-                throw new ArgumentException(SR.ID0216), nameof(secret));
+                throw new ArgumentException(SR.ID0216);
             }
 
             if (string.IsNullOrEmpty(comparand))
             {
-                throw new ArgumentException(SR.ID0218), nameof(comparand));
+                throw new ArgumentException(SR.ID0218);
             }
 
             try
@@ -1421,9 +1422,9 @@ namespace OpenIddict.Core
 
             catch (Exception exception)
             {
-                Logger.LogWarning(exception, SR.ID6163));
+                Logger.LogWarning(exception.Message);
 
-                return new ValueTask<bool>(false));
+                return new ValueTask<bool>(false);
             }
 
             // Note: the following logic deliberately uses the same format as CryptoHelper (used in OpenIddict 1.x/2.x),
@@ -1445,27 +1446,27 @@ namespace OpenIddict.Core
                 }
 
                 // Read the hashing algorithm version.
-                var algorithm = (int) BinaryPrimitives.ReadUInt32BigEndian(payload.Slice(1, 4)) switch
+                var algorithm = (int)BinaryPrimitives.ReadUInt32BigEndian(payload.Slice(1, 4)) switch
                 {
                     0 => HashAlgorithmName.SHA1,
                     1 => HashAlgorithmName.SHA256,
                     2 => HashAlgorithmName.SHA512,
 
-                    _ => throw new InvalidOperationException(SR.ID0217))
+                    _ => throw new InvalidOperationException(SR.ID0217)
                 };
 
                 // Read the iteration count of the algorithm.
-                var iterations = (int) BinaryPrimitives.ReadUInt32BigEndian(payload.Slice(5, 8));
+                var iterations = (int)BinaryPrimitives.ReadUInt32BigEndian(payload.Slice(5, 8));
 
                 // Read the size of the salt and ensure it's more than 128 bits.
-                var saltLength = (int) BinaryPrimitives.ReadUInt32BigEndian(payload.Slice(9, 12));
+                var saltLength = (int)BinaryPrimitives.ReadUInt32BigEndian(payload.Slice(9, 12));
                 if (saltLength < 128 / 8)
                 {
                     return false;
                 }
 
                 // Read the salt.
-                var salt = payload.Slice(13, saltLength));
+                var salt = payload.Slice(13, saltLength);
 
                 // Ensure the derived key length is more than 128 bits.
                 var keyLength = payload.Length - 13 - salt.Length;
@@ -1474,16 +1475,12 @@ namespace OpenIddict.Core
                     return false;
                 }
 
-#if SUPPORTS_TIME_CONSTANT_COMPARISONS
-                return CryptographicOperations.FixedTimeEquals(
-                    left: payload.Slice(13 + salt.Length, keyLength),
-                    right: DeriveKey(secret, salt, algorithm, iterations, keyLength));
-#else
-                return Arrays.ConstantTimeAreEqual(
-                    a: payload.Slice(13 + salt.Length, keyLength).ToArray(),
-                    b: DeriveKey(secret, salt, algorithm, iterations, keyLength));
-#endif
+                var result = Arrays.ConstantTimeAreEqual(
+                     a: payload.Slice(13 + salt.Length, keyLength).ToArray(),
+                     b: DeriveKey(secret, salt, algorithm, iterations, keyLength));
+                return result;
             }
+
         }
 
         [SuppressMessage("Security", "CA5379:Do not use weak key derivation function algorithm",
@@ -1491,184 +1488,169 @@ namespace OpenIddict.Core
         private static byte[] DeriveKey(string secret, ReadOnlySpan<byte> salt,
             HashAlgorithmName algorithm, int iterations, int length)
         {
-#if SUPPORTS_KEY_DERIVATION_WITH_SPECIFIED_HASH_ALGORITHM
-            using var generator = new Rfc2898DeriveBytes(secret, salt.ToArray(), iterations, algorithm));
-            return generator.GetBytes(length));
-#else
-            var generator = new Pkcs5S2ParametersGenerator(algorithm switch
-            {
-                var name when name == HashAlgorithmName.SHA1   => new Sha1Digest(),
-                var name when name == HashAlgorithmName.SHA256 => new Sha256Digest(),
-                var name when name == HashAlgorithmName.SHA512 => new Sha512Digest(),
 
-                _ => throw new InvalidOperationException(SR.ID0217))
-            }));
-
-            generator.Init(PbeParametersGenerator.Pkcs5PasswordToBytes(secret.ToCharArray()), salt.ToArray(), iterations));
-
-            var key = (KeyParameter) generator.GenerateDerivedMacParameters(length * 8));
-            return key.GetKey());
-#endif
+            using var generator = new Rfc2898DeriveBytes(secret, salt.ToArray(), iterations, algorithm);
+            return generator.GetBytes(length);
         }
 
         /// <inheritdoc/>
         ValueTask<long> IOpenIddictApplicationManager.CountAsync(CancellationToken cancellationToken)
-            => CountAsync(cancellationToken));
+            => CountAsync(cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<long> IOpenIddictApplicationManager.CountAsync<TResult>(Func<IQueryable<object>, IQueryable<TResult>> query, CancellationToken cancellationToken)
-            => CountAsync(query, cancellationToken));
+            => CountAsync(query, cancellationToken);
 
         /// <inheritdoc/>
         async ValueTask<object> IOpenIddictApplicationManager.CreateAsync(OpenIddictApplicationDescriptor descriptor, CancellationToken cancellationToken)
-            => await CreateAsync(descriptor, cancellationToken));
+            => await CreateAsync(descriptor, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask IOpenIddictApplicationManager.CreateAsync(object application, CancellationToken cancellationToken)
-            => CreateAsync((TApplication) application, cancellationToken));
+            => CreateAsync((TApplication)application, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask IOpenIddictApplicationManager.CreateAsync(object application, string? secret, CancellationToken cancellationToken)
-            => CreateAsync((TApplication) application, secret, cancellationToken));
+            => CreateAsync((TApplication)application, secret, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask IOpenIddictApplicationManager.DeleteAsync(object application, CancellationToken cancellationToken)
-            => DeleteAsync((TApplication) application, cancellationToken));
+            => DeleteAsync((TApplication)application, cancellationToken);
 
         /// <inheritdoc/>
         async ValueTask<object?> IOpenIddictApplicationManager.FindByClientIdAsync(string identifier, CancellationToken cancellationToken)
-            => await FindByClientIdAsync(identifier, cancellationToken));
+            => await FindByClientIdAsync(identifier, cancellationToken);
 
         /// <inheritdoc/>
         async ValueTask<object?> IOpenIddictApplicationManager.FindByIdAsync(string identifier, CancellationToken cancellationToken)
-            => await FindByIdAsync(identifier, cancellationToken));
+            => await FindByIdAsync(identifier, cancellationToken);
 
         /// <inheritdoc/>
         IAsyncEnumerable<object> IOpenIddictApplicationManager.FindByPostLogoutRedirectUriAsync(string address, CancellationToken cancellationToken)
-            => FindByPostLogoutRedirectUriAsync(address, cancellationToken));
+            => FindByPostLogoutRedirectUriAsync(address, cancellationToken);
 
         /// <inheritdoc/>
         IAsyncEnumerable<object> IOpenIddictApplicationManager.FindByRedirectUriAsync(string address, CancellationToken cancellationToken)
-            => FindByRedirectUriAsync(address, cancellationToken));
+            => FindByRedirectUriAsync(address, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<TResult> IOpenIddictApplicationManager.GetAsync<TResult>(Func<IQueryable<object>, IQueryable<TResult>> query, CancellationToken cancellationToken)
-            => GetAsync(query, cancellationToken));
+            => GetAsync(query, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<TResult> IOpenIddictApplicationManager.GetAsync<TState, TResult>(Func<IQueryable<object>, TState, IQueryable<TResult>> query, TState state, CancellationToken cancellationToken)
-            => GetAsync(query, state, cancellationToken));
+            => GetAsync(query, state, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<string?> IOpenIddictApplicationManager.GetClientIdAsync(object application, CancellationToken cancellationToken)
-            => GetClientIdAsync((TApplication) application, cancellationToken));
+            => GetClientIdAsync((TApplication)application, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<string?> IOpenIddictApplicationManager.GetClientTypeAsync(object application, CancellationToken cancellationToken)
-            => GetClientTypeAsync((TApplication) application, cancellationToken));
+            => GetClientTypeAsync((TApplication)application, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<string?> IOpenIddictApplicationManager.GetConsentTypeAsync(object application, CancellationToken cancellationToken)
-            => GetConsentTypeAsync((TApplication) application, cancellationToken));
+            => GetConsentTypeAsync((TApplication)application, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<string?> IOpenIddictApplicationManager.GetDisplayNameAsync(object application, CancellationToken cancellationToken)
-            => GetDisplayNameAsync((TApplication) application, cancellationToken));
+            => GetDisplayNameAsync((TApplication)application, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<ImmutableDictionary<CultureInfo, string>> IOpenIddictApplicationManager.GetDisplayNamesAsync(object application, CancellationToken cancellationToken)
-            => GetDisplayNamesAsync((TApplication) application, cancellationToken));
+            => GetDisplayNamesAsync((TApplication)application, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<string?> IOpenIddictApplicationManager.GetIdAsync(object application, CancellationToken cancellationToken)
-            => GetIdAsync((TApplication) application, cancellationToken));
+            => GetIdAsync((TApplication)application, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<string?> IOpenIddictApplicationManager.GetLocalizedDisplayNameAsync(object application, CancellationToken cancellationToken)
-            => GetLocalizedDisplayNameAsync((TApplication) application, cancellationToken));
+            => GetLocalizedDisplayNameAsync((TApplication)application, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<string?> IOpenIddictApplicationManager.GetLocalizedDisplayNameAsync(object application, CultureInfo culture, CancellationToken cancellationToken)
-            => GetLocalizedDisplayNameAsync((TApplication) application, culture, cancellationToken));
+            => GetLocalizedDisplayNameAsync((TApplication)application, culture, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<ImmutableArray<string>> IOpenIddictApplicationManager.GetPermissionsAsync(object application, CancellationToken cancellationToken)
-            => GetPermissionsAsync((TApplication) application, cancellationToken));
+            => GetPermissionsAsync((TApplication)application, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<ImmutableArray<string>> IOpenIddictApplicationManager.GetPostLogoutRedirectUrisAsync(object application, CancellationToken cancellationToken)
-            => GetPostLogoutRedirectUrisAsync((TApplication) application, cancellationToken));
+            => GetPostLogoutRedirectUrisAsync((TApplication)application, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<ImmutableDictionary<string, JsonElement>> IOpenIddictApplicationManager.GetPropertiesAsync(object application, CancellationToken cancellationToken)
-            => GetPropertiesAsync((TApplication) application, cancellationToken));
+            => GetPropertiesAsync((TApplication)application, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<ImmutableArray<string>> IOpenIddictApplicationManager.GetRedirectUrisAsync(object application, CancellationToken cancellationToken)
-            => GetRedirectUrisAsync((TApplication) application, cancellationToken));
+            => GetRedirectUrisAsync((TApplication)application, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<ImmutableArray<string>> IOpenIddictApplicationManager.GetRequirementsAsync(object application, CancellationToken cancellationToken)
-            => GetRequirementsAsync((TApplication) application, cancellationToken));
+            => GetRequirementsAsync((TApplication)application, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<bool> IOpenIddictApplicationManager.HasClientTypeAsync(object application, string type, CancellationToken cancellationToken)
-            => HasClientTypeAsync((TApplication) application, type, cancellationToken));
+            => HasClientTypeAsync((TApplication)application, type, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<bool> IOpenIddictApplicationManager.HasConsentTypeAsync(object application, string type, CancellationToken cancellationToken)
-            => HasConsentTypeAsync((TApplication) application, type, cancellationToken));
+            => HasConsentTypeAsync((TApplication)application, type, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<bool> IOpenIddictApplicationManager.HasPermissionAsync(object application, string permission, CancellationToken cancellationToken)
-            => HasPermissionAsync((TApplication) application, permission, cancellationToken));
+            => HasPermissionAsync((TApplication)application, permission, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<bool> IOpenIddictApplicationManager.HasRequirementAsync(object application, string requirement, CancellationToken cancellationToken)
-            => HasRequirementAsync((TApplication) application, requirement, cancellationToken));
+            => HasRequirementAsync((TApplication)application, requirement, cancellationToken);
 
         /// <inheritdoc/>
         IAsyncEnumerable<object> IOpenIddictApplicationManager.ListAsync(int? count, int? offset, CancellationToken cancellationToken)
-            => ListAsync(count, offset, cancellationToken));
+            => ListAsync(count, offset, cancellationToken);
 
         /// <inheritdoc/>
         IAsyncEnumerable<TResult> IOpenIddictApplicationManager.ListAsync<TResult>(Func<IQueryable<object>, IQueryable<TResult>> query, CancellationToken cancellationToken)
-            => ListAsync(query, cancellationToken));
+            => ListAsync(query, cancellationToken);
 
         /// <inheritdoc/>
         IAsyncEnumerable<TResult> IOpenIddictApplicationManager.ListAsync<TState, TResult>(Func<IQueryable<object>, TState, IQueryable<TResult>> query, TState state, CancellationToken cancellationToken)
-            => ListAsync(query, state, cancellationToken));
+            => ListAsync(query, state, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask IOpenIddictApplicationManager.PopulateAsync(OpenIddictApplicationDescriptor descriptor, object application, CancellationToken cancellationToken)
-            => PopulateAsync(descriptor, (TApplication) application, cancellationToken));
+            => PopulateAsync(descriptor, (TApplication)application, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask IOpenIddictApplicationManager.PopulateAsync(object application, OpenIddictApplicationDescriptor descriptor, CancellationToken cancellationToken)
-            => PopulateAsync((TApplication) application, descriptor, cancellationToken));
+            => PopulateAsync((TApplication)application, descriptor, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask IOpenIddictApplicationManager.UpdateAsync(object application, CancellationToken cancellationToken)
-            => UpdateAsync((TApplication) application, cancellationToken));
+            => UpdateAsync((TApplication)application, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask IOpenIddictApplicationManager.UpdateAsync(object application, OpenIddictApplicationDescriptor descriptor, CancellationToken cancellationToken)
-            => UpdateAsync((TApplication) application, descriptor, cancellationToken));
+            => UpdateAsync((TApplication)application, descriptor, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask IOpenIddictApplicationManager.UpdateAsync(object application, string? secret, CancellationToken cancellationToken)
-            => UpdateAsync((TApplication) application, secret, cancellationToken));
+            => UpdateAsync((TApplication)application, secret, cancellationToken);
 
         /// <inheritdoc/>
         IAsyncEnumerable<ValidationResult> IOpenIddictApplicationManager.ValidateAsync(object application, CancellationToken cancellationToken)
-            => ValidateAsync((TApplication) application, cancellationToken));
+            => ValidateAsync((TApplication)application, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<bool> IOpenIddictApplicationManager.ValidateClientSecretAsync(object application, string secret, CancellationToken cancellationToken)
-            => ValidateClientSecretAsync((TApplication) application, secret, cancellationToken));
+            => ValidateClientSecretAsync((TApplication)application, secret, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<bool> IOpenIddictApplicationManager.ValidateRedirectUriAsync(object application, string address, CancellationToken cancellationToken)
-            => ValidateRedirectUriAsync((TApplication) application, address, cancellationToken));
+            => ValidateRedirectUriAsync((TApplication)application, address, cancellationToken);
     }
 }

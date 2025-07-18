@@ -23,6 +23,6 @@ namespace OpenIddict.Core
         /// <returns>An <see cref="IOpenIddictTokenStore{TToken}"/>.</returns>
         public IOpenIddictTokenStore<TToken> Get<TToken>() where TToken : class
             => _provider.GetService<IOpenIddictTokenStore<TToken>>() ??
-                throw new InvalidOperationException(SR.ID0231));
+                throw new InvalidOperationException(SR.ID0231);
     }
 }

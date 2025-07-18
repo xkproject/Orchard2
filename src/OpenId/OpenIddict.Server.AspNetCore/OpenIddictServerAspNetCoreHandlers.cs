@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -97,7 +97,7 @@ namespace OpenIddict.Server.AspNetCore
                 var request = context.Transaction.GetHttpRequest();
                 if (request is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 context.EndpointType =
@@ -115,7 +115,7 @@ namespace OpenIddict.Server.AspNetCore
 
                 if (context.EndpointType != OpenIddictServerEndpointType.Unknown)
                 {
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6053), context.EndpointType);
+                    context.Logger.LogInformation((SR.ID6053), context.EndpointType);
                 }
 
                 return default;
@@ -203,7 +203,7 @@ namespace OpenIddict.Server.AspNetCore
                 var request = context.Transaction.GetHttpRequest();
                 if (request is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 // Don't require that the request host be present if the request is not handled
@@ -217,8 +217,8 @@ namespace OpenIddict.Server.AspNetCore
                 {
                     context.Reject(
                         error: Errors.InvalidRequest,
-                        description: SR.FormatID2081(HeaderNames.Host),
-                        uri: SR.FormatID8000(SR.ID2081));
+                        description: (HeaderNames.Host),
+                        uri: (SR.ID2081));
 
                     return default;
                 }
@@ -228,8 +228,8 @@ namespace OpenIddict.Server.AspNetCore
                 {
                     context.Reject(
                         error: Errors.InvalidRequest,
-                        description: SR.FormatID2082(HeaderNames.Host),
-                        uri: SR.FormatID8000(SR.ID2082));
+                        description: (HeaderNames.Host),
+                        uri: (SR.ID2082));
 
                     return default;
                 }
@@ -271,7 +271,7 @@ namespace OpenIddict.Server.AspNetCore
                 var request = context.Transaction.GetHttpRequest();
                 if (request is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 // Don't require that the host be present if the request is not handled by OpenIddict.
@@ -285,8 +285,8 @@ namespace OpenIddict.Server.AspNetCore
                 {
                     context.Reject(
                         error: Errors.InvalidRequest,
-                        description: SR.GetResourceString(SR.ID2083),
-                        uri: SR.FormatID8000(SR.ID2083));
+                        description: (SR.ID2083),
+                        uri: (SR.ID2083));
 
                     return default;
                 }
@@ -358,7 +358,7 @@ namespace OpenIddict.Server.AspNetCore
                     throw new ArgumentNullException(nameof(context));
                 }
 
-                Debug.Assert(context.Transaction.Response is not null, SR.GetResourceString(SR.ID4007));
+                Debug.Assert(context.Transaction.Response is not null, (SR.ID4007));
 
                 var properties = context.Transaction.GetProperty<AuthenticationProperties>(typeof(AuthenticationProperties).FullName!);
                 if (properties is null)
@@ -379,7 +379,7 @@ namespace OpenIddict.Server.AspNetCore
                         string              value => new OpenIddictParameter(value),
                         string[]            value => new OpenIddictParameter(value),
 
-                        _ => throw new InvalidOperationException(SR.GetResourceString(SR.ID0115))
+                        _ => throw new InvalidOperationException((SR.ID0115))
                     });
                 }
 
@@ -417,7 +417,7 @@ namespace OpenIddict.Server.AspNetCore
                 var request = context.Transaction.GetHttpRequest();
                 if (request is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 if (HttpMethods.IsGet(request.Method))
@@ -427,12 +427,12 @@ namespace OpenIddict.Server.AspNetCore
 
                 else
                 {
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6137), request.Method);
+                    context.Logger.LogInformation((SR.ID6137), request.Method);
 
                     context.Reject(
                         error: Errors.InvalidRequest,
-                        description: SR.GetResourceString(SR.ID2084),
-                        uri: SR.FormatID8000(SR.ID2084));
+                        description: (SR.ID2084),
+                        uri: (SR.ID2084));
 
                     return default;
                 }
@@ -471,7 +471,7 @@ namespace OpenIddict.Server.AspNetCore
                 var request = context.Transaction.GetHttpRequest();
                 if (request is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 if (HttpMethods.IsGet(request.Method))
@@ -484,12 +484,12 @@ namespace OpenIddict.Server.AspNetCore
                     // See http://openid.net/specs/openid-connect-core-1_0.html#FormSerialization
                     if (string.IsNullOrEmpty(request.ContentType))
                     {
-                        context.Logger.LogInformation(SR.GetResourceString(SR.ID6138), HeaderNames.ContentType);
+                        context.Logger.LogInformation((SR.ID6138), HeaderNames.ContentType);
 
                         context.Reject(
                             error: Errors.InvalidRequest,
-                            description: SR.FormatID2081(HeaderNames.ContentType),
-                            uri: SR.FormatID8000(SR.ID2081));
+                            description: (HeaderNames.ContentType),
+                            uri: (SR.ID2081));
 
                         return;
                     }
@@ -497,12 +497,12 @@ namespace OpenIddict.Server.AspNetCore
                     // May have media/type; charset=utf-8, allow partial match.
                     if (!request.ContentType.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase))
                     {
-                        context.Logger.LogInformation(SR.GetResourceString(SR.ID6139), HeaderNames.ContentType, request.ContentType);
+                        context.Logger.LogInformation((SR.ID6139), HeaderNames.ContentType, request.ContentType);
 
                         context.Reject(
                             error: Errors.InvalidRequest,
-                            description: SR.FormatID2082(HeaderNames.ContentType),
-                            uri: SR.FormatID8000(SR.ID2082));
+                            description: (HeaderNames.ContentType),
+                            uri: (SR.ID2082));
 
                         return;
                     }
@@ -512,12 +512,12 @@ namespace OpenIddict.Server.AspNetCore
 
                 else
                 {
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6137), request.Method);
+                    context.Logger.LogInformation((SR.ID6137), request.Method);
 
                     context.Reject(
                         error: Errors.InvalidRequest,
-                        description: SR.GetResourceString(SR.ID2084),
-                        uri: SR.FormatID8000(SR.ID2084));
+                        description: (SR.ID2084),
+                        uri: (SR.ID2084));
 
                     return;
                 }
@@ -554,7 +554,7 @@ namespace OpenIddict.Server.AspNetCore
                 var request = context.Transaction.GetHttpRequest();
                 if (request is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 if (HttpMethods.IsPost(request.Method))
@@ -562,12 +562,12 @@ namespace OpenIddict.Server.AspNetCore
                     // See http://openid.net/specs/openid-connect-core-1_0.html#FormSerialization
                     if (string.IsNullOrEmpty(request.ContentType))
                     {
-                        context.Logger.LogInformation(SR.GetResourceString(SR.ID6138), HeaderNames.ContentType);
+                        context.Logger.LogInformation((SR.ID6138), HeaderNames.ContentType);
 
                         context.Reject(
                             error: Errors.InvalidRequest,
-                            description: SR.FormatID2081(HeaderNames.ContentType),
-                            uri: SR.FormatID8000(SR.ID2081));
+                            description: (HeaderNames.ContentType),
+                            uri: (SR.ID2081));
 
                         return;
                     }
@@ -575,12 +575,12 @@ namespace OpenIddict.Server.AspNetCore
                     // May have media/type; charset=utf-8, allow partial match.
                     if (!request.ContentType.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase))
                     {
-                        context.Logger.LogInformation(SR.GetResourceString(SR.ID6139), HeaderNames.ContentType, request.ContentType);
+                        context.Logger.LogInformation((SR.ID6139), HeaderNames.ContentType, request.ContentType);
 
                         context.Reject(
                             error: Errors.InvalidRequest,
-                            description: SR.FormatID2082(HeaderNames.ContentType),
-                            uri: SR.FormatID8000(SR.ID2082));
+                            description: (HeaderNames.ContentType),
+                            uri: (SR.ID2082));
 
                         return;
                     }
@@ -590,12 +590,12 @@ namespace OpenIddict.Server.AspNetCore
 
                 else
                 {
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6137), request.Method);
+                    context.Logger.LogInformation((SR.ID6137), request.Method);
 
                     context.Reject(
                         error: Errors.InvalidRequest,
-                        description: SR.GetResourceString(SR.ID2084),
-                        uri: SR.FormatID8000(SR.ID2084));
+                        description: (SR.ID2084),
+                        uri: (SR.ID2084));
 
                     return;
                 }
@@ -628,14 +628,14 @@ namespace OpenIddict.Server.AspNetCore
                     throw new ArgumentNullException(nameof(context));
                 }
 
-                Debug.Assert(context.Transaction.Request is not null, SR.GetResourceString(SR.ID4008));
+                Debug.Assert(context.Transaction.Request is not null, (SR.ID4008));
 
                 // This handler only applies to ASP.NET Core requests. If the HTTP context cannot be resolved,
                 // this may indicate that the request was incorrectly processed by another server stack.
                 var request = context.Transaction.GetHttpRequest();
                 if (request is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 string header = request.Headers[HeaderNames.Authorization];
@@ -649,12 +649,12 @@ namespace OpenIddict.Server.AspNetCore
                 if (!string.IsNullOrEmpty(context.Transaction.Request.ClientAssertion) ||
                     !string.IsNullOrEmpty(context.Transaction.Request.ClientSecret))
                 {
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6140));
+                    context.Logger.LogInformation((SR.ID6140));
 
                     context.Reject(
                         error: Errors.InvalidRequest,
-                        description: SR.GetResourceString(SR.ID2087),
-                        uri: SR.FormatID8000(SR.ID2087));
+                        description: (SR.ID2087),
+                        uri: (SR.ID2087));
 
                     return default;
                 }
@@ -669,8 +669,8 @@ namespace OpenIddict.Server.AspNetCore
                     {
                         context.Reject(
                             error: Errors.InvalidRequest,
-                            description: SR.GetResourceString(SR.ID2055),
-                            uri: SR.FormatID8000(SR.ID2055));
+                            description: (SR.ID2055),
+                            uri: (SR.ID2055));
 
                         return default;
                     }
@@ -686,8 +686,8 @@ namespace OpenIddict.Server.AspNetCore
                 {
                     context.Reject(
                         error: Errors.InvalidRequest,
-                        description: SR.GetResourceString(SR.ID2055),
-                        uri: SR.FormatID8000(SR.ID2055));
+                        description: (SR.ID2055),
+                        uri: (SR.ID2055));
 
                     return default;
                 }
@@ -735,10 +735,10 @@ namespace OpenIddict.Server.AspNetCore
                 var request = context.Transaction.GetHttpRequest();
                 if (request is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
-                Debug.Assert(context.Transaction.Request is not null, SR.GetResourceString(SR.ID4008));
+                Debug.Assert(context.Transaction.Request is not null, (SR.ID4008));
 
                 string header = request.Headers[HeaderNames.Authorization];
                 if (string.IsNullOrEmpty(header) || !header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
@@ -817,10 +817,10 @@ namespace OpenIddict.Server.AspNetCore
                 var response = context.Transaction.GetHttpRequest()?.HttpContext.Response;
                 if (response is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
-                Debug.Assert(context.Transaction.Response is not null, SR.GetResourceString(SR.ID4007));
+                Debug.Assert(context.Transaction.Response is not null, (SR.ID4007));
 
                 // When client authentication is made using basic authentication, the authorization server MUST return
                 // a 401 response with a valid WWW-Authenticate header containing the Basic scheme and a non-empty realm.
@@ -874,7 +874,7 @@ namespace OpenIddict.Server.AspNetCore
                 var response = context.Transaction.GetHttpRequest()?.HttpContext.Response;
                 if (response is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 // Prevent the response from being cached.
@@ -921,10 +921,10 @@ namespace OpenIddict.Server.AspNetCore
                 var response = context.Transaction.GetHttpRequest()?.HttpContext.Response;
                 if (response is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
-                Debug.Assert(context.Transaction.Response is not null, SR.GetResourceString(SR.ID4007));
+                Debug.Assert(context.Transaction.Response is not null, (SR.ID4007));
 
                 // When client authentication is made using basic authentication, the authorization server MUST return
                 // a 401 response with a valid WWW-Authenticate header containing the HTTP Basic authentication scheme.
@@ -1035,7 +1035,7 @@ namespace OpenIddict.Server.AspNetCore
                 var response = context.Transaction.GetHttpRequest()?.HttpContext.Response;
                 if (response is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 // If the response doesn't contain a WWW-Authenticate header, don't return an empty response.
@@ -1044,7 +1044,7 @@ namespace OpenIddict.Server.AspNetCore
                     return default;
                 }
 
-                context.Logger.LogInformation(SR.GetResourceString(SR.ID6141), context.Transaction.Response);
+                context.Logger.LogInformation((SR.ID6141), context.Transaction.Response);
                 context.HandleRequest();
 
                 return default;
@@ -1076,17 +1076,17 @@ namespace OpenIddict.Server.AspNetCore
                     throw new ArgumentNullException(nameof(context));
                 }
 
-                Debug.Assert(context.Transaction.Response is not null, SR.GetResourceString(SR.ID4007));
+                Debug.Assert(context.Transaction.Response is not null, (SR.ID4007));
 
                 // This handler only applies to ASP.NET Core requests. If the HTTP context cannot be resolved,
                 // this may indicate that the request was incorrectly processed by another server stack.
                 var response = context.Transaction.GetHttpRequest()?.HttpContext.Response;
                 if (response is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
-                context.Logger.LogInformation(SR.GetResourceString(SR.ID6142), context.Transaction.Response);
+                context.Logger.LogInformation((SR.ID6142), context.Transaction.Response);
 
                 using var stream = new MemoryStream();
                 using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions
@@ -1143,10 +1143,10 @@ namespace OpenIddict.Server.AspNetCore
                 var response = context.Transaction.GetHttpRequest()?.HttpContext.Response;
                 if (response is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
-                Debug.Assert(context.Transaction.Response is not null, SR.GetResourceString(SR.ID4007));
+                Debug.Assert(context.Transaction.Response is not null, (SR.ID4007));
 
                 if (string.IsNullOrEmpty(context.Transaction.Response.Error))
                 {
@@ -1191,10 +1191,10 @@ namespace OpenIddict.Server.AspNetCore
                 var response = context.Transaction.GetHttpRequest()?.HttpContext.Response;
                 if (response is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
-                Debug.Assert(context.Transaction.Response is not null, SR.GetResourceString(SR.ID4007));
+                Debug.Assert(context.Transaction.Response is not null, (SR.ID4007));
 
                 if (string.IsNullOrEmpty(context.Transaction.Response.Error))
                 {
@@ -1250,10 +1250,10 @@ namespace OpenIddict.Server.AspNetCore
                 var response = context.Transaction.GetHttpRequest()?.HttpContext.Response;
                 if (response is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
-                Debug.Assert(context.Transaction.Response is not null, SR.GetResourceString(SR.ID4007));
+                Debug.Assert(context.Transaction.Response is not null, (SR.ID4007));
 
                 if (string.IsNullOrEmpty(context.Transaction.Response.Error))
                 {
@@ -1263,7 +1263,7 @@ namespace OpenIddict.Server.AspNetCore
                 // Don't return the state originally sent by the client application.
                 context.Transaction.Response.State = null;
 
-                context.Logger.LogInformation(SR.GetResourceString(SR.ID6143), context.Transaction.Response);
+                context.Logger.LogInformation((SR.ID6143), context.Transaction.Response);
 
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
@@ -1322,7 +1322,7 @@ namespace OpenIddict.Server.AspNetCore
                     throw new ArgumentNullException(nameof(context));
                 }
 
-                context.Logger.LogInformation(SR.GetResourceString(SR.ID6145));
+                context.Logger.LogInformation((SR.ID6145));
                 context.HandleRequest();
 
                 return default;

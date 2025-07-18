@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -95,7 +95,7 @@ namespace OpenIddict.Validation.AspNetCore
                 var request = context.Transaction.GetHttpRequest();
                 if (request is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 // Only use the current host as the issuer if the
@@ -109,8 +109,8 @@ namespace OpenIddict.Validation.AspNetCore
                 {
                     context.Reject(
                         error: Errors.InvalidRequest,
-                        description: SR.FormatID2081(HeaderNames.Host),
-                        uri: SR.FormatID8000(SR.ID2081));
+                        description: (HeaderNames.Host),
+                        uri: (SR.ID2081));
 
                     return default;
                 }
@@ -120,8 +120,8 @@ namespace OpenIddict.Validation.AspNetCore
                 {
                     context.Reject(
                         error: Errors.InvalidRequest,
-                        description: SR.FormatID2082(HeaderNames.Host),
-                        uri: SR.FormatID8000(SR.ID2082));
+                        description: (HeaderNames.Host),
+                        uri: (SR.ID2082));
 
                     return default;
                 }
@@ -168,7 +168,7 @@ namespace OpenIddict.Validation.AspNetCore
                 var request = context.Transaction.GetHttpRequest();
                 if (request is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 // Resolve the access token from the standard Authorization header.
@@ -222,7 +222,7 @@ namespace OpenIddict.Validation.AspNetCore
                 var request = context.Transaction.GetHttpRequest();
                 if (request is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 if (string.IsNullOrEmpty(request.ContentType) ||
@@ -280,7 +280,7 @@ namespace OpenIddict.Validation.AspNetCore
                 var request = context.Transaction.GetHttpRequest();
                 if (request is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 // Resolve the access token from the standard access_token query parameter.
@@ -360,14 +360,14 @@ namespace OpenIddict.Validation.AspNetCore
                     throw new ArgumentNullException(nameof(context));
                 }
 
-                Debug.Assert(context.Transaction.Response is not null, SR.GetResourceString(SR.ID4007));
+                Debug.Assert(context.Transaction.Response is not null, (SR.ID4007));
 
                 // This handler only applies to ASP.NET Core requests. If the HTTP context cannot be resolved,
                 // this may indicate that the request was incorrectly processed by another server stack.
                 var response = context.Transaction.GetHttpRequest()?.HttpContext.Response;
                 if (response is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 response.StatusCode = context.Transaction.Response.Error switch
@@ -415,7 +415,7 @@ namespace OpenIddict.Validation.AspNetCore
                 var response = context.Transaction.GetHttpRequest()?.HttpContext.Response;
                 if (response is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 // Prevent the response from being cached.
@@ -457,14 +457,14 @@ namespace OpenIddict.Validation.AspNetCore
                     throw new ArgumentNullException(nameof(context));
                 }
 
-                Debug.Assert(context.Transaction.Response is not null, SR.GetResourceString(SR.ID4007));
+                Debug.Assert(context.Transaction.Response is not null, (SR.ID4007));
 
                 // This handler only applies to ASP.NET Core requests. If the HTTP context cannot be resolved,
                 // this may indicate that the request was incorrectly processed by another server stack.
                 var response = context.Transaction.GetHttpRequest()?.HttpContext.Response;
                 if (response is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 var scheme = context.Transaction.Response.Error switch
@@ -567,7 +567,7 @@ namespace OpenIddict.Validation.AspNetCore
                 var response = context.Transaction.GetHttpRequest()?.HttpContext.Response;
                 if (response is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 // If the response doesn't contain a WWW-Authenticate header, don't return an empty response.
@@ -576,7 +576,7 @@ namespace OpenIddict.Validation.AspNetCore
                     return default;
                 }
 
-                context.Logger.LogInformation(SR.GetResourceString(SR.ID6141), context.Transaction.Response);
+                context.Logger.LogInformation((SR.ID6141), context.Transaction.Response);
                 context.HandleRequest();
 
                 return default;
@@ -608,17 +608,17 @@ namespace OpenIddict.Validation.AspNetCore
                     throw new ArgumentNullException(nameof(context));
                 }
 
-                Debug.Assert(context.Transaction.Response is not null, SR.GetResourceString(SR.ID4007));
+                Debug.Assert(context.Transaction.Response is not null, (SR.ID4007));
 
                 // This handler only applies to ASP.NET Core requests. If the HTTP context cannot be resolved,
                 // this may indicate that the request was incorrectly processed by another server stack.
                 var response = context.Transaction.GetHttpRequest()?.HttpContext.Response;
                 if (response is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
-                context.Logger.LogInformation(SR.GetResourceString(SR.ID6142), context.Transaction.Response);
+                context.Logger.LogInformation((SR.ID6142), context.Transaction.Response);
 
                 using var stream = new MemoryStream();
                 using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions

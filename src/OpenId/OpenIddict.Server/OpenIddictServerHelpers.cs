@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -31,7 +31,7 @@ namespace OpenIddict.Server
 
             if (string.IsNullOrEmpty(name))
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0106), nameof(name));
+                throw new ArgumentException((SR.ID0106), nameof(name));
             }
 
             if (transaction.Properties.TryGetValue(name, out var property) && property is TProperty result)
@@ -61,7 +61,7 @@ namespace OpenIddict.Server
 
             if (string.IsNullOrEmpty(name))
             {
-                throw new ArgumentException(SR.GetResourceString(SR.ID0106), nameof(name));
+                throw new ArgumentException((SR.ID0106), nameof(name));
             }
 
             if (value is null)

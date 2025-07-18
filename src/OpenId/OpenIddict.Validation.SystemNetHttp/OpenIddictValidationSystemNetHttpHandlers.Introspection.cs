@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -62,14 +62,14 @@ namespace OpenIddict.Validation.SystemNetHttp
                         throw new ArgumentNullException(nameof(context));
                     }
 
-                    Debug.Assert(context.Request is not null, SR.GetResourceString(SR.ID4008));
+                    Debug.Assert(context.Request is not null, (SR.ID4008));
 
                     // This handler only applies to System.Net.Http requests. If the HTTP request cannot be resolved,
                     // this may indicate that the request was incorrectly processed by another client stack.
                     var request = context.Transaction.GetHttpRequestMessage();
                     if (request is null)
                     {
-                        throw new InvalidOperationException(SR.GetResourceString(SR.ID0173));
+                        throw new InvalidOperationException((SR.ID0173));
                     }
 
                     // If no client identifier was attached to the request, skip the following logic.
@@ -79,7 +79,7 @@ namespace OpenIddict.Validation.SystemNetHttp
                     }
 
                     var configuration = await context.Options.ConfigurationManager.GetConfigurationAsync(default) ??
-                        throw new InvalidOperationException(SR.GetResourceString(SR.ID0140));
+                        throw new InvalidOperationException((SR.ID0140));
 
                     // The OAuth 2.0 specification recommends sending the client credentials using basic authentication.
                     // However, this authentication method is known to have compatibility issues with the way the

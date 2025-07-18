@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -88,7 +88,7 @@ namespace OpenIddict.Server.AspNetCore
                 var response = context.Transaction.GetHttpRequest()?.HttpContext.Response;
                 if (response is null)
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                    throw new InvalidOperationException((SR.ID0114));
                 }
 
                 // Note: this handler only redirects the user agent to the address specified in
@@ -104,7 +104,7 @@ namespace OpenIddict.Server.AspNetCore
                 {
                     response.Redirect(properties.RedirectUri);
 
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6144));
+                    context.Logger.LogInformation((SR.ID6144));
                     context.HandleRequest();
                 }
 

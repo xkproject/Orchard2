@@ -44,7 +44,7 @@ namespace OpenIddict.Core
             Cache = cache;
             Logger = logger;
             Options = options;
-            Store = resolver.Get<TToken>());
+            Store = resolver.Get<TToken>();
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace OpenIddict.Core
         /// whose result returns the number of tokens in the database.
         /// </returns>
         public virtual ValueTask<long> CountAsync(CancellationToken cancellationToken = default)
-            => Store.CountAsync(cancellationToken));
+            => Store.CountAsync(cancellationToken);
 
         /// <summary>
         /// Determines the number of tokens that match the specified query.
@@ -96,7 +96,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(query));
             }
 
-            return Store.CountAsync(query, cancellationToken));
+            return Store.CountAsync(query, cancellationToken);
         }
 
         /// <summary>
@@ -117,50 +117,50 @@ namespace OpenIddict.Core
             // If no status was explicitly specified, assume that the token is valid.
             if (string.IsNullOrEmpty(await Store.GetStatusAsync(token, cancellationToken)))
             {
-                await Store.SetStatusAsync(token, Statuses.Valid, cancellationToken));
+                await Store.SetStatusAsync(token, Statuses.Valid, cancellationToken);
             }
 
             // If a reference identifier was set, obfuscate it.
-            var identifier = await Store.GetReferenceIdAsync(token, cancellationToken));
+            var identifier = await Store.GetReferenceIdAsync(token, cancellationToken);
             if (!string.IsNullOrEmpty(identifier))
             {
-                identifier = await ObfuscateReferenceIdAsync(identifier, cancellationToken));
-                await Store.SetReferenceIdAsync(token, identifier, cancellationToken));
+                identifier = await ObfuscateReferenceIdAsync(identifier, cancellationToken);
+                await Store.SetReferenceIdAsync(token, identifier, cancellationToken);
             }
 
-            var results = await GetValidationResultsAsync(token, cancellationToken));
+            var results = await GetValidationResultsAsync(token, cancellationToken);
             if (results.Any(result => result != ValidationResult.Success))
             {
-                var builder = new StringBuilder());
-                builder.AppendLine(SR.ID0225));
-                builder.AppendLine());
+                var builder = new StringBuilder();
+                builder.AppendLine(SR.ID0225);
+                builder.AppendLine();
 
                 foreach (var result in results)
                 {
-                    builder.AppendLine(result.ErrorMessage));
+                    builder.AppendLine(result.ErrorMessage);
                 }
 
-                throw new OpenIddictExceptions.ValidationException(builder.ToString(), results));
+                throw new OpenIddictExceptions.ValidationException(builder.ToString(), results);
             }
 
-            await Store.CreateAsync(token, cancellationToken));
+            await Store.CreateAsync(token, cancellationToken);
 
             if (!Options.CurrentValue.DisableEntityCaching)
             {
-                await Cache.AddAsync(token, cancellationToken));
+                await Cache.AddAsync(token, cancellationToken);
             }
 
             async Task<ImmutableArray<ValidationResult>> GetValidationResultsAsync(
                 TToken token, CancellationToken cancellationToken)
             {
-                var builder = ImmutableArray.CreateBuilder<ValidationResult>());
+                var builder = ImmutableArray.CreateBuilder<ValidationResult>();
 
                 await foreach (var result in ValidateAsync(token, cancellationToken))
                 {
-                    builder.Add(result));
+                    builder.Add(result);
                 }
 
-                return builder.ToImmutable());
+                return builder.ToImmutable();
             }
         }
 
@@ -180,14 +180,14 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(descriptor));
             }
 
-            var token = await Store.InstantiateAsync(cancellationToken));
+            var token = await Store.InstantiateAsync(cancellationToken);
             if (token is null)
             {
-                throw new InvalidOperationException(SR.ID0226));
+                throw new InvalidOperationException(SR.ID0226);
             }
 
-            await PopulateAsync(token, descriptor, cancellationToken));
-            await CreateAsync(token, cancellationToken));
+            await PopulateAsync(token, descriptor, cancellationToken);
+            await CreateAsync(token, cancellationToken);
 
             return token;
         }
@@ -209,10 +209,10 @@ namespace OpenIddict.Core
 
             if (!Options.CurrentValue.DisableEntityCaching)
             {
-                await Cache.RemoveAsync(token, cancellationToken));
+                await Cache.RemoveAsync(token, cancellationToken);
             }
 
-            await Store.DeleteAsync(token, cancellationToken));
+            await Store.DeleteAsync(token, cancellationToken);
         }
 
         /// <summary>
@@ -228,17 +228,17 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(subject))
             {
-                throw new ArgumentException(SR.ID0198), nameof(subject));
+                throw new ArgumentException(SR.ID0198);
             }
 
             if (string.IsNullOrEmpty(client))
             {
-                throw new ArgumentException(SR.ID0124), nameof(client));
+                throw new ArgumentException(SR.ID0124);
             }
 
             var tokens = Options.CurrentValue.DisableEntityCaching ?
                 Store.FindAsync(subject, client, cancellationToken) :
-                Cache.FindAsync(subject, client, cancellationToken));
+                Cache.FindAsync(subject, client, cancellationToken);
 
             if (Options.CurrentValue.DisableAdditionalFiltering)
             {
@@ -249,7 +249,7 @@ namespace OpenIddict.Core
             // To ensure a case-sensitive comparison is enforced independently of the database/table/query collation
             // used by the store, a second pass using string.Equals(StringComparison.Ordinal) is manually made here.
 
-            return ExecuteAsync(cancellationToken));
+            return ExecuteAsync(cancellationToken);
 
             async IAsyncEnumerable<TToken> ExecuteAsync([EnumeratorCancellation] CancellationToken cancellationToken)
             {
@@ -277,22 +277,22 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(subject))
             {
-                throw new ArgumentException(SR.ID0198), nameof(subject));
+                throw new ArgumentException(SR.ID0198);
             }
 
             if (string.IsNullOrEmpty(client))
             {
-                throw new ArgumentException(SR.ID0124), nameof(client));
+                throw new ArgumentException(SR.ID0124);
             }
 
             if (string.IsNullOrEmpty(status))
             {
-                throw new ArgumentException(SR.ID0199), nameof(status));
+                throw new ArgumentException(SR.ID0199);
             }
 
             var tokens = Options.CurrentValue.DisableEntityCaching ?
                 Store.FindAsync(subject, client, status, cancellationToken) :
-                Cache.FindAsync(subject, client, status, cancellationToken));
+                Cache.FindAsync(subject, client, status, cancellationToken);
 
             if (Options.CurrentValue.DisableAdditionalFiltering)
             {
@@ -303,7 +303,7 @@ namespace OpenIddict.Core
             // To ensure a case-sensitive comparison is enforced independently of the database/table/query collation
             // used by the store, a second pass using string.Equals(StringComparison.Ordinal) is manually made here.
 
-            return ExecuteAsync(cancellationToken));
+            return ExecuteAsync(cancellationToken);
 
             async IAsyncEnumerable<TToken> ExecuteAsync([EnumeratorCancellation] CancellationToken cancellationToken)
             {
@@ -332,27 +332,27 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(subject))
             {
-                throw new ArgumentException(SR.ID0198), nameof(subject));
+                throw new ArgumentException(SR.ID0198);
             }
 
             if (string.IsNullOrEmpty(client))
             {
-                throw new ArgumentException(SR.ID0124), nameof(client));
+                throw new ArgumentException(SR.ID0124);
             }
 
             if (string.IsNullOrEmpty(status))
             {
-                throw new ArgumentException(SR.ID0199), nameof(status));
+                throw new ArgumentException(SR.ID0199);
             }
 
             if (string.IsNullOrEmpty(type))
             {
-                throw new ArgumentException(SR.ID0200), nameof(type));
+                throw new ArgumentException(SR.ID0200);
             }
 
             var tokens = Options.CurrentValue.DisableEntityCaching ?
                 Store.FindAsync(subject, client, status, type, cancellationToken) :
-                Cache.FindAsync(subject, client, status, type, cancellationToken));
+                Cache.FindAsync(subject, client, status, type, cancellationToken);
 
             if (Options.CurrentValue.DisableAdditionalFiltering)
             {
@@ -363,7 +363,7 @@ namespace OpenIddict.Core
             // To ensure a case-sensitive comparison is enforced independently of the database/table/query collation
             // used by the store, a second pass using string.Equals(StringComparison.Ordinal) is manually made here.
 
-            return ExecuteAsync(cancellationToken));
+            return ExecuteAsync(cancellationToken);
 
             async IAsyncEnumerable<TToken> ExecuteAsync([EnumeratorCancellation] CancellationToken cancellationToken)
             {
@@ -388,12 +388,12 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(identifier))
             {
-                throw new ArgumentException(SR.ID0195), nameof(identifier));
+                throw new ArgumentException(SR.ID0195);
             }
 
             var tokens = Options.CurrentValue.DisableEntityCaching ?
                 Store.FindByApplicationIdAsync(identifier, cancellationToken) :
-                Cache.FindByApplicationIdAsync(identifier, cancellationToken));
+                Cache.FindByApplicationIdAsync(identifier, cancellationToken);
 
             if (Options.CurrentValue.DisableAdditionalFiltering)
             {
@@ -404,7 +404,7 @@ namespace OpenIddict.Core
             // To ensure a case-sensitive comparison is enforced independently of the database/table/query collation
             // used by the store, a second pass using string.Equals(StringComparison.Ordinal) is manually made here.
 
-            return ExecuteAsync(cancellationToken));
+            return ExecuteAsync(cancellationToken);
 
             async IAsyncEnumerable<TToken> ExecuteAsync([EnumeratorCancellation] CancellationToken cancellationToken)
             {
@@ -429,12 +429,12 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(identifier))
             {
-                throw new ArgumentException(SR.ID0195), nameof(identifier));
+                throw new ArgumentException(SR.ID0195);
             }
 
             var tokens = Options.CurrentValue.DisableEntityCaching ?
                 Store.FindByAuthorizationIdAsync(identifier, cancellationToken) :
-                Cache.FindByAuthorizationIdAsync(identifier, cancellationToken));
+                Cache.FindByAuthorizationIdAsync(identifier, cancellationToken);
 
             if (Options.CurrentValue.DisableAdditionalFiltering)
             {
@@ -445,7 +445,7 @@ namespace OpenIddict.Core
             // To ensure a case-sensitive comparison is enforced independently of the database/table/query collation
             // used by the store, a second pass using string.Equals(StringComparison.Ordinal) is manually made here.
 
-            return ExecuteAsync(cancellationToken));
+            return ExecuteAsync(cancellationToken);
 
             async IAsyncEnumerable<TToken> ExecuteAsync([EnumeratorCancellation] CancellationToken cancellationToken)
             {
@@ -472,12 +472,12 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(identifier))
             {
-                throw new ArgumentException(SR.ID0195), nameof(identifier));
+                throw new ArgumentException(SR.ID0195);
             }
 
             var token = Options.CurrentValue.DisableEntityCaching ?
                 await Store.FindByIdAsync(identifier, cancellationToken) :
-                await Cache.FindByIdAsync(identifier, cancellationToken));
+                await Cache.FindByIdAsync(identifier, cancellationToken);
 
             if (token is null)
             {
@@ -510,14 +510,14 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(identifier))
             {
-                throw new ArgumentException(SR.ID0195), nameof(identifier));
+                throw new ArgumentException(SR.ID0195);
             }
 
-            identifier = await ObfuscateReferenceIdAsync(identifier, cancellationToken));
+            identifier = await ObfuscateReferenceIdAsync(identifier, cancellationToken);
 
             var token = Options.CurrentValue.DisableEntityCaching ?
                 await Store.FindByReferenceIdAsync(identifier, cancellationToken) :
-                await Cache.FindByReferenceIdAsync(identifier, cancellationToken));
+                await Cache.FindByReferenceIdAsync(identifier, cancellationToken);
 
             if (token is null)
             {
@@ -548,12 +548,12 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(subject))
             {
-                throw new ArgumentException(SR.ID0198), nameof(subject));
+                throw new ArgumentException(SR.ID0198);
             }
 
             var tokens = Options.CurrentValue.DisableEntityCaching ?
                 Store.FindBySubjectAsync(subject, cancellationToken) :
-                Cache.FindBySubjectAsync(subject, cancellationToken));
+                Cache.FindBySubjectAsync(subject, cancellationToken);
 
             if (Options.CurrentValue.DisableAdditionalFiltering)
             {
@@ -564,7 +564,7 @@ namespace OpenIddict.Core
             // To ensure a case-sensitive comparison is enforced independently of the database/table/query collation
             // used by the store, a second pass using string.Equals(StringComparison.Ordinal) is manually made here.
 
-            return ExecuteAsync(cancellationToken));
+            return ExecuteAsync(cancellationToken);
 
             async IAsyncEnumerable<TToken> ExecuteAsync([EnumeratorCancellation] CancellationToken cancellationToken)
             {
@@ -594,7 +594,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(token));
             }
 
-            return Store.GetApplicationIdAsync(token, cancellationToken));
+            return Store.GetApplicationIdAsync(token, cancellationToken);
         }
 
         /// <summary>
@@ -615,7 +615,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(query));
             }
 
-            return GetAsync(static (tokens, query) => query(tokens), query, cancellationToken));
+            return GetAsync(static (tokens, query) => query(tokens), query, cancellationToken);
         }
 
         /// <summary>
@@ -639,7 +639,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(query));
             }
 
-            return Store.GetAsync(query, state, cancellationToken));
+            return Store.GetAsync(query, state, cancellationToken);
         }
 
         /// <summary>
@@ -658,7 +658,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(token));
             }
 
-            return Store.GetAuthorizationIdAsync(token, cancellationToken));
+            return Store.GetAuthorizationIdAsync(token, cancellationToken);
         }
 
         /// <summary>
@@ -677,7 +677,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(token));
             }
 
-            return Store.GetCreationDateAsync(token, cancellationToken));
+            return Store.GetCreationDateAsync(token, cancellationToken);
         }
 
         /// <summary>
@@ -696,7 +696,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(token));
             }
 
-            return Store.GetExpirationDateAsync(token, cancellationToken));
+            return Store.GetExpirationDateAsync(token, cancellationToken);
         }
 
         /// <summary>
@@ -715,7 +715,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(token));
             }
 
-            return Store.GetIdAsync(token, cancellationToken));
+            return Store.GetIdAsync(token, cancellationToken);
         }
 
         /// <summary>
@@ -734,7 +734,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(token));
             }
 
-            return Store.GetPayloadAsync(token, cancellationToken));
+            return Store.GetPayloadAsync(token, cancellationToken);
         }
 
         /// <summary>
@@ -754,7 +754,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(token));
             }
 
-            return Store.GetPropertiesAsync(token, cancellationToken));
+            return Store.GetPropertiesAsync(token, cancellationToken);
         }
 
         /// <summary>
@@ -773,7 +773,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(token));
             }
 
-            return Store.GetRedemptionDateAsync(token, cancellationToken));
+            return Store.GetRedemptionDateAsync(token, cancellationToken);
         }
 
         /// <summary>
@@ -794,7 +794,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(token));
             }
 
-            return Store.GetReferenceIdAsync(token, cancellationToken));
+            return Store.GetReferenceIdAsync(token, cancellationToken);
         }
 
         /// <summary>
@@ -813,7 +813,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(token));
             }
 
-            return Store.GetStatusAsync(token, cancellationToken));
+            return Store.GetStatusAsync(token, cancellationToken);
         }
 
         /// <summary>
@@ -832,7 +832,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(token));
             }
 
-            return Store.GetSubjectAsync(token, cancellationToken));
+            return Store.GetSubjectAsync(token, cancellationToken);
         }
 
         /// <summary>
@@ -851,7 +851,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(token));
             }
 
-            return Store.GetTypeAsync(token, cancellationToken));
+            return Store.GetTypeAsync(token, cancellationToken);
         }
 
         /// <summary>
@@ -870,10 +870,10 @@ namespace OpenIddict.Core
 
             if (string.IsNullOrEmpty(status))
             {
-                throw new ArgumentException(SR.ID0199), nameof(status));
+                throw new ArgumentException(SR.ID0199);
             }
 
-            return string.Equals(await Store.GetStatusAsync(token, cancellationToken), status, StringComparison.OrdinalIgnoreCase));
+            return string.Equals(await Store.GetStatusAsync(token, cancellationToken), status, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -892,10 +892,10 @@ namespace OpenIddict.Core
 
             if (string.IsNullOrEmpty(type))
             {
-                throw new ArgumentException(SR.ID0200), nameof(type));
+                throw new ArgumentException(SR.ID0200);
             }
 
-            return string.Equals(await Store.GetTypeAsync(token, cancellationToken), type, StringComparison.OrdinalIgnoreCase));
+            return string.Equals(await Store.GetTypeAsync(token, cancellationToken), type, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -907,7 +907,7 @@ namespace OpenIddict.Core
         /// <returns>All the elements returned when executing the specified query.</returns>
         public virtual IAsyncEnumerable<TToken> ListAsync(
             int? count = null, int? offset = null, CancellationToken cancellationToken = default)
-            => Store.ListAsync(count, offset, cancellationToken));
+            => Store.ListAsync(count, offset, cancellationToken);
 
         /// <summary>
         /// Executes the specified query and returns all the corresponding elements.
@@ -924,7 +924,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(query));
             }
 
-            return ListAsync(static (tokens, query) => query(tokens), query, cancellationToken));
+            return ListAsync(static (tokens, query) => query(tokens), query, cancellationToken);
         }
 
         /// <summary>
@@ -945,7 +945,7 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(query));
             }
 
-            return Store.ListAsync(query, state, cancellationToken));
+            return Store.ListAsync(query, state, cancellationToken);
         }
 
         /// <summary>
@@ -970,17 +970,17 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(descriptor));
             }
 
-            await Store.SetApplicationIdAsync(token, descriptor.ApplicationId, cancellationToken));
-            await Store.SetAuthorizationIdAsync(token, descriptor.AuthorizationId, cancellationToken));
-            await Store.SetCreationDateAsync(token, descriptor.CreationDate, cancellationToken));
-            await Store.SetExpirationDateAsync(token, descriptor.ExpirationDate, cancellationToken));
-            await Store.SetPayloadAsync(token, descriptor.Payload, cancellationToken));
-            await Store.SetPropertiesAsync(token, descriptor.Properties.ToImmutableDictionary(), cancellationToken));
-            await Store.SetRedemptionDateAsync(token, descriptor.RedemptionDate, cancellationToken));
-            await Store.SetReferenceIdAsync(token, descriptor.ReferenceId, cancellationToken));
-            await Store.SetStatusAsync(token, descriptor.Status, cancellationToken));
-            await Store.SetSubjectAsync(token, descriptor.Subject, cancellationToken));
-            await Store.SetTypeAsync(token, descriptor.Type, cancellationToken));
+            await Store.SetApplicationIdAsync(token, descriptor.ApplicationId, cancellationToken);
+            await Store.SetAuthorizationIdAsync(token, descriptor.AuthorizationId, cancellationToken);
+            await Store.SetCreationDateAsync(token, descriptor.CreationDate, cancellationToken);
+            await Store.SetExpirationDateAsync(token, descriptor.ExpirationDate, cancellationToken);
+            await Store.SetPayloadAsync(token, descriptor.Payload, cancellationToken);
+            await Store.SetPropertiesAsync(token, descriptor.Properties.ToImmutableDictionary(), cancellationToken);
+            await Store.SetRedemptionDateAsync(token, descriptor.RedemptionDate, cancellationToken);
+            await Store.SetReferenceIdAsync(token, descriptor.ReferenceId, cancellationToken);
+            await Store.SetStatusAsync(token, descriptor.Status, cancellationToken);
+            await Store.SetSubjectAsync(token, descriptor.Subject, cancellationToken);
+            await Store.SetTypeAsync(token, descriptor.Type, cancellationToken);
         }
 
         /// <summary>
@@ -1006,21 +1006,21 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(token));
             }
 
-            descriptor.ApplicationId = await Store.GetApplicationIdAsync(token, cancellationToken));
-            descriptor.AuthorizationId = await Store.GetAuthorizationIdAsync(token, cancellationToken));
-            descriptor.CreationDate = await Store.GetCreationDateAsync(token, cancellationToken));
-            descriptor.ExpirationDate = await Store.GetExpirationDateAsync(token, cancellationToken));
-            descriptor.Payload = await Store.GetPayloadAsync(token, cancellationToken));
-            descriptor.RedemptionDate = await Store.GetRedemptionDateAsync(token, cancellationToken));
-            descriptor.ReferenceId = await Store.GetReferenceIdAsync(token, cancellationToken));
-            descriptor.Status = await Store.GetStatusAsync(token, cancellationToken));
-            descriptor.Subject = await Store.GetSubjectAsync(token, cancellationToken));
-            descriptor.Type = await Store.GetTypeAsync(token, cancellationToken));
+            descriptor.ApplicationId = await Store.GetApplicationIdAsync(token, cancellationToken);
+            descriptor.AuthorizationId = await Store.GetAuthorizationIdAsync(token, cancellationToken);
+            descriptor.CreationDate = await Store.GetCreationDateAsync(token, cancellationToken);
+            descriptor.ExpirationDate = await Store.GetExpirationDateAsync(token, cancellationToken);
+            descriptor.Payload = await Store.GetPayloadAsync(token, cancellationToken);
+            descriptor.RedemptionDate = await Store.GetRedemptionDateAsync(token, cancellationToken);
+            descriptor.ReferenceId = await Store.GetReferenceIdAsync(token, cancellationToken);
+            descriptor.Status = await Store.GetStatusAsync(token, cancellationToken);
+            descriptor.Subject = await Store.GetSubjectAsync(token, cancellationToken);
+            descriptor.Type = await Store.GetTypeAsync(token, cancellationToken);
 
-            descriptor.Properties.Clear());
+            descriptor.Properties.Clear();
             foreach (var pair in await Store.GetPropertiesAsync(token, cancellationToken))
             {
-                descriptor.Properties.Add(pair.Key, pair.Value));
+                descriptor.Properties.Add(pair.Key, pair.Value);
             }
         }
 
@@ -1034,7 +1034,7 @@ namespace OpenIddict.Core
         /// A <see cref="ValueTask"/> that can be used to monitor the asynchronous operation.
         /// </returns>
         public virtual ValueTask PruneAsync(DateTimeOffset threshold, CancellationToken cancellationToken = default)
-            => Store.PruneAsync(threshold, cancellationToken));
+            => Store.PruneAsync(threshold, cancellationToken);
         /// <summary>
         /// Tries to redeem a token.
         /// </summary>
@@ -1052,30 +1052,30 @@ namespace OpenIddict.Core
             // the first time the token is redeemed. In this case, attach the current date.
             if (await Store.GetRedemptionDateAsync(token, cancellationToken) is null)
             {
-                await Store.SetRedemptionDateAsync(token, DateTimeOffset.UtcNow, cancellationToken));
+                await Store.SetRedemptionDateAsync(token, DateTimeOffset.UtcNow, cancellationToken);
             }
 
-            await Store.SetStatusAsync(token, Statuses.Redeemed, cancellationToken));
+            await Store.SetStatusAsync(token, Statuses.Redeemed, cancellationToken);
 
             try
             {
-                await UpdateAsync(token, cancellationToken));
+                await UpdateAsync(token, cancellationToken);
 
-                Logger.LogInformation(SR.ID6168), await Store.GetIdAsync(token, cancellationToken));
+                Logger.LogInformation(SR.ID6168);
 
                 return true;
             }
 
             catch (ConcurrencyException exception)
             {
-                Logger.LogDebug(exception, SR.ID6169), await Store.GetIdAsync(token, cancellationToken));
+                Logger.LogDebug(exception.Message);
 
                 return false;
             }
 
             catch (Exception exception)
             {
-                Logger.LogWarning(exception, SR.ID6170), await Store.GetIdAsync(token, cancellationToken));
+                Logger.LogWarning(exception.Message);
 
                 return false;
             }
@@ -1094,27 +1094,24 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(token));
             }
 
-            await Store.SetStatusAsync(token, Statuses.Rejected, cancellationToken));
+            await Store.SetStatusAsync(token, Statuses.Rejected, cancellationToken);
 
             try
             {
-                await UpdateAsync(token, cancellationToken));
+                await UpdateAsync(token, cancellationToken);
 
-                Logger.LogInformation(SR.ID6171), await Store.GetIdAsync(token, cancellationToken));
 
                 return true;
             }
 
             catch (ConcurrencyException exception)
             {
-                Logger.LogDebug(exception, SR.ID6172), await Store.GetIdAsync(token, cancellationToken));
 
                 return false;
             }
 
             catch (Exception exception)
             {
-                Logger.LogWarning(exception, SR.ID6173), await Store.GetIdAsync(token, cancellationToken));
 
                 return false;
             }
@@ -1133,27 +1130,24 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(token));
             }
 
-            await Store.SetStatusAsync(token, Statuses.Revoked, cancellationToken));
+            await Store.SetStatusAsync(token, Statuses.Revoked, cancellationToken);
 
             try
             {
-                await UpdateAsync(token, cancellationToken));
+                await UpdateAsync(token, cancellationToken);
 
-                Logger.LogInformation(SR.ID6174), await Store.GetIdAsync(token, cancellationToken));
 
                 return true;
             }
 
             catch (ConcurrencyException exception)
             {
-                Logger.LogDebug(exception, SR.ID6175), await Store.GetIdAsync(token, cancellationToken));
 
                 return false;
             }
 
             catch (Exception exception)
             {
-                Logger.LogWarning(exception, SR.ID6176), await Store.GetIdAsync(token, cancellationToken));
 
                 return false;
             }
@@ -1174,40 +1168,40 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(token));
             }
 
-            var results = await GetValidationResultsAsync(token, cancellationToken));
+            var results = await GetValidationResultsAsync(token, cancellationToken);
             if (results.Any(result => result != ValidationResult.Success))
             {
-                var builder = new StringBuilder());
-                builder.AppendLine(SR.ID0227));
-                builder.AppendLine());
+                var builder = new StringBuilder();
+                builder.AppendLine(SR.ID0227);
+                builder.AppendLine();
 
                 foreach (var result in results)
                 {
-                    builder.AppendLine(result.ErrorMessage));
+                    builder.AppendLine(result.ErrorMessage);
                 }
 
-                throw new OpenIddictExceptions.ValidationException(builder.ToString(), results));
+                throw new OpenIddictExceptions.ValidationException(builder.ToString(), results);
             }
 
-            await Store.UpdateAsync(token, cancellationToken));
+            await Store.UpdateAsync(token, cancellationToken);
 
             if (!Options.CurrentValue.DisableEntityCaching)
             {
-                await Cache.RemoveAsync(token, cancellationToken));
-                await Cache.AddAsync(token, cancellationToken));
+                await Cache.RemoveAsync(token, cancellationToken);
+                await Cache.AddAsync(token, cancellationToken);
             }
 
             async Task<ImmutableArray<ValidationResult>> GetValidationResultsAsync(
                 TToken token, CancellationToken cancellationToken)
             {
-                var builder = ImmutableArray.CreateBuilder<ValidationResult>());
+                var builder = ImmutableArray.CreateBuilder<ValidationResult>();
 
                 await foreach (var result in ValidateAsync(token, cancellationToken))
                 {
-                    builder.Add(result));
+                    builder.Add(result);
                 }
 
-                return builder.ToImmutable());
+                return builder.ToImmutable();
             }
         }
 
@@ -1234,18 +1228,18 @@ namespace OpenIddict.Core
             }
 
             // Store the original reference identifier for later comparison.
-            var comparand = await Store.GetReferenceIdAsync(token, cancellationToken));
-            await PopulateAsync(token, descriptor, cancellationToken));
+            var comparand = await Store.GetReferenceIdAsync(token, cancellationToken);
+            await PopulateAsync(token, descriptor, cancellationToken);
 
             // If the reference identifier was updated, re-obfuscate it before persisting the changes.
-            var identifier = await Store.GetReferenceIdAsync(token, cancellationToken));
+            var identifier = await Store.GetReferenceIdAsync(token, cancellationToken);
             if (!string.IsNullOrEmpty(identifier) && !string.Equals(identifier, comparand, StringComparison.Ordinal))
             {
-                identifier = await ObfuscateReferenceIdAsync(identifier, cancellationToken));
-                await Store.SetReferenceIdAsync(token, identifier, cancellationToken));
+                identifier = await ObfuscateReferenceIdAsync(identifier, cancellationToken);
+                await Store.SetReferenceIdAsync(token, identifier, cancellationToken);
             }
 
-            await UpdateAsync(token, cancellationToken));
+            await UpdateAsync(token, cancellationToken);
         }
 
         /// <summary>
@@ -1264,31 +1258,31 @@ namespace OpenIddict.Core
 
             // If a reference identifier was associated with the token,
             // ensure it's not already used for a different token.
-            var identifier = await Store.GetReferenceIdAsync(token, cancellationToken));
+            var identifier = await Store.GetReferenceIdAsync(token, cancellationToken);
             if (!string.IsNullOrEmpty(identifier))
             {
                 // Note: depending on the database/table/query collation used by the store, a reference token
                 // whose identifier doesn't exactly match the specified value may be returned (e.g because
                 // the casing is different). To avoid issues when the reference identifier is part of an index
                 // using the same collation, an error is added even if the two identifiers don't exactly match.
-                var other = await Store.FindByReferenceIdAsync(identifier, cancellationToken));
+                var other = await Store.FindByReferenceIdAsync(identifier, cancellationToken);
                 if (other is not null && !string.Equals(
                     await Store.GetIdAsync(other, cancellationToken),
                     await Store.GetIdAsync(token, cancellationToken), StringComparison.Ordinal))
                 {
-                    yield return new ValidationResult(SR.ID2085));
+                    yield return new ValidationResult(SR.ID2085);
                 }
             }
 
-            var type = await Store.GetTypeAsync(token, cancellationToken));
+            var type = await Store.GetTypeAsync(token, cancellationToken);
             if (string.IsNullOrEmpty(type))
             {
-                yield return new ValidationResult(SR.ID2086));
+                yield return new ValidationResult(SR.ID2086);
             }
 
             if (string.IsNullOrEmpty(await Store.GetStatusAsync(token, cancellationToken)))
             {
-                yield return new ValidationResult(SR.ID2038));
+                yield return new ValidationResult(SR.ID2038);
             }
         }
 
@@ -1305,177 +1299,177 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(identifier))
             {
-                throw new ArgumentException(SR.ID0195), nameof(identifier));
+                throw new ArgumentException(SR.ID0195);
             }
 
             // Compute the digest of the generated identifier and use it as the hashed identifier of the reference token.
             // Doing that prevents token identifiers stolen from the database from being used as valid reference tokens.
-            using var algorithm = SHA256.Create());
+            using var algorithm = SHA256.Create();
             return new ValueTask<string>(Convert.ToBase64String(algorithm.ComputeHash(Encoding.UTF8.GetBytes(identifier))));
         }
 
         /// <inheritdoc/>
         ValueTask<long> IOpenIddictTokenManager.CountAsync(CancellationToken cancellationToken)
-            => CountAsync(cancellationToken));
+            => CountAsync(cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<long> IOpenIddictTokenManager.CountAsync<TResult>(Func<IQueryable<object>, IQueryable<TResult>> query, CancellationToken cancellationToken)
-            => CountAsync(query, cancellationToken));
+            => CountAsync(query, cancellationToken);
 
         /// <inheritdoc/>
         async ValueTask<object> IOpenIddictTokenManager.CreateAsync(OpenIddictTokenDescriptor descriptor, CancellationToken cancellationToken)
-            => await CreateAsync(descriptor, cancellationToken));
+            => await CreateAsync(descriptor, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask IOpenIddictTokenManager.CreateAsync(object token, CancellationToken cancellationToken)
-            => CreateAsync((TToken) token, cancellationToken));
+            => CreateAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask IOpenIddictTokenManager.DeleteAsync(object token, CancellationToken cancellationToken)
-            => DeleteAsync((TToken) token, cancellationToken));
+            => DeleteAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         IAsyncEnumerable<object> IOpenIddictTokenManager.FindAsync(string subject, string client, CancellationToken cancellationToken)
-            => FindAsync(subject, client, cancellationToken));
+            => FindAsync(subject, client, cancellationToken);
 
         /// <inheritdoc/>
         IAsyncEnumerable<object> IOpenIddictTokenManager.FindAsync(string subject, string client, string status, CancellationToken cancellationToken)
-            => FindAsync(subject, client, status, cancellationToken));
+            => FindAsync(subject, client, status, cancellationToken);
 
         /// <inheritdoc/>
         IAsyncEnumerable<object> IOpenIddictTokenManager.FindAsync(string subject, string client, string status, string type, CancellationToken cancellationToken)
-            => FindAsync(subject, client, status, type, cancellationToken));
+            => FindAsync(subject, client, status, type, cancellationToken);
 
         /// <inheritdoc/>
         IAsyncEnumerable<object> IOpenIddictTokenManager.FindByApplicationIdAsync(string identifier, CancellationToken cancellationToken)
-            => FindByApplicationIdAsync(identifier, cancellationToken));
+            => FindByApplicationIdAsync(identifier, cancellationToken);
 
         /// <inheritdoc/>
         IAsyncEnumerable<object> IOpenIddictTokenManager.FindByAuthorizationIdAsync(string identifier, CancellationToken cancellationToken)
-            => FindByAuthorizationIdAsync(identifier, cancellationToken));
+            => FindByAuthorizationIdAsync(identifier, cancellationToken);
 
         /// <inheritdoc/>
         async ValueTask<object?> IOpenIddictTokenManager.FindByIdAsync(string identifier, CancellationToken cancellationToken)
-            => await FindByIdAsync(identifier, cancellationToken));
+            => await FindByIdAsync(identifier, cancellationToken);
 
         /// <inheritdoc/>
         async ValueTask<object?> IOpenIddictTokenManager.FindByReferenceIdAsync(string identifier, CancellationToken cancellationToken)
-            => await FindByReferenceIdAsync(identifier, cancellationToken));
+            => await FindByReferenceIdAsync(identifier, cancellationToken);
 
         /// <inheritdoc/>
         IAsyncEnumerable<object> IOpenIddictTokenManager.FindBySubjectAsync(string subject, CancellationToken cancellationToken)
-            => FindBySubjectAsync(subject, cancellationToken));
+            => FindBySubjectAsync(subject, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<string?> IOpenIddictTokenManager.GetApplicationIdAsync(object token, CancellationToken cancellationToken)
-            => GetApplicationIdAsync((TToken) token, cancellationToken));
+            => GetApplicationIdAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<TResult> IOpenIddictTokenManager.GetAsync<TResult>(Func<IQueryable<object>, IQueryable<TResult>> query, CancellationToken cancellationToken)
-            => GetAsync(query, cancellationToken));
+            => GetAsync(query, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<TResult> IOpenIddictTokenManager.GetAsync<TState, TResult>(Func<IQueryable<object>, TState, IQueryable<TResult>> query, TState state, CancellationToken cancellationToken)
-            => GetAsync(query, state, cancellationToken));
+            => GetAsync(query, state, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<string?> IOpenIddictTokenManager.GetAuthorizationIdAsync(object token, CancellationToken cancellationToken)
-            => GetAuthorizationIdAsync((TToken) token, cancellationToken));
+            => GetAuthorizationIdAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<DateTimeOffset?> IOpenIddictTokenManager.GetCreationDateAsync(object token, CancellationToken cancellationToken)
-            => GetCreationDateAsync((TToken) token, cancellationToken));
+            => GetCreationDateAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<DateTimeOffset?> IOpenIddictTokenManager.GetExpirationDateAsync(object token, CancellationToken cancellationToken)
-            => GetExpirationDateAsync((TToken) token, cancellationToken));
+            => GetExpirationDateAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<string?> IOpenIddictTokenManager.GetIdAsync(object token, CancellationToken cancellationToken)
-            => GetIdAsync((TToken) token, cancellationToken));
+            => GetIdAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<string?> IOpenIddictTokenManager.GetPayloadAsync(object token, CancellationToken cancellationToken)
-            => GetPayloadAsync((TToken) token, cancellationToken));
+            => GetPayloadAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<ImmutableDictionary<string, JsonElement>> IOpenIddictTokenManager.GetPropertiesAsync(object token, CancellationToken cancellationToken)
-            => GetPropertiesAsync((TToken) token, cancellationToken));
+            => GetPropertiesAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<DateTimeOffset?> IOpenIddictTokenManager.GetRedemptionDateAsync(object token, CancellationToken cancellationToken)
-            => GetRedemptionDateAsync((TToken) token, cancellationToken));
+            => GetRedemptionDateAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<string?> IOpenIddictTokenManager.GetReferenceIdAsync(object token, CancellationToken cancellationToken)
-            => GetReferenceIdAsync((TToken) token, cancellationToken));
+            => GetReferenceIdAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<string?> IOpenIddictTokenManager.GetStatusAsync(object token, CancellationToken cancellationToken)
-            => GetStatusAsync((TToken) token, cancellationToken));
+            => GetStatusAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<string?> IOpenIddictTokenManager.GetSubjectAsync(object token, CancellationToken cancellationToken)
-            => GetSubjectAsync((TToken) token, cancellationToken));
+            => GetSubjectAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<string?> IOpenIddictTokenManager.GetTypeAsync(object token, CancellationToken cancellationToken)
-            => GetTypeAsync((TToken) token, cancellationToken));
+            => GetTypeAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<bool> IOpenIddictTokenManager.HasStatusAsync(object token, string status, CancellationToken cancellationToken)
-            => HasStatusAsync((TToken) token, status, cancellationToken));
+            => HasStatusAsync((TToken) token, status, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<bool> IOpenIddictTokenManager.HasTypeAsync(object token, string type, CancellationToken cancellationToken)
-            => HasTypeAsync((TToken) token, type, cancellationToken));
+            => HasTypeAsync((TToken) token, type, cancellationToken);
 
         /// <inheritdoc/>
         IAsyncEnumerable<object> IOpenIddictTokenManager.ListAsync(int? count, int? offset, CancellationToken cancellationToken)
-            => ListAsync(count, offset, cancellationToken));
+            => ListAsync(count, offset, cancellationToken);
 
         /// <inheritdoc/>
         IAsyncEnumerable<TResult> IOpenIddictTokenManager.ListAsync<TResult>(Func<IQueryable<object>, IQueryable<TResult>> query, CancellationToken cancellationToken)
-            => ListAsync(query, cancellationToken));
+            => ListAsync(query, cancellationToken);
 
         /// <inheritdoc/>
         IAsyncEnumerable<TResult> IOpenIddictTokenManager.ListAsync<TState, TResult>(Func<IQueryable<object>, TState, IQueryable<TResult>> query, TState state, CancellationToken cancellationToken)
-            => ListAsync(query, state, cancellationToken));
+            => ListAsync(query, state, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask IOpenIddictTokenManager.PopulateAsync(OpenIddictTokenDescriptor descriptor, object token, CancellationToken cancellationToken)
-            => PopulateAsync(descriptor, (TToken) token, cancellationToken));
+            => PopulateAsync(descriptor, (TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask IOpenIddictTokenManager.PopulateAsync(object token, OpenIddictTokenDescriptor descriptor, CancellationToken cancellationToken)
-            => PopulateAsync((TToken) token, descriptor, cancellationToken));
+            => PopulateAsync((TToken) token, descriptor, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask IOpenIddictTokenManager.PruneAsync(DateTimeOffset threshold, CancellationToken cancellationToken)
-            => PruneAsync(threshold, cancellationToken));
+            => PruneAsync(threshold, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<bool> IOpenIddictTokenManager.TryRedeemAsync(object token, CancellationToken cancellationToken)
-            => TryRedeemAsync((TToken) token, cancellationToken));
+            => TryRedeemAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<bool> IOpenIddictTokenManager.TryRejectAsync(object token, CancellationToken cancellationToken)
-            => TryRejectAsync((TToken) token, cancellationToken));
+            => TryRejectAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask<bool> IOpenIddictTokenManager.TryRevokeAsync(object token, CancellationToken cancellationToken)
-            => TryRevokeAsync((TToken) token, cancellationToken));
+            => TryRevokeAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask IOpenIddictTokenManager.UpdateAsync(object token, CancellationToken cancellationToken)
-            => UpdateAsync((TToken) token, cancellationToken));
+            => UpdateAsync((TToken) token, cancellationToken);
 
         /// <inheritdoc/>
         ValueTask IOpenIddictTokenManager.UpdateAsync(object token, OpenIddictTokenDescriptor descriptor, CancellationToken cancellationToken)
-            => UpdateAsync((TToken) token, descriptor, cancellationToken));
+            => UpdateAsync((TToken) token, descriptor, cancellationToken);
 
         /// <inheritdoc/>
         IAsyncEnumerable<ValidationResult> IOpenIddictTokenManager.ValidateAsync(object token, CancellationToken cancellationToken)
-            => ValidateAsync((TToken) token, cancellationToken));
+            => ValidateAsync((TToken) token, cancellationToken);
     }
 }

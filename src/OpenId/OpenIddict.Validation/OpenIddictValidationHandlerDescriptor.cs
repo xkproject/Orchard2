@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -86,7 +86,7 @@ namespace OpenIddict.Validation
 
                 if (!typeof(IOpenIddictValidationHandlerFilter<>).MakeGenericType(typeof(TContext)).IsAssignableFrom(type))
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0104));
+                    throw new InvalidOperationException((SR.ID0104));
                 }
 
                 _filters.Add(type);
@@ -118,7 +118,7 @@ namespace OpenIddict.Validation
 
                 if (descriptor.ContextType != typeof(TContext))
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0284));
+                    throw new InvalidOperationException((SR.ID0284));
                 }
 
                 _descriptor = descriptor.ServiceDescriptor;
@@ -145,7 +145,7 @@ namespace OpenIddict.Validation
                 var type = descriptor.ServiceType;
                 if (!typeof(IOpenIddictValidationHandler<>).MakeGenericType(typeof(TContext)).IsAssignableFrom(type))
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0104));
+                    throw new InvalidOperationException((SR.ID0104));
                 }
 
                 _descriptor = descriptor;
@@ -279,7 +279,7 @@ namespace OpenIddict.Validation
                 ContextType = typeof(TContext),
                 FilterTypes = _filters.ToImmutableArray(),
                 Order = _order,
-                ServiceDescriptor = _descriptor ?? throw new InvalidOperationException(SR.GetResourceString(SR.ID0105)),
+                ServiceDescriptor = _descriptor ?? throw new InvalidOperationException((SR.ID0105)),
                 Type = _type
             };
         }

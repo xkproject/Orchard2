@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -68,7 +68,7 @@ namespace OpenIddict.Server.AspNetCore
             {
                 private readonly IDistributedCache _cache;
 
-                public RestoreCachedRequestParameters() => throw new InvalidOperationException(SR.GetResourceString(SR.ID0116));
+                public RestoreCachedRequestParameters() => throw new InvalidOperationException((SR.ID0116));
 
                 public RestoreCachedRequestParameters(IDistributedCache cache)
                     => _cache = cache;
@@ -93,7 +93,7 @@ namespace OpenIddict.Server.AspNetCore
                         throw new ArgumentNullException(nameof(context));
                     }
 
-                    Debug.Assert(context.Request is not null, SR.GetResourceString(SR.ID4008));
+                    Debug.Assert(context.Request is not null, (SR.ID4008));
 
                     // If a request_id parameter can be found in the logout request,
                     // restore the complete logout request from the distributed cache.
@@ -108,12 +108,12 @@ namespace OpenIddict.Server.AspNetCore
                     var token = await _cache.GetStringAsync(Cache.LogoutRequest + context.Request.RequestId);
                     if (token is null || !context.Options.JsonWebTokenHandler.CanReadToken(token))
                     {
-                        context.Logger.LogInformation(SR.GetResourceString(SR.ID6150), Parameters.RequestId);
+                        context.Logger.LogInformation((SR.ID6150), Parameters.RequestId);
 
                         context.Reject(
                             error: Errors.InvalidRequest,
-                            description: SR.FormatID2052(Parameters.RequestId),
-                            uri: SR.FormatID8000(SR.ID2052));
+                            description: (Parameters.RequestId),
+                            uri: (SR.ID2052));
 
                         return;
                     }
@@ -126,12 +126,12 @@ namespace OpenIddict.Server.AspNetCore
                     var result = context.Options.JsonWebTokenHandler.ValidateToken(token, parameters);
                     if (!result.IsValid)
                     {
-                        context.Logger.LogInformation(SR.GetResourceString(SR.ID6150), Parameters.RequestId);
+                        context.Logger.LogInformation((SR.ID6150), Parameters.RequestId);
 
                         context.Reject(
                             error: Errors.InvalidRequest,
-                            description: SR.FormatID2052(Parameters.RequestId),
-                            uri: SR.FormatID8000(SR.ID2052));
+                            description: (Parameters.RequestId),
+                            uri: (SR.ID2052));
 
                         return;
                     }
@@ -140,7 +140,7 @@ namespace OpenIddict.Server.AspNetCore
                         Base64UrlEncoder.Decode(((JsonWebToken) result.SecurityToken).InnerToken.EncodedPayload));
                     if (document.RootElement.ValueKind != JsonValueKind.Object)
                     {
-                        throw new InvalidOperationException(SR.GetResourceString(SR.ID0118));
+                        throw new InvalidOperationException((SR.ID0118));
                     }
 
                     // Restore the authorization request parameters from the serialized payload.
@@ -166,7 +166,7 @@ namespace OpenIddict.Server.AspNetCore
                 private readonly IDistributedCache _cache;
                 private readonly IOptionsMonitor<OpenIddictServerAspNetCoreOptions> _options;
 
-                public CacheRequestParameters() => throw new InvalidOperationException(SR.GetResourceString(SR.ID0116));
+                public CacheRequestParameters() => throw new InvalidOperationException((SR.ID0116));
 
                 public CacheRequestParameters(
                     IDistributedCache cache,
@@ -196,14 +196,14 @@ namespace OpenIddict.Server.AspNetCore
                         throw new ArgumentNullException(nameof(context));
                     }
 
-                    Debug.Assert(context.Request is not null, SR.GetResourceString(SR.ID4008));
+                    Debug.Assert(context.Request is not null, (SR.ID4008));
 
                     // This handler only applies to ASP.NET Core requests. If the HTTP context cannot be resolved,
                     // this may indicate that the request was incorrectly processed by another server stack.
                     var request = context.Transaction.GetHttpRequest();
                     if (request is null)
                     {
-                        throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                        throw new InvalidOperationException((SR.ID0114));
                     }
 
                     // Don't cache the request if the request doesn't include any parameter.
@@ -266,7 +266,7 @@ namespace OpenIddict.Server.AspNetCore
             {
                 private readonly IDistributedCache _cache;
 
-                public RemoveCachedRequest() => throw new InvalidOperationException(SR.GetResourceString(SR.ID0116));
+                public RemoveCachedRequest() => throw new InvalidOperationException((SR.ID0116));
 
                 public RemoveCachedRequest(IDistributedCache cache)
                     => _cache = cache;
@@ -336,7 +336,7 @@ namespace OpenIddict.Server.AspNetCore
                     var response = context.Transaction.GetHttpRequest()?.HttpContext.Response;
                     if (response is null)
                     {
-                        throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                        throw new InvalidOperationException((SR.ID0114));
                     }
 
                     if (string.IsNullOrEmpty(context.PostLogoutRedirectUri))
@@ -344,7 +344,7 @@ namespace OpenIddict.Server.AspNetCore
                         return default;
                     }
 
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6151), context.PostLogoutRedirectUri, response);
+                    context.Logger.LogInformation((SR.ID6151), context.PostLogoutRedirectUri, response);
 
                     // Note: while initially not allowed by the core OAuth 2.0 specification, multiple parameters
                     // with the same name are used by derived drafts like the OAuth 2.0 token exchange specification.
@@ -409,7 +409,7 @@ namespace OpenIddict.Server.AspNetCore
                     var response = context.Transaction.GetHttpRequest()?.HttpContext.Response;
                     if (response is null)
                     {
-                        throw new InvalidOperationException(SR.GetResourceString(SR.ID0114));
+                        throw new InvalidOperationException((SR.ID0114));
                     }
 
                     // Note: this handler only executes if no post_logout_redirect_uri was specified
@@ -425,7 +425,7 @@ namespace OpenIddict.Server.AspNetCore
                     {
                         response.Redirect(properties.RedirectUri);
 
-                        context.Logger.LogInformation(SR.GetResourceString(SR.ID6144));
+                        context.Logger.LogInformation((SR.ID6144));
                         context.HandleRequest();
                     }
 

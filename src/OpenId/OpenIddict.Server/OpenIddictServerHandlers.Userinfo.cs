@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -102,10 +102,10 @@ namespace OpenIddict.Server
 
                     if (notification.Request is null)
                     {
-                        throw new InvalidOperationException(SR.GetResourceString(SR.ID0053));
+                        throw new InvalidOperationException((SR.ID0053));
                     }
 
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6129), notification.Request);
+                    context.Logger.LogInformation((SR.ID6129), notification.Request);
                 }
             }
 
@@ -166,7 +166,7 @@ namespace OpenIddict.Server
                         return;
                     }
 
-                    context.Logger.LogInformation(SR.GetResourceString(SR.ID6130));
+                    context.Logger.LogInformation((SR.ID6130));
                 }
             }
 
@@ -306,7 +306,7 @@ namespace OpenIddict.Server
                         return;
                     }
 
-                    throw new InvalidOperationException(SR.GetResourceString(SR.ID0054));
+                    throw new InvalidOperationException((SR.ID0054));
                 }
             }
 
@@ -335,12 +335,12 @@ namespace OpenIddict.Server
 
                     if (string.IsNullOrEmpty(context.Request.AccessToken))
                     {
-                        context.Logger.LogInformation(SR.GetResourceString(SR.ID6131), Parameters.AccessToken);
+                        context.Logger.LogInformation((SR.ID6131), Parameters.AccessToken);
 
                         context.Reject(
                             error: Errors.MissingToken,
-                            description: SR.FormatID2029(Parameters.AccessToken),
-                            uri: SR.FormatID8000(SR.ID2029));
+                            description: (Parameters.AccessToken),
+                            uri: (SR.ID2029));
 
                         return default;
                     }
@@ -436,7 +436,7 @@ namespace OpenIddict.Server
 
                     var notification = context.Transaction.GetProperty<ValidateUserinfoRequestContext>(
                         typeof(ValidateUserinfoRequestContext).FullName!) ??
-                        throw new InvalidOperationException(SR.GetResourceString(SR.ID0007));
+                        throw new InvalidOperationException((SR.ID0007));
 
                     context.Principal ??= notification.Principal;
 
@@ -467,7 +467,7 @@ namespace OpenIddict.Server
                         throw new ArgumentNullException(nameof(context));
                     }
 
-                    Debug.Assert(context.Principal is { Identity: ClaimsIdentity }, SR.GetResourceString(SR.ID4006));
+                    Debug.Assert(context.Principal is { Identity: ClaimsIdentity }, (SR.ID4006));
 
                     // Note: when receiving an access token, its audiences list cannot be used for the "aud" claim
                     // as the client application is not the intented audience but only an authorized presenter.
@@ -501,7 +501,7 @@ namespace OpenIddict.Server
                         throw new ArgumentNullException(nameof(context));
                     }
 
-                    Debug.Assert(context.Principal is { Identity: ClaimsIdentity }, SR.GetResourceString(SR.ID4006));
+                    Debug.Assert(context.Principal is { Identity: ClaimsIdentity }, (SR.ID4006));
 
                     context.Subject = context.Principal.GetClaim(Claims.Subject);
 

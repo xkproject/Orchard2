@@ -35,11 +35,11 @@ namespace OpenIddict.Core
         {
             _cache = new MemoryCache(new MemoryCacheOptions
             {
-                SizeLimit = options.CurrentValue.EntityCacheLimit
-            }));
+               
+            });
 
-            _signals = new ConcurrentDictionary<string, CancellationTokenSource>(StringComparer.Ordinal));
-            _store = resolver.Get<TAuthorization>());
+            _signals = new ConcurrentDictionary<string, CancellationTokenSource>(StringComparer.Ordinal);
+            _store = resolver.Get<TAuthorization>();
         }
 
         /// <inheritdoc/>
@@ -55,7 +55,7 @@ namespace OpenIddict.Core
                 Method = nameof(FindAsync),
                 Subject = await _store.GetSubjectAsync(authorization, cancellationToken),
                 Client = await _store.GetApplicationIdAsync(authorization, cancellationToken)
-            }));
+            });
 
             _cache.Remove(new
             {
@@ -63,7 +63,7 @@ namespace OpenIddict.Core
                 Subject = await _store.GetSubjectAsync(authorization, cancellationToken),
                 Client = await _store.GetApplicationIdAsync(authorization, cancellationToken),
                 Status = await _store.GetStatusAsync(authorization, cancellationToken)
-            }));
+            });
 
             _cache.Remove(new
             {
@@ -72,31 +72,31 @@ namespace OpenIddict.Core
                 Client = await _store.GetApplicationIdAsync(authorization, cancellationToken),
                 Status = await _store.GetStatusAsync(authorization, cancellationToken),
                 Type = await _store.GetTypeAsync(authorization, cancellationToken)
-            }));
+            });
 
             _cache.Remove(new
             {
                 Method = nameof(FindByApplicationIdAsync),
                 Identifier = await _store.GetApplicationIdAsync(authorization, cancellationToken)
-            }));
+            });
 
             _cache.Remove(new
             {
                 Method = nameof(FindByIdAsync),
                 Identifier = await _store.GetIdAsync(authorization, cancellationToken)
-            }));
+            });
 
             _cache.Remove(new
             {
                 Method = nameof(FindBySubjectAsync),
                 Subject = await _store.GetSubjectAsync(authorization, cancellationToken)
-            }));
+            });
 
             await CreateEntryAsync(new
             {
                 Method = nameof(FindByIdAsync),
                 Identifier = await _store.GetIdAsync(authorization, cancellationToken)
-            }, authorization, cancellationToken));
+            }, authorization, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -104,10 +104,10 @@ namespace OpenIddict.Core
         {
             foreach (var signal in _signals)
             {
-                signal.Value.Dispose());
+                signal.Value.Dispose();
             }
 
-            _cache.Dispose());
+            _cache.Dispose();
         }
 
         /// <inheritdoc/>
@@ -115,15 +115,15 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(subject))
             {
-                throw new ArgumentException(SR.ID0198), nameof(subject));
+                throw new ArgumentException(SR.ID0198);
             }
 
             if (string.IsNullOrEmpty(client))
             {
-                throw new ArgumentException(SR.ID0124), nameof(client));
+                throw new ArgumentException(SR.ID0124);
             }
 
-            return ExecuteAsync(cancellationToken));
+            return ExecuteAsync(cancellationToken);
 
             async IAsyncEnumerable<TAuthorization> ExecuteAsync([EnumeratorCancellation] CancellationToken cancellationToken)
             {
@@ -136,18 +136,18 @@ namespace OpenIddict.Core
 
                 if (!_cache.TryGetValue(parameters, out ImmutableArray<TAuthorization> authorizations))
                 {
-                    var builder = ImmutableArray.CreateBuilder<TAuthorization>());
+                    var builder = ImmutableArray.CreateBuilder<TAuthorization>();
 
                     await foreach (var authorization in _store.FindAsync(subject, client, cancellationToken))
                     {
-                        builder.Add(authorization));
+                        builder.Add(authorization);
 
-                        await AddAsync(authorization, cancellationToken));
+                        await AddAsync(authorization, cancellationToken);
                     }
 
-                    authorizations = builder.ToImmutable());
+                    authorizations = builder.ToImmutable();
 
-                    await CreateEntryAsync(parameters, authorizations, cancellationToken));
+                    await CreateEntryAsync(parameters, authorizations, cancellationToken);
                 }
 
                 foreach (var authorization in authorizations)
@@ -164,20 +164,20 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(subject))
             {
-                throw new ArgumentException(SR.ID0198), nameof(subject));
+                throw new ArgumentException(SR.ID0198);
             }
 
             if (string.IsNullOrEmpty(client))
             {
-                throw new ArgumentException(SR.ID0124), nameof(client));
+                throw new ArgumentException(SR.ID0124);
             }
 
             if (string.IsNullOrEmpty(status))
             {
-                throw new ArgumentException(SR.ID0199), nameof(status));
+                throw new ArgumentException(SR.ID0199);
             }
 
-            return ExecuteAsync(cancellationToken));
+            return ExecuteAsync(cancellationToken);
 
             async IAsyncEnumerable<TAuthorization> ExecuteAsync([EnumeratorCancellation] CancellationToken cancellationToken)
             {
@@ -191,18 +191,18 @@ namespace OpenIddict.Core
 
                 if (!_cache.TryGetValue(parameters, out ImmutableArray<TAuthorization> authorizations))
                 {
-                    var builder = ImmutableArray.CreateBuilder<TAuthorization>());
+                    var builder = ImmutableArray.CreateBuilder<TAuthorization>();
 
                     await foreach (var authorization in _store.FindAsync(subject, client, status, cancellationToken))
                     {
-                        builder.Add(authorization));
+                        builder.Add(authorization);
 
-                        await AddAsync(authorization, cancellationToken));
+                        await AddAsync(authorization, cancellationToken);
                     }
 
-                    authorizations = builder.ToImmutable());
+                    authorizations = builder.ToImmutable();
 
-                    await CreateEntryAsync(parameters, authorizations, cancellationToken));
+                    await CreateEntryAsync(parameters, authorizations, cancellationToken);
                 }
 
                 foreach (var authorization in authorizations)
@@ -219,25 +219,25 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(subject))
             {
-                throw new ArgumentException(SR.ID0198), nameof(subject));
+                throw new ArgumentException(SR.ID0198);
             }
 
             if (string.IsNullOrEmpty(client))
             {
-                throw new ArgumentException(SR.ID0124), nameof(client));
+                throw new ArgumentException(SR.ID0124);
             }
 
             if (string.IsNullOrEmpty(status))
             {
-                throw new ArgumentException(SR.ID0199), nameof(status));
+                throw new ArgumentException(SR.ID0199);
             }
 
             if (string.IsNullOrEmpty(type))
             {
-                throw new ArgumentException(SR.ID0200), nameof(type));
+                throw new ArgumentException(SR.ID0200);
             }
 
-            return ExecuteAsync(cancellationToken));
+            return ExecuteAsync(cancellationToken);
 
             async IAsyncEnumerable<TAuthorization> ExecuteAsync([EnumeratorCancellation] CancellationToken cancellationToken)
             {
@@ -252,18 +252,18 @@ namespace OpenIddict.Core
 
                 if (!_cache.TryGetValue(parameters, out ImmutableArray<TAuthorization> authorizations))
                 {
-                    var builder = ImmutableArray.CreateBuilder<TAuthorization>());
+                    var builder = ImmutableArray.CreateBuilder<TAuthorization>();
 
                     await foreach (var authorization in _store.FindAsync(subject, client, status, type, cancellationToken))
                     {
-                        builder.Add(authorization));
+                        builder.Add(authorization);
 
-                        await AddAsync(authorization, cancellationToken));
+                        await AddAsync(authorization, cancellationToken);
                     }
 
-                    authorizations = builder.ToImmutable());
+                    authorizations = builder.ToImmutable();
 
-                    await CreateEntryAsync(parameters, authorizations, cancellationToken));
+                    await CreateEntryAsync(parameters, authorizations, cancellationToken);
                 }
 
                 foreach (var authorization in authorizations)
@@ -281,33 +281,33 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(subject))
             {
-                throw new ArgumentException(SR.ID0198), nameof(subject));
+                throw new ArgumentException(SR.ID0198);
             }
 
             if (string.IsNullOrEmpty(client))
             {
-                throw new ArgumentException(SR.ID0124), nameof(client));
+                throw new ArgumentException(SR.ID0124);
             }
 
             if (string.IsNullOrEmpty(status))
             {
-                throw new ArgumentException(SR.ID0199), nameof(status));
+                throw new ArgumentException(SR.ID0199);
             }
 
             if (string.IsNullOrEmpty(type))
             {
-                throw new ArgumentException(SR.ID0200), nameof(type));
+                throw new ArgumentException(SR.ID0200);
             }
 
             // Note: this method is only partially cached.
 
-            return ExecuteAsync(cancellationToken));
+            return ExecuteAsync(cancellationToken);
 
             async IAsyncEnumerable<TAuthorization> ExecuteAsync([EnumeratorCancellation] CancellationToken cancellationToken)
             {
                 await foreach (var authorization in _store.FindAsync(subject, client, status, type, scopes, cancellationToken))
                 {
-                    await AddAsync(authorization, cancellationToken));
+                    await AddAsync(authorization, cancellationToken);
 
                     yield return authorization;
                 }
@@ -319,10 +319,10 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(identifier))
             {
-                throw new ArgumentException(SR.ID0195), nameof(identifier));
+                throw new ArgumentException(SR.ID0195);
             }
 
-            return ExecuteAsync(cancellationToken));
+            return ExecuteAsync(cancellationToken);
 
             async IAsyncEnumerable<TAuthorization> ExecuteAsync([EnumeratorCancellation] CancellationToken cancellationToken)
             {
@@ -334,18 +334,18 @@ namespace OpenIddict.Core
 
                 if (!_cache.TryGetValue(parameters, out ImmutableArray<TAuthorization> authorizations))
                 {
-                    var builder = ImmutableArray.CreateBuilder<TAuthorization>());
+                    var builder = ImmutableArray.CreateBuilder<TAuthorization>();
 
                     await foreach (var authorization in _store.FindByApplicationIdAsync(identifier, cancellationToken))
                     {
-                        builder.Add(authorization));
+                        builder.Add(authorization);
 
-                        await AddAsync(authorization, cancellationToken));
+                        await AddAsync(authorization, cancellationToken);
                     }
 
-                    authorizations = builder.ToImmutable());
+                    authorizations = builder.ToImmutable();
 
-                    await CreateEntryAsync(parameters, authorizations, cancellationToken));
+                    await CreateEntryAsync(parameters, authorizations, cancellationToken);
                 }
 
                 foreach (var authorization in authorizations)
@@ -360,7 +360,7 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(identifier))
             {
-                throw new ArgumentException(SR.ID0195), nameof(identifier));
+                throw new ArgumentException(SR.ID0195);
             }
 
             var parameters = new
@@ -371,7 +371,7 @@ namespace OpenIddict.Core
 
             if (_cache.TryGetValue(parameters, out TAuthorization? authorization))
             {
-                return new ValueTask<TAuthorization?>(authorization));
+                return new ValueTask<TAuthorization?>(authorization);
             }
 
             return new ValueTask<TAuthorization?>(ExecuteAsync());
@@ -380,10 +380,10 @@ namespace OpenIddict.Core
             {
                 if ((authorization = await _store.FindByIdAsync(identifier, cancellationToken)) is not null)
                 {
-                    await AddAsync(authorization, cancellationToken));
+                    await AddAsync(authorization, cancellationToken);
                 }
 
-                await CreateEntryAsync(parameters, authorization, cancellationToken));
+                await CreateEntryAsync(parameters, authorization, cancellationToken);
 
                 return authorization;
             }
@@ -394,10 +394,10 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(subject))
             {
-                throw new ArgumentException(SR.ID0198), nameof(subject));
+                throw new ArgumentException(SR.ID0198);
             }
 
-            return ExecuteAsync(cancellationToken));
+            return ExecuteAsync(cancellationToken);
 
             async IAsyncEnumerable<TAuthorization> ExecuteAsync([EnumeratorCancellation] CancellationToken cancellationToken)
             {
@@ -409,18 +409,18 @@ namespace OpenIddict.Core
 
                 if (!_cache.TryGetValue(parameters, out ImmutableArray<TAuthorization> authorizations))
                 {
-                    var builder = ImmutableArray.CreateBuilder<TAuthorization>());
+                    var builder = ImmutableArray.CreateBuilder<TAuthorization>();
 
                     await foreach (var authorization in _store.FindBySubjectAsync(subject, cancellationToken))
                     {
-                        builder.Add(authorization));
+                        builder.Add(authorization);
 
-                        await AddAsync(authorization, cancellationToken));
+                        await AddAsync(authorization, cancellationToken);
                     }
 
-                    authorizations = builder.ToImmutable());
+                    authorizations = builder.ToImmutable();
 
-                    await CreateEntryAsync(parameters, authorizations, cancellationToken));
+                    await CreateEntryAsync(parameters, authorizations, cancellationToken);
                 }
 
                 foreach (var authorization in authorizations)
@@ -438,16 +438,16 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(authorization));
             }
 
-            var identifier = await _store.GetIdAsync(authorization, cancellationToken));
+            var identifier = await _store.GetIdAsync(authorization, cancellationToken);
             if (string.IsNullOrEmpty(identifier))
             {
-                throw new InvalidOperationException(SR.ID0196));
+                throw new InvalidOperationException(SR.ID0196);
             }
 
             if (_signals.TryRemove(identifier, out CancellationTokenSource? signal))
             {
-                signal.Cancel());
-                signal.Dispose());
+                signal.Cancel();
+                signal.Dispose();
             }
         }
 
@@ -465,21 +465,21 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(key));
             }
 
-            using var entry = _cache.CreateEntry(key));
+            using var entry = _cache.CreateEntry(key);
 
             if (authorization is not null)
             {
-                var signal = await CreateExpirationSignalAsync(authorization, cancellationToken));
+                var signal = await CreateExpirationSignalAsync(authorization, cancellationToken);
                 if (signal is null)
                 {
-                    throw new InvalidOperationException(SR.ID0197));
+                    throw new InvalidOperationException(SR.ID0197);
                 }
 
-                entry.AddExpirationToken(signal));
+                entry.AddExpirationToken(signal);
             }
 
-            entry.SetSize(1L));
-            entry.SetValue(authorization));
+            
+            entry.SetValue(authorization);
         }
 
         /// <summary>
@@ -497,21 +497,20 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(key));
             }
 
-            using var entry = _cache.CreateEntry(key));
+            using var entry = _cache.CreateEntry(key);
 
             foreach (var authorization in authorizations)
             {
-                var signal = await CreateExpirationSignalAsync(authorization, cancellationToken));
+                var signal = await CreateExpirationSignalAsync(authorization, cancellationToken);
                 if (signal is null)
                 {
-                    throw new InvalidOperationException(SR.ID0197));
+                    throw new InvalidOperationException(SR.ID0197);
                 }
 
-                entry.AddExpirationToken(signal));
+                entry.AddExpirationToken(signal);
             }
 
-            entry.SetSize(authorizations.Length));
-            entry.SetValue(authorizations));
+            entry.SetValue(authorizations);
         }
 
         /// <summary>
@@ -532,15 +531,15 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(authorization));
             }
 
-            var identifier = await _store.GetIdAsync(authorization, cancellationToken));
+            var identifier = await _store.GetIdAsync(authorization, cancellationToken);
             if (string.IsNullOrEmpty(identifier))
             {
-                throw new InvalidOperationException(SR.ID0201));
+                throw new InvalidOperationException(SR.ID0201);
             }
 
             var signal = _signals.GetOrAdd(identifier, _ => new CancellationTokenSource());
 
-            return new CancellationChangeToken(signal.Token));
+            return new CancellationChangeToken(signal.Token);
         }
     }
 }

@@ -23,6 +23,6 @@ namespace OpenIddict.Core
         /// <returns>An <see cref="IOpenIddictAuthorizationStore{TAuthorization}"/>.</returns>
         public IOpenIddictAuthorizationStore<TAuthorization> Get<TAuthorization>() where TAuthorization : class
             => _provider.GetService<IOpenIddictAuthorizationStore<TAuthorization>>() ??
-                throw new InvalidOperationException(SR.ID0229));
+                throw new InvalidOperationException(SR.ID0229);
     }
 }

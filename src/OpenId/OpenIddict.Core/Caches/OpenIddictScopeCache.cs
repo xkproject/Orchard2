@@ -36,11 +36,11 @@ namespace OpenIddict.Core
         {
             _cache = new MemoryCache(new MemoryCacheOptions
             {
-                SizeLimit = options.CurrentValue.EntityCacheLimit
-            }));
+                
+            });
 
-            _signals = new ConcurrentDictionary<string, CancellationTokenSource>(StringComparer.Ordinal));
-            _store = resolver.Get<TScope>());
+            _signals = new ConcurrentDictionary<string, CancellationTokenSource>(StringComparer.Ordinal);
+            _store = resolver.Get<TScope>();
         }
 
         /// <inheritdoc/>
@@ -55,13 +55,13 @@ namespace OpenIddict.Core
             {
                 Method = nameof(FindByIdAsync),
                 Identifier = await _store.GetIdAsync(scope, cancellationToken)
-            }));
+            });
 
             _cache.Remove(new
             {
                 Method = nameof(FindByNameAsync),
                 Name = await _store.GetNameAsync(scope, cancellationToken)
-            }));
+            });
 
             foreach (var resource in await _store.GetResourcesAsync(scope, cancellationToken))
             {
@@ -69,20 +69,20 @@ namespace OpenIddict.Core
                 {
                     Method = nameof(FindByResourceAsync),
                     Resource = resource
-                }));
+                });
             }
 
             await CreateEntryAsync(new
             {
                 Method = nameof(FindByIdAsync),
                 Identifier = await _store.GetIdAsync(scope, cancellationToken)
-            }, scope, cancellationToken));
+            }, scope, cancellationToken);
 
             await CreateEntryAsync(new
             {
                 Method = nameof(FindByNameAsync),
                 Name = await _store.GetNameAsync(scope, cancellationToken)
-            }, scope, cancellationToken));
+            }, scope, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -90,10 +90,10 @@ namespace OpenIddict.Core
         {
             foreach (var signal in _signals)
             {
-                signal.Value.Dispose());
+                signal.Value.Dispose();
             }
 
-            _cache.Dispose());
+            _cache.Dispose();
         }
 
         /// <inheritdoc/>
@@ -101,7 +101,7 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(identifier))
             {
-                throw new ArgumentException(SR.ID0195), nameof(identifier));
+                throw new ArgumentException(SR.ID0195);
             }
 
             var parameters = new
@@ -112,7 +112,7 @@ namespace OpenIddict.Core
 
             if (_cache.TryGetValue(parameters, out TScope? scope))
             {
-                return new ValueTask<TScope?>(scope));
+                return new ValueTask<TScope?>(scope);
             }
 
             return new ValueTask<TScope?>(ExecuteAsync());
@@ -121,10 +121,10 @@ namespace OpenIddict.Core
             {
                 if ((scope = await _store.FindByIdAsync(identifier, cancellationToken)) is not null)
                 {
-                    await AddAsync(scope, cancellationToken));
+                    await AddAsync(scope, cancellationToken);
                 }
 
-                await CreateEntryAsync(parameters, scope, cancellationToken));
+                await CreateEntryAsync(parameters, scope, cancellationToken);
 
                 return scope;
             }
@@ -135,7 +135,7 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(name))
             {
-                throw new ArgumentException(SR.ID0202), nameof(name));
+                throw new ArgumentException(SR.ID0202);
             }
 
             var parameters = new
@@ -146,17 +146,17 @@ namespace OpenIddict.Core
 
             if (_cache.TryGetValue(parameters, out TScope? scope))
             {
-                return new ValueTask<TScope?>(scope));
+                return new ValueTask<TScope?>(scope);
             }
 
             async Task<TScope?> ExecuteAsync()
             {
                 if ((scope = await _store.FindByNameAsync(name, cancellationToken)) is not null)
                 {
-                    await AddAsync(scope, cancellationToken));
+                    await AddAsync(scope, cancellationToken);
                 }
 
-                await CreateEntryAsync(parameters, scope, cancellationToken));
+                await CreateEntryAsync(parameters, scope, cancellationToken);
 
                 return scope;
             }
@@ -169,18 +169,18 @@ namespace OpenIddict.Core
         {
             if (names.Any(name => string.IsNullOrEmpty(name)))
             {
-                throw new ArgumentException(SR.ID0203), nameof(names));
+                throw new ArgumentException(SR.ID0203);
             }
 
             // Note: this method is only partially cached.
 
-            return ExecuteAsync(cancellationToken));
+            return ExecuteAsync(cancellationToken);
 
             async IAsyncEnumerable<TScope> ExecuteAsync([EnumeratorCancellation] CancellationToken cancellationToken)
             {
                 await foreach (var scope in _store.FindByNamesAsync(names, cancellationToken))
                 {
-                    await AddAsync(scope, cancellationToken));
+                    await AddAsync(scope, cancellationToken);
 
                     yield return scope;
                 }
@@ -192,10 +192,10 @@ namespace OpenIddict.Core
         {
             if (string.IsNullOrEmpty(resource))
             {
-                throw new ArgumentException(SR.ID0062), nameof(resource));
+                throw new ArgumentException(SR.ID0062);
             }
 
-            return ExecuteAsync(cancellationToken));
+            return ExecuteAsync(cancellationToken);
 
             async IAsyncEnumerable<TScope> ExecuteAsync([EnumeratorCancellation] CancellationToken cancellationToken)
             {
@@ -207,18 +207,18 @@ namespace OpenIddict.Core
 
                 if (!_cache.TryGetValue(parameters, out ImmutableArray<TScope> scopes))
                 {
-                    var builder = ImmutableArray.CreateBuilder<TScope>());
+                    var builder = ImmutableArray.CreateBuilder<TScope>();
 
                     await foreach (var scope in _store.FindByResourceAsync(resource, cancellationToken))
                     {
-                        builder.Add(scope));
+                        builder.Add(scope);
 
-                        await AddAsync(scope, cancellationToken));
+                        await AddAsync(scope, cancellationToken);
                     }
 
-                    scopes = builder.ToImmutable());
+                    scopes = builder.ToImmutable();
 
-                    await CreateEntryAsync(parameters, scopes, cancellationToken));
+                    await CreateEntryAsync(parameters, scopes, cancellationToken);
                 }
 
                 foreach (var scope in scopes)
@@ -236,16 +236,16 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(scope));
             }
 
-            var identifier = await _store.GetIdAsync(scope, cancellationToken));
+            var identifier = await _store.GetIdAsync(scope, cancellationToken);
             if (string.IsNullOrEmpty(identifier))
             {
-                throw new InvalidOperationException(SR.ID0196));
+                throw new InvalidOperationException(SR.ID0196);
             }
 
             if (_signals.TryRemove(identifier, out CancellationTokenSource? signal))
             {
-                signal.Cancel());
-                signal.Dispose());
+                signal.Cancel();
+                signal.Dispose();
             }
         }
 
@@ -263,21 +263,20 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(key));
             }
 
-            using var entry = _cache.CreateEntry(key));
+            using var entry = _cache.CreateEntry(key);
 
             if (scope is not null)
             {
-                var signal = await CreateExpirationSignalAsync(scope, cancellationToken));
+                var signal = await CreateExpirationSignalAsync(scope, cancellationToken);
                 if (signal is null)
                 {
-                    throw new InvalidOperationException(SR.ID0197));
+                    throw new InvalidOperationException(SR.ID0197);
                 }
 
-                entry.AddExpirationToken(signal));
+                entry.AddExpirationToken(signal);
             }
 
-            entry.SetSize(1L));
-            entry.SetValue(scope));
+            entry.SetValue(scope);
         }
 
         /// <summary>
@@ -295,21 +294,20 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(key));
             }
 
-            using var entry = _cache.CreateEntry(key));
+            using var entry = _cache.CreateEntry(key);
 
             foreach (var scope in scopes)
             {
-                var signal = await CreateExpirationSignalAsync(scope, cancellationToken));
+                var signal = await CreateExpirationSignalAsync(scope, cancellationToken);
                 if (signal is null)
                 {
-                    throw new InvalidOperationException(SR.ID0197));
+                    throw new InvalidOperationException(SR.ID0197);
                 }
 
-                entry.AddExpirationToken(signal));
+                entry.AddExpirationToken(signal);
             }
 
-            entry.SetSize(scopes.Length));
-            entry.SetValue(scopes));
+            entry.SetValue(scopes);
         }
 
         /// <summary>
@@ -329,15 +327,15 @@ namespace OpenIddict.Core
                 throw new ArgumentNullException(nameof(scope));
             }
 
-            var identifier = await _store.GetIdAsync(scope, cancellationToken));
+            var identifier = await _store.GetIdAsync(scope, cancellationToken);
             if (string.IsNullOrEmpty(identifier))
             {
-                throw new InvalidOperationException(SR.ID0204));
+                throw new InvalidOperationException(SR.ID0204);
             }
 
             var signal = _signals.GetOrAdd(identifier, _ => new CancellationTokenSource());
 
-            return new CancellationChangeToken(signal.Token));
+            return new CancellationChangeToken(signal.Token);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/openiddict/openiddict-core for more information concerning
  * the license and the contributors participating to this project.
@@ -136,7 +136,7 @@ namespace OpenIddict.Validation
                         TokenTypeHints.AccessToken => JsonWebTokenTypes.AccessToken,
                         TokenTypeHints.IdToken     => JsonWebTokenTypes.IdentityToken,
 
-                        _ => throw new NotSupportedException(SR.GetResourceString(SR.ID0269))
+                        _ => throw new NotSupportedException((SR.ID0269))
                     };
                 }
 
@@ -144,14 +144,14 @@ namespace OpenIddict.Validation
                 // (provided via the type delegate parameter) or inferred from the token_usage claim.
                 if (string.IsNullOrEmpty(type))
                 {
-                    throw new SecurityTokenInvalidTypeException(SR.GetResourceString(SR.ID0270));
+                    throw new SecurityTokenInvalidTypeException((SR.ID0270));
                 }
 
                 // Note: unlike IdentityModel, this custom validator deliberately uses case-insensitive comparisons.
                 if (parameters.ValidTypes is not null && parameters.ValidTypes.Any() &&
                    !parameters.ValidTypes.Contains(type, StringComparer.OrdinalIgnoreCase))
                 {
-                    throw new SecurityTokenInvalidTypeException(SR.GetResourceString(SR.ID0271))
+                    throw new SecurityTokenInvalidTypeException((SR.ID0271))
                     {
                         InvalidType = type
                     };

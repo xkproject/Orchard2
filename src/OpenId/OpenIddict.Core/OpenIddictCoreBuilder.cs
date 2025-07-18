@@ -45,7 +45,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(configuration));
             }
 
-            Services.Configure(configuration));
+            Services.Configure(configuration);
 
             return this;
         }
@@ -61,7 +61,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The <see cref="OpenIddictCoreBuilder"/>.</returns>
         public OpenIddictCoreBuilder AddApplicationStore<TStore>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TStore : class
-            => AddApplicationStore(typeof(TStore), lifetime));
+            => AddApplicationStore(typeof(TStore), lifetime);
 
         /// <summary>
         /// Adds a custom application store by a custom implementation derived
@@ -82,7 +82,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var root = OpenIddictHelpers.FindGenericBaseType(type, typeof(IOpenIddictApplicationStore<>));
             if (root is null)
             {
-                throw new ArgumentException(SR.ID0232), nameof(type));
+                throw new ArgumentException(SR.ID0232);
             }
 
             // Note: managers can be either open generics (e.g OpenIddictApplicationStore<>)
@@ -91,7 +91,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 if (type.GetGenericArguments().Length != 1)
                 {
-                    throw new ArgumentException(SR.ID0232), nameof(type));
+                    throw new ArgumentException(SR.ID0232);
                 }
 
                 Services.Replace(new ServiceDescriptor(typeof(IOpenIddictApplicationStore<>), type, lifetime));
@@ -117,7 +117,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The <see cref="OpenIddictCoreBuilder"/>.</returns>
         public OpenIddictCoreBuilder AddAuthorizationStore<TStore>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TStore : class
-            => AddAuthorizationStore(typeof(TStore), lifetime));
+            => AddAuthorizationStore(typeof(TStore), lifetime);
 
         /// <summary>
         /// Adds a custom authorization store by a custom implementation derived
@@ -138,7 +138,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var root = OpenIddictHelpers.FindGenericBaseType(type, typeof(IOpenIddictAuthorizationStore<>));
             if (root is null)
             {
-                throw new ArgumentException(SR.ID0232), nameof(type));
+                throw new ArgumentException(SR.ID0232);
             }
 
             // Note: managers can be either open generics (e.g OpenIddictAuthorizationStore<>)
@@ -147,7 +147,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 if (type.GetGenericArguments().Length != 1)
                 {
-                    throw new ArgumentException(SR.ID0232), nameof(type));
+                    throw new ArgumentException(SR.ID0232);
                 }
 
                 Services.Replace(new ServiceDescriptor(typeof(IOpenIddictAuthorizationStore<>), type, lifetime));
@@ -173,7 +173,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The <see cref="OpenIddictCoreBuilder"/>.</returns>
         public OpenIddictCoreBuilder AddScopeStore<TStore>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TStore : class
-            => AddScopeStore(typeof(TStore), lifetime));
+            => AddScopeStore(typeof(TStore), lifetime);
 
         /// <summary>
         /// Adds a custom scope store by a custom implementation derived
@@ -194,7 +194,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var root = OpenIddictHelpers.FindGenericBaseType(type, typeof(IOpenIddictScopeStore<>));
             if (root is null)
             {
-                throw new ArgumentException(SR.ID0232), nameof(type));
+                throw new ArgumentException(SR.ID0232);
             }
 
             // Note: managers can be either open generics (e.g OpenIddictScopeStore<>)
@@ -203,7 +203,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 if (type.GetGenericArguments().Length != 1)
                 {
-                    throw new ArgumentException(SR.ID0232), nameof(type));
+                    throw new ArgumentException(SR.ID0232);
                 }
 
                 Services.Replace(new ServiceDescriptor(typeof(IOpenIddictScopeStore<>), type, lifetime));
@@ -229,7 +229,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The <see cref="OpenIddictCoreBuilder"/>.</returns>
         public OpenIddictCoreBuilder AddTokenStore<TStore>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TStore : class
-            => AddTokenStore(typeof(TStore), lifetime));
+            => AddTokenStore(typeof(TStore), lifetime);
 
         /// <summary>
         /// Adds a custom token store by a custom implementation derived
@@ -250,7 +250,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var root = OpenIddictHelpers.FindGenericBaseType(type, typeof(IOpenIddictTokenStore<>));
             if (root is null)
             {
-                throw new ArgumentException(SR.ID0232), nameof(type));
+                throw new ArgumentException(SR.ID0232);
             }
 
             // Note: managers can be either open generics (e.g OpenIddictTokenStore<>)
@@ -259,7 +259,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 if (type.GetGenericArguments().Length != 1)
                 {
-                    throw new ArgumentException(SR.ID0232), nameof(type));
+                    throw new ArgumentException(SR.ID0232);
                 }
 
                 Services.Replace(new ServiceDescriptor(typeof(IOpenIddictTokenStore<>), type, lifetime));
@@ -304,7 +304,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var root = OpenIddictHelpers.FindGenericBaseType(type, typeof(OpenIddictApplicationManager<>));
             if (root is null)
             {
-                throw new ArgumentException(SR.ID0232), nameof(type));
+                throw new ArgumentException(SR.ID0232);
             }
 
             // Note: managers can be either open generics (e.g OpenIddictApplicationManager<>)
@@ -313,7 +313,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 if (type.GetGenericArguments().Length != 1)
                 {
-                    throw new ArgumentException(SR.ID0232), nameof(type));
+                    throw new ArgumentException(SR.ID0232);
                 }
 
                 Services.Replace(ServiceDescriptor.Scoped(type, type));
@@ -342,7 +342,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The <see cref="OpenIddictCoreBuilder"/>.</returns>
         public OpenIddictCoreBuilder ReplaceApplicationStoreResolver<TResolver>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TResolver : IOpenIddictApplicationStoreResolver
-            => ReplaceApplicationStoreResolver(typeof(TResolver), lifetime));
+            => ReplaceApplicationStoreResolver(typeof(TResolver), lifetime);
 
         /// <summary>
         /// Replaces the default application store resolver by a custom implementation.
@@ -360,7 +360,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             if (!typeof(IOpenIddictApplicationStoreResolver).IsAssignableFrom(type))
             {
-                throw new ArgumentException(SR.ID0232), nameof(type));
+                throw new ArgumentException(SR.ID0232);
             }
 
             Services.Replace(new ServiceDescriptor(typeof(IOpenIddictApplicationStoreResolver), type, lifetime));
@@ -398,7 +398,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var root = OpenIddictHelpers.FindGenericBaseType(type, typeof(OpenIddictAuthorizationManager<>));
             if (root is null)
             {
-                throw new ArgumentException(SR.ID0232), nameof(type));
+                throw new ArgumentException(SR.ID0232);
             }
 
             // Note: managers can be either open generics (e.g OpenIddictAuthorizationManager<>)
@@ -407,7 +407,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 if (type.GetGenericArguments().Length != 1)
                 {
-                    throw new ArgumentException(SR.ID0232), nameof(type));
+                    throw new ArgumentException(SR.ID0232);
                 }
 
                 Services.Replace(ServiceDescriptor.Scoped(type, type));
@@ -436,7 +436,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The <see cref="OpenIddictCoreBuilder"/>.</returns>
         public OpenIddictCoreBuilder ReplaceAuthorizationStoreResolver<TResolver>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TResolver : IOpenIddictAuthorizationStoreResolver
-            => ReplaceAuthorizationStoreResolver(typeof(TResolver), lifetime));
+            => ReplaceAuthorizationStoreResolver(typeof(TResolver), lifetime);
 
         /// <summary>
         /// Replaces the default authorization store resolver by a custom implementation.
@@ -454,7 +454,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             if (!typeof(IOpenIddictAuthorizationStoreResolver).IsAssignableFrom(type))
             {
-                throw new ArgumentException(SR.ID0232), nameof(type));
+                throw new ArgumentException(SR.ID0232);
             }
 
             Services.Replace(new ServiceDescriptor(typeof(IOpenIddictAuthorizationStoreResolver), type, lifetime));
@@ -492,7 +492,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var root = OpenIddictHelpers.FindGenericBaseType(type, typeof(OpenIddictScopeManager<>));
             if (root is null)
             {
-                throw new ArgumentException(SR.ID0232), nameof(type));
+                throw new ArgumentException(SR.ID0232);
             }
 
             // Note: managers can be either open generics (e.g OpenIddictScopeManager<>)
@@ -501,7 +501,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 if (type.GetGenericArguments().Length != 1)
                 {
-                    throw new ArgumentException(SR.ID0232), nameof(type));
+                    throw new ArgumentException(SR.ID0232);
                 }
 
                 Services.Replace(ServiceDescriptor.Scoped(type, type));
@@ -530,7 +530,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The <see cref="OpenIddictCoreBuilder"/>.</returns>
         public OpenIddictCoreBuilder ReplaceScopeStoreResolver<TResolver>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TResolver : IOpenIddictScopeStoreResolver
-            => ReplaceScopeStoreResolver(typeof(TResolver), lifetime));
+            => ReplaceScopeStoreResolver(typeof(TResolver), lifetime);
 
         /// <summary>
         /// Replaces the default scope store resolver by a custom implementation.
@@ -548,7 +548,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             if (!typeof(IOpenIddictScopeStoreResolver).IsAssignableFrom(type))
             {
-                throw new ArgumentException(SR.ID0232), nameof(type));
+                throw new ArgumentException(SR.ID0232);
             }
 
             Services.Replace(new ServiceDescriptor(typeof(IOpenIddictScopeStoreResolver), type, lifetime));
@@ -586,7 +586,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var root = OpenIddictHelpers.FindGenericBaseType(type, typeof(OpenIddictTokenManager<>));
             if (root is null)
             {
-                throw new ArgumentException(SR.ID0232), nameof(type));
+                throw new ArgumentException(SR.ID0232);
             }
 
             // Note: managers can be either open generics (e.g OpenIddictTokenManager<>)
@@ -595,7 +595,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 if (type.GetGenericArguments().Length != 1)
                 {
-                    throw new ArgumentException(SR.ID0232), nameof(type));
+                    throw new ArgumentException(SR.ID0232);
                 }
 
                 Services.Replace(ServiceDescriptor.Scoped(type, type));
@@ -624,7 +624,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The <see cref="OpenIddictCoreBuilder"/>.</returns>
         public OpenIddictCoreBuilder ReplaceTokenStoreResolver<TResolver>(ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TResolver : IOpenIddictTokenStoreResolver
-            => ReplaceTokenStoreResolver(typeof(TResolver), lifetime));
+            => ReplaceTokenStoreResolver(typeof(TResolver), lifetime);
 
         /// <summary>
         /// Replaces the default token store resolver by a custom implementation.
@@ -642,7 +642,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             if (!typeof(IOpenIddictTokenStoreResolver).IsAssignableFrom(type))
             {
-                throw new ArgumentException(SR.ID0232), nameof(type));
+                throw new ArgumentException(SR.ID0232);
             }
 
             Services.Replace(new ServiceDescriptor(typeof(IOpenIddictTokenStoreResolver), type, lifetime));
@@ -659,7 +659,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <returns>The <see cref="OpenIddictCoreBuilder"/>.</returns>
         public OpenIddictCoreBuilder DisableAdditionalFiltering()
-            => Configure(options => options.DisableAdditionalFiltering = true));
+            => Configure(options => options.DisableAdditionalFiltering = true);
 
         /// <summary>
         /// Disables the scoped entity caching applied by the OpenIddict managers.
@@ -668,7 +668,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <returns>The <see cref="OpenIddictCoreBuilder"/>.</returns>
         public OpenIddictCoreBuilder DisableEntityCaching()
-            => Configure(options => options.DisableEntityCaching = true));
+            => Configure(options => options.DisableEntityCaching = true);
 
         /// <summary>
         /// Configures OpenIddict to use the specified entity as the default application entity.
@@ -691,10 +691,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             if (type.IsValueType)
             {
-                throw new ArgumentException(SR.ID0232), nameof(type));
+                throw new ArgumentException(SR.ID0232);
             }
 
-            return Configure(options => options.DefaultApplicationType = type));
+            return Configure(options => options.DefaultApplicationType = type);
         }
 
         /// <summary>
@@ -718,10 +718,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             if (type.IsValueType)
             {
-                throw new ArgumentException(SR.ID0232), nameof(type));
+                throw new ArgumentException(SR.ID0232);
             }
 
-            return Configure(options => options.DefaultAuthorizationType = type));
+            return Configure(options => options.DefaultAuthorizationType = type);
         }
 
         /// <summary>
@@ -745,10 +745,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             if (type.IsValueType)
             {
-                throw new ArgumentException(SR.ID0232), nameof(type));
+                throw new ArgumentException(SR.ID0232);
             }
 
-            return Configure(options => options.DefaultScopeType = type));
+            return Configure(options => options.DefaultScopeType = type);
         }
 
         /// <summary>
@@ -772,10 +772,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             if (type.IsValueType)
             {
-                throw new ArgumentException(SR.ID0232), nameof(type));
+                throw new ArgumentException(SR.ID0232);
             }
 
-            return Configure(options => options.DefaultTokenType = type));
+            return Configure(options => options.DefaultTokenType = type);
         }
 
         /// <summary>
@@ -788,22 +788,22 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (limit < 10)
             {
-                throw new ArgumentException(SR.ID0233), nameof(limit));
+                throw new ArgumentException(SR.ID0233);
             }
 
-            return Configure(options => options.EntityCacheLimit = limit));
+            return Configure(options => options.EntityCacheLimit = limit);
         }
 
         /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override bool Equals(object? obj) => base.Equals(obj));
+        public override bool Equals(object? obj) => base.Equals(obj);
 
         /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override int GetHashCode() => base.GetHashCode());
+        public override int GetHashCode() => base.GetHashCode();
 
         /// <inheritdoc/>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override string? ToString() => base.ToString());
+        public override string? ToString() => base.ToString();
     }
 }
