@@ -191,24 +191,28 @@ namespace OrchardCore.Email.Services
 
         private bool CertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
-            if (sslPolicyErrors == SslPolicyErrors.None)
-                return true;
+            /* TODO PCCOM rever this and use https://github.com/OrchardCMS/OrchardCore/pull/14444/files and set prodesco,vadevinos, nicolas y valero to use the flag
+             * 
+             * if (sslPolicyErrors == SslPolicyErrors.None)
+                  return true;
 
-            _logger.LogError(string.Concat("SMTP Server's certificate {CertificateSubject} issued by {CertificateIssuer} ",
-                "with thumbprint {CertificateThumbprint} and expiration date {CertificateExpirationDate} ",
-                "is considered invalid with {SslPolicyErrors} policy errors"),
-                certificate.Subject, certificate.Issuer, certificate.GetCertHashString(),
-                certificate.GetExpirationDateString(), sslPolicyErrors);
+              _logger.LogError(string.Concat("SMTP Server's certificate {CertificateSubject} issued by {CertificateIssuer} ",
+                  "with thumbprint {CertificateThumbprint} and expiration date {CertificateExpirationDate} ",
+                  "is considered invalid with {SslPolicyErrors} policy errors"),
+                  certificate.Subject, certificate.Issuer, certificate.GetCertHashString(),
+                  certificate.GetExpirationDateString(), sslPolicyErrors);
 
-            if (sslPolicyErrors.HasFlag(SslPolicyErrors.RemoteCertificateChainErrors) && chain?.ChainStatus != null)
-            {
-                foreach (var chainStatus in chain.ChainStatus)
-                {
-                    _logger.LogError("Status: {Status} - {StatusInformation}", chainStatus.Status, chainStatus.StatusInformation);
-                }
-            }
+              if (sslPolicyErrors.HasFlag(SslPolicyErrors.RemoteCertificateChainErrors) && chain?.ChainStatus != null)
+              {
+                  foreach (var chainStatus in chain.ChainStatus)
+                  {
+                      _logger.LogError("Status: {Status} - {StatusInformation}", chainStatus.Status, chainStatus.StatusInformation);
+                  }
+              }
 
-            return false;
+              return false;*/
+            return true;
+
         }
         private async Task<string> SendOnlineMessage(MimeMessage message)
         {
