@@ -1,14 +1,21 @@
 @model OrchardCore.ContentFields.ViewModels.EditYoutubeFieldViewModel
-
+@using OrchardCore.ContentFields
+@using OrchardCore.Mvc.Utilities
+@using OrchardCore.Localization.Data
+@inject IDataLocalizer D
 @{
     var settings = Model.PartFieldDefinition.GetSettings<YoutubeFieldSettings>();
+    string localizedFieldName = D[Model.PartFieldDefinition.DisplayName(), DataLocalizationContext.ContentField(Model.PartFieldDefinition.PartDefinition.Name)];
 }
 
-<div class="form-group">
-    <label asp-for="RawAddress">@Model.PartFieldDefinition.DisplayName()</label>
-    <input asp-for="RawAddress" class="form-control content-preview-text" required="@settings.Required" />
-    @if (!String.IsNullOrEmpty(settings.Hint))
-    {
-        <span class="hint">@settings.Hint</span>
-    }
+<div class="@Orchard.GetFieldWrapperClasses(Model.PartFieldDefinition)" id="@Html.IdFor(x => x.RawAddress)_FieldWrapper">
+    <label asp-for="RawAddress" class="@Orchard.GetLabelClasses(inputRequired: settings.Required)">@localizedFieldName</label>
+    <div class="@Orchard.GetEndClasses()">
+        <input asp-for="RawAddress" placeholder="@settings.Placeholder" class="form-control content-preview-text" />
+        <span asp-validation-for="RawAddress"></span>
+        @if (!string.IsNullOrEmpty(settings.Hint))
+        {
+            <span class="hint">@settings.Hint</span>
+        }
+    </div>
 </div>

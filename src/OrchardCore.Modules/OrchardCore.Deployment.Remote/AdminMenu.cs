@@ -1,43 +1,56 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Localization;
 using OrchardCore.Navigation;
 
-namespace OrchardCore.Deployment.Remote
+namespace OrchardCore.Deployment.Remote;
+
+public sealed class AdminMenu : AdminNavigationProvider
 {
-    public class AdminMenu : INavigationProvider
+    internal readonly IStringLocalizer S;
+
+    public AdminMenu(IStringLocalizer<AdminMenu> localizer)
     {
-        private readonly IStringLocalizer S;
+        S = localizer;
+    }
 
-        public AdminMenu(IStringLocalizer<AdminMenu> localizer)
+    protected override ValueTask BuildAsync(NavigationBuilder builder)
+    {
+        if (NavigationHelper.UseLegacyFormat())
         {
-            S = localizer;
-        }
-
-        public Task BuildNavigationAsync(string name, NavigationBuilder builder)
-        {
-            if (!String.Equals(name, "admin", StringComparison.OrdinalIgnoreCase))
-            {
-                return Task.CompletedTask;
-            }
-
             builder
                 .Add(S["Configuration"], configuration => configuration
                     .Add(S["Import/Export"], import => import
                         .Add(S["Remote Instances"], S["Remote Instances"].PrefixPosition(), remote => remote
-                            .Action("Index", "RemoteInstance", new { area = "OrchardCore.Deployment.Remote" })
-                            .Permission(Permissions.ManageRemoteInstances)
+                            .Action("Index", "RemoteInstance", "OrchardCore.Deployment.Remote")
+                            .Permission(DeploymentPermissions.ManageRemoteInstances)
                             .LocalNav()
                         )
                         .Add(S["Remote Clients"], S["Remote Clients"].PrefixPosition(), remote => remote
-                            .Action("Index", "RemoteClient", new { area = "OrchardCore.Deployment.Remote" })
-                            .Permission(Permissions.ManageRemoteClients)
+                            .Action("Index", "RemoteClient", "OrchardCore.Deployment.Remote")
+                            .Permission(DeploymentPermissions.ManageRemoteClients)
                             .LocalNav()
                         )
                     )
                 );
 
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
+
+        builder
+            .Add(S["Tools"], tools => tools
+                .Add(S["Deployments"], import => import
+                    .Add(S["Remote Instances"], S["Remote Instances"].PrefixPosition(), remote => remote
+                        .Action("Index", "RemoteInstance", "OrchardCore.Deployment.Remote")
+                        .Permission(DeploymentPermissions.ManageRemoteInstances)
+                        .LocalNav()
+                    )
+                    .Add(S["Remote Clients"], S["Remote Clients"].PrefixPosition(), remote => remote
+                        .Action("Index", "RemoteClient", "OrchardCore.Deployment.Remote")
+                        .Permission(DeploymentPermissions.ManageRemoteClients)
+                        .LocalNav()
+                    )
+                )
+            );
+
+        return ValueTask.CompletedTask;
     }
 }

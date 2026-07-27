@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <RootNamespace>OrchardCore.Email</RootNamespace>
     <!-- NuGet properties-->
     <Title>OrchardCore Email Core</Title>
     <Description>
@@ -17,10 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OrchardCore.Email.Abstractions\OrchardCore.Email.Abstractions.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MailKit" />
+    <ProjectReference Include="..\OrchardCore.Infrastructure.Abstractions\OrchardCore.Infrastructure.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

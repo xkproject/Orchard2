@@ -1,38 +1,65 @@
-using System;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Localization;
 using OrchardCore.Navigation;
+using OrchardCore.Settings.Drivers;
 
-namespace OrchardCore.Settings
+namespace OrchardCore.Settings;
+
+public sealed class AdminMenu : AdminNavigationProvider
 {
-    public class AdminMenu : INavigationProvider
+    private static readonly RouteValueDictionary _routeValues = new()
     {
-        private readonly IStringLocalizer S;
+        { "area", "OrchardCore.Settings" },
+        { "groupId", DefaultSiteSettingsDisplayDriver.GroupId },
+    };
 
-        public AdminMenu(IStringLocalizer<AdminMenu> localizer)
+    internal readonly IStringLocalizer S;
+
+    public AdminMenu(IStringLocalizer<AdminMenu> stringLocalizer)
+    {
+        S = stringLocalizer;
+    }
+
+    protected override ValueTask BuildAsync(NavigationBuilder builder)
+    {
+
+        if (NavigationHelper.UseLegacyFormat())
         {
-            S = localizer;
+            builder
+                .Add(S["Configuration"], NavigationConstants.AdminMenuConfigurationPosition, configuration => configuration
+                    .AddClass("menu-configuration")
+                    .Id("configuration")
+                    .Add(S["Settings"], "1", settings => settings
+                        .Add(S["General"], "1", entry => entry
+                            .AddClass("general")
+                            .Id("general")
+                            .Action("Index", "Admin", _routeValues)
+                            .Permission(SettingsPermissions.ManageGroupSettings)
+                            .LocalNav()
+                        ),
+                    priority: 1)
+                );
+
+            return ValueTask.CompletedTask;
         }
 
-        public Task BuildNavigationAsync(string name, NavigationBuilder builder)
-        {
-            if (!String.Equals(name, "admin", StringComparison.OrdinalIgnoreCase))
-            {
-                return Task.CompletedTask;
-            }
-
-            builder.Add(S["Configuration"], configuration => configuration
-                .Add(S["Settings"], "1", settings => settings
-                    .Add(S["General"], "1", entry => entry
-                    .AddClass("general").Id("general")
-                        .Action("Index", "Admin", new { area = "OrchardCore.Settings", groupId = "general" })
-                        .Permission(Permissions.ManageGroupSettings)
-                        .LocalNav()
-                    )
+        builder
+            .Add(S["Tools"], "after.50", tools => tools
+                .Id("tools")
+                .AddClass("tools")
+            , priority: 1)
+            .Add(S["Settings"], "after.100", settings => settings
+                .Id("settings")
+                .AddClass("settings")
+                .Add(S["General"], "before", general => general
+                    .AddClass("general")
+                    .Id("general")
+                    .Action("Index", "Admin", _routeValues)
+                    .Permission(SettingsPermissions.ManageGroupSettings)
+                    .LocalNav()
                 )
-            );
+            , priority: 1);
 
-            return Task.CompletedTask;
-        }
+        return ValueTask.CompletedTask;
     }
 }

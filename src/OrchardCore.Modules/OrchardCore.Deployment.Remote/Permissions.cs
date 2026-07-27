@@ -1,31 +1,34 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using OrchardCore.Security.Permissions;
 
-namespace OrchardCore.Deployment.Remote
+namespace OrchardCore.Deployment.Remote;
+
+public sealed class Permissions : IPermissionProvider
 {
-    public class Permissions : IPermissionProvider
-    {
-        public static readonly Permission ManageRemoteInstances = new Permission("ManageRemoteInstances", "Manage remote instances");
-        public static readonly Permission ManageRemoteClients = new Permission("ManageRemoteClients", "Manage remote clients");
-        public static readonly Permission Export = new Permission("ExportRemoteInstances", "Export to remote instances");
+    private readonly IEnumerable<Permission> _allPermissions =
+    [
+        DeploymentPermissions.ManageRemoteInstances,
+        DeploymentPermissions.ManageRemoteClients,
+        DeploymentPermissions.ExportRemoteInstances,
+    ];
 
-        public Task<IEnumerable<Permission>> GetPermissionsAsync()
-        {
-            return Task.FromResult(new[] { ManageRemoteInstances, ManageRemoteClients, Export }.AsEnumerable());
-        }
+    [Obsolete("This will be removed in a future release. Instead use 'DeploymentPermissions.ManageRemoteInstances'.")]
+    public static readonly Permission ManageRemoteInstances = DeploymentPermissions.ManageRemoteInstances;
 
-        public IEnumerable<PermissionStereotype> GetDefaultStereotypes()
+    [Obsolete("This will be removed in a future release. Instead use 'DeploymentPermissions.ManageRemoteClients'.")]
+    public static readonly Permission ManageRemoteClients = DeploymentPermissions.ManageRemoteClients;
+
+    [Obsolete("This will be removed in a future release. Instead use 'DeploymentPermissions.ExportRemoteInstances'.")]
+    public static readonly Permission Export = DeploymentPermissions.ExportRemoteInstances;
+
+    public Task<IEnumerable<Permission>> GetPermissionsAsync()
+        => Task.FromResult(_allPermissions);
+
+    public IEnumerable<PermissionStereotype> GetDefaultStereotypes() =>
+    [
+        new PermissionStereotype
         {
-            return new[]
-            {
-                new PermissionStereotype
-                {
-                    Name = "Administrator",
-                    Permissions = new[] { ManageRemoteInstances, ManageRemoteClients, Export }
-                }
-            };
-        }
-    }
+            Name = OrchardCoreConstants.Roles.Administrator,
+            Permissions = _allPermissions,
+        },
+    ];
 }

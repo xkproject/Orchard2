@@ -4,27 +4,25 @@ using OrchardCore.MetaWeblog;
 using OrchardCore.XmlRpc;
 using OrchardCore.XmlRpc.Models;
 
-namespace OrchardCore.Markdown.RemotePublishing
-{
-    public class MarkdownBodyMetaWeblogDriver : MetaWeblogDriver
-    {
-        public override void BuildPost(XRpcStruct rpcStruct, XmlRpcContext context, ContentItem contentItem)
-        {
-            var bodyPart = contentItem.As<MarkdownBodyPart>();
-            if (bodyPart == null)
-            {
-                return;
-            }
+namespace OrchardCore.Markdown.RemotePublishing;
 
-            rpcStruct.Set("description", bodyPart.Markdown);
+public sealed class MarkdownBodyMetaWeblogDriver : MetaWeblogDriver
+{
+    public override void BuildPost(XRpcStruct rpcStruct, XmlRpcContext context, ContentItem contentItem)
+    {
+        if (!contentItem.TryGet<MarkdownBodyPart>(out var bodyPart))
+        {
+            return;
         }
 
-        public override void EditPost(XRpcStruct rpcStruct, ContentItem contentItem)
+        rpcStruct.Set("description", bodyPart.Markdown);
+    }
+
+    public override void EditPost(XRpcStruct rpcStruct, ContentItem contentItem)
+    {
+        if (contentItem.TryGet<MarkdownBodyPart>(out _))
         {
-            if (contentItem.As<MarkdownBodyPart>() != null)
-            {
-                contentItem.Alter<MarkdownBodyPart>(x => x.Markdown = rpcStruct.Optional<string>("description"));
-            }
+            contentItem.Alter<MarkdownBodyPart>(x => x.Markdown = rpcStruct.Optional<string>("description"));
         }
     }
 }

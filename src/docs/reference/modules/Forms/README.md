@@ -21,6 +21,26 @@ Creating a form typically involves the following steps:
 3. Add the Form widget.
 4. Because the Form widget has the `FlowPart` attached, you can add other widgets to the Form widget. Add widgets such as Input, Textarea and Button to build up your form.
 
+### Configuring Form Visibility
+
+Once your form’s basic structure is in place, you can enhance it with conditional visibility rules. These allow you to hide or show certain fields based on the values of other fields. For example:
+
+1. In the **Form editor**, select the input widget you want to control and expand its **Visibility Settings** pane.  
+2. Choose an **Action**:
+   - **Always Visible** – the widget is never hidden.  
+   - **Conditionally Show** – the widget appears only when your rules evaluate to true; when your rules evaluate to false, the widget is hidden.  
+   - **Conditionally Hide** – the widget is hidden when your rules evaluate to true; when your rules evaluate to false, the widget appears.  
+3. Build one or more rule groups:
+   1. Click **New Group**.  
+   2. Within that group, click **New Rule** and configure each rule:
+      - **Field** – the input to observe (e.g. `MembershipType`). Note that fields will only be listed if you save the form after adding them.
+      - **Operator** – how to compare (e.g. `Contains`)  
+      - **Value** – the comparison target (e.g. `Premium`)  
+   3. **Rule logic** within a group is combined with **AND**: all rules in the same group must pass.  
+4. **Group logic** across multiple groups is combined with **OR**: if **any** group passes, the overall condition is met.  
+5. Repeat step 3 to add additional rules or groups as needed.  
+6. Save the form to apply your visibility settings.
+
 ### Processing Form submissions
 
 Once you have a form in place, you need to handle its submission. The Form widget has a field called **Action**, into which you can enter a URL to where the form should submit to. This could be the path to your own controller, but it can also be the URL pointing to a workflow type.  
@@ -29,7 +49,7 @@ Using a workflow is convenient because it doesn't require you to create a custom
 Creating a workflow and associating it with a form typically involves the following steps:
 
 1. Make sure the **HTTP Workflows Activities** feature is enabled.
-2. Click on the Workflows menu item and create a new Workflow Type.
+2. Go to **Design** → **Workflows** and create a new Workflow Type.
 3. Add the **HTTP Request Event** event to the workflow. Make sure the **HTTP Method** field is set to **POST**.
 4. Copy the generated workflow URL to your clipboard.
 5. Click **Save** to save the changes and return to the workflow editor.
@@ -84,9 +104,9 @@ Add the following widgets to the Form widget:
 ### Configuring NoCaptcha
 
 When adding the NoCaptcha widget, a message was displayed that the NoCaptcha settings need to be configured before it will be displayed on the form. Let's do that right away.  
-Click on the **NoCaptcha Settings** link that is displayed within the message. Alternatively, go to *Configuration* -> *Settings* -> *Forms*.
+Click on the **NoCaptcha Settings** link that is displayed within the message. Alternatively, go to *Settings* -> *Security* -> *reCaptcha*.
 
-The Forms settings shows two fields: **SiteKey** and **Site Secret**. You can get these values for free from [https://developers.google.com/recaptcha/](https://developers.google.com/recaptcha/). The widget uses **reCaptcha V2**, so make sure to create Site Key and Site Secret for that version.  
+The reCaptcha settings show two fields: **SiteKey** and **Site Secret**. You can get these values for free from [https://developers.google.com/recaptcha/](https://developers.google.com/recaptcha/). The widget uses **reCaptcha V2**, so make sure to create Site Key and Site Secret for that version.  
 Once you have generated a Site Key and Site Secret with Google, copy & paste those values in the SiteKey and Site Secret fields, respectively, and click the **Save** button.
 
 The final form configuration should look something like this:
@@ -99,9 +119,9 @@ And on the front-end, it will look like this:
 
 ### Create the Contact Form Workflow
 
-In order to validate the form input and send an email, we will create a workflow. 
+In order to validate the form input and send an email, we will create a workflow.
 
-From the admin menu, click the **Workflows** menu item. Next, click on **Create Workflow Type**.  
+From the admin menu, go to **Design** → **Workflows**. Next, click on **Create Workflow Type**.  
 We're now asked to provide a name for the workflow. Enter "Contact Form Workflow", leave the other options as-is, and click **Save**. When you do, you will be redirected to the Workflow Editor, which is where we'll implement the Contact Form submission logic.
 
 ### Adding the Http Request Event
@@ -183,7 +203,7 @@ Click the **Add Task** button and locate the Send Email activity. Enter the foll
 
 #### Configuring SMTP
 
-In order to try out sending emails, you will need to configure the SMTP settings. You can do so via *Configuration* -> *Settings* -> *Smtp*. For development purposes, I am a big fan of [Smtp4Dev](https://github.com/rnwood/smtp4dev), which makes it super easy to try out sending emails *without actually sending them*. It's basically an SMTP host that intercepts emails being sent that you can then inspect.  
+In order to try out sending emails, you will need to configure the SMTP settings. You can do so via *Settings* -> *Communication* -> *Email* and then select the *SMTP* tab. For development purposes, I am a big fan of [Smtp4Dev](https://github.com/rnwood/smtp4dev), which makes it super easy to try out sending emails *without actually sending them*. It's basically an SMTP host that intercepts emails being sent that you can then inspect.  
 When configuring the SMTP settings in Orchard, make sure to provide the **Sender email address**, which will be used by default (remember, we didn't specify a Sender in the Send Email activity). Enter `system@orchardcore.io` or any other valid email address you like.  
 If you're using Smtp4Dev, make sure to enter `localhost` in the Host name field, and the configured port number.
 
@@ -200,7 +220,7 @@ Create a new Page content item with a title of `Thank You!`, and make sure its P
 Now that our workflow is done, we need to update the Contact Form widget with the Workflow URL that was generated for us in the **HTTP Request** activity. Unless you have that URL still on your clipboard, go back to the first activity on the workflow, double-click it to get to its activity editor, and copy the URL (without the scheme, host and port number; just the path).  
 Go back to the Contact Form page content item, expand the Contact Form widget and paste in the URL into the **Action** field and save your changes.
 
-### Try it out!
+### Try it out
 
 Go ahead and try it out. Navigate to <https://localhost:44300/contact-form> and fill out the form. If all went well, you should see an email coming in and be redirected to the Thank You page.  
 If you leave any field empty or do not pass the captcha, you should be redirected to the Contact Form page and see the validation errors.
@@ -215,7 +235,6 @@ The final workflow should look like this:
 
 ![Contact Form Workflow](./assets/contact-form-workflow-1.png)
 
-## Future Improvements
+## Video
 
-Implementing a workflow that handles form submissions is easy, but the workflow becomes big quite quickly as soon as you start adding validation logic to the mix. In the next version of the Forms module, there will be an easier way to validate Form submissions in combination with the Form widget. The Form widget will contain all of the validation settings, and there will be a single workflow activity that validates the submitted values against those settings.  
-The low-level validation activities will remain part of the toolbox to support workflow validation for forms that are not built with the Form widget, but implemented as raw HTML for example.
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/Sd-aYy5DblI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>

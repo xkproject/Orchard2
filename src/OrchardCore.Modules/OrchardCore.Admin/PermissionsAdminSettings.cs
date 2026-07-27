@@ -1,29 +1,26 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using OrchardCore.Security.Permissions;
 
-namespace OrchardCore.Admin
+namespace OrchardCore.Admin;
+
+public sealed class PermissionsAdminSettings : IPermissionProvider
 {
-    public class PermissionsAdminSettings : IPermissionProvider
-    {
-        public static readonly Permission ManageAdminSettings = new Permission("ManageAdminSettings", "Manage Admin Settings");
+    private readonly IEnumerable<Permission> _allPermissions =
+    [
+        AdminPermissions.ManageAdminSettings,
+    ];
 
-        public Task<IEnumerable<Permission>> GetPermissionsAsync()
-        {
-            return Task.FromResult(new[] { ManageAdminSettings }.AsEnumerable());
-        }
+    [Obsolete("This will be removed in a future release. Instead use 'AdminPermissions.ManageAdminSettings'.")]
+    public static readonly Permission ManageAdminSettings = AdminPermissions.ManageAdminSettings;
 
-        public IEnumerable<PermissionStereotype> GetDefaultStereotypes()
+    public IEnumerable<PermissionStereotype> GetDefaultStereotypes() =>
+    [
+        new PermissionStereotype
         {
-            return new[]
-            {
-                new PermissionStereotype
-                {
-                    Name = "Administrator",
-                    Permissions = new[] { ManageAdminSettings }
-                }
-            };
-        }
-    }
+            Name = OrchardCoreConstants.Roles.Administrator,
+            Permissions = _allPermissions,
+        },
+    ];
+
+    public Task<IEnumerable<Permission>> GetPermissionsAsync()
+        => Task.FromResult(_allPermissions);
 }

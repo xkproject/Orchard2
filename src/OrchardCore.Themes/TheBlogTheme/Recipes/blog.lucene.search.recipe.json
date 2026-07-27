@@ -1,0 +1,106 @@
+{
+  "name": "Blog.Lucene.Search",
+  "displayName": "Blog - Lucene Search",
+  "description": "Creates Lucene settings, permission and indices.",
+  "author": "The Orchard Core Team",
+  "website": "https://orchardcore.net",
+  "version": "1.0.0",
+  "issetuprecipe": false,
+  "categories": [ "default" ],
+  "tags": [ "blog", "lucene" ],
+
+  "steps": [
+    {
+      "name": "feature",
+      "enable": [
+        "OrchardCore.Search",
+        "OrchardCore.Lucene"
+      ]
+    },
+    {
+      "name": "CreateOrUpdateIndexProfile",
+      "indexes": [
+        {
+          "IndexName": "Search",
+          "ProviderName": "Lucene",
+          "Type": "Content",
+          "Name": "Search",
+          "Properties": {
+            "LuceneIndexMetadata": {
+              "StoreSourceData": false,
+              "AnalyzerName": "standardanalyzer"
+            },
+            "ContentIndexMetadata": {
+              "IndexLatest": false,
+              "IndexedContentTypes": [
+                "Article",
+                "Blockquote",
+                "Blog",
+                "BlogPost",
+                "Container",
+                "Image",
+                "LinkMenuItem",
+                "Menu",
+                "Page",
+                "Paragraph",
+                "RawHtml"
+              ],
+              "Culture": "any"
+            },
+            "LuceneIndexDefaultQueryMetadata": {
+              "DefaultVersion": "LUCENE_30",
+              "QueryAnalyzerName": "standardanalyzer",
+              "AllowLuceneQueries": false,
+              "DefaultSearchFields": [
+                "Content.ContentItem.FullText"
+              ]
+            }
+          },
+          "IndexLatest": false,
+          "Culture": "any",
+          "IndexedContentTypes": [
+            "Article",
+            "Blockquote",
+            "Blog",
+            "BlogPost",
+            "Container",
+            "Image",
+            "LinkMenuItem",
+            "Menu",
+            "Page",
+            "Paragraph",
+            "RawHtml"
+          ]
+        }
+      ]
+    },
+    {
+      // Create the search settings.
+      "name": "Settings",
+      "SearchSettings": {
+        "DefaultIndexProfileName": "Search"
+      }
+    },
+    {
+      "name": "RebuildIndex",
+      "includeAll": false,
+      "indexNames": [
+        "Search"
+      ]
+    },
+    {
+      // Create the search index permissions.
+      "name": "Roles",
+      "Roles": [
+        {
+          "Name": "Anonymous",
+          "Description": "Anonymous role",
+          "Permissions": [
+            "ViewContent",
+            "QueryIndex_Search"
+          ]
+        }
+      ]
+    }
+  ]
+}

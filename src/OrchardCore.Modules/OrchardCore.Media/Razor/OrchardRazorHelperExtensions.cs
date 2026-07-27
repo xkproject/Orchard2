@@ -1,19 +1,21 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using OrchardCore;
 using OrchardCore.Media;
+using OrchardCore.Media.Core.Processing;
 using OrchardCore.Media.Fields;
 using OrchardCore.Media.Processing;
 using OrchardCore.Media.Services;
 
-public static class OrchardRazorHelperExtensions
+#pragma warning disable CA1050 // Declare types in namespaces
+public static class MediaOrchardRazorHelperExtensions
+#pragma warning restore CA1050 // Declare types in namespaces
 {
     /// <summary>
     /// Returns the relative URL of the specified asset path with optional resizing parameters.
     /// </summary>
-    public static string AssetUrl(this IOrchardHelper orchardHelper, string assetPath, int? width = null, int? height = null, ResizeMode resizeMode = ResizeMode.Undefined, bool appendVersion = false, int? quality = null, Format format = Format.Undefined, Anchor anchor = null, string bgcolor = null)
+    public static string AssetUrl(this IOrchardHelper orchardHelper, string assetPath, int? width = null, int? height = null, ResizeMode resizeMode = ResizeMode.Undefined, bool appendVersion = false, int? quality = null, Format format = Format.Undefined, Anchor anchor = null, string bgColor = null)
     {
         var mediaFileStore = orchardHelper.HttpContext.RequestServices.GetService<IMediaFileStore>();
 
@@ -31,7 +33,7 @@ public static class OrchardRazorHelperExtensions
             resolvedAssetPath = fileVersionProvider.AddFileVersionToPath(orchardHelper.HttpContext.Request.PathBase, resolvedAssetPath);
         }
 
-        return orchardHelper.ImageResizeUrl(resolvedAssetPath, width, height, resizeMode, quality, format, anchor, bgcolor);
+        return orchardHelper.ImageResizeUrl(resolvedAssetPath, width, height, resizeMode, quality, format, anchor, bgColor);
     }
 
     /// <summary>

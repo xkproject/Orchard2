@@ -1,34 +1,31 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using OrchardCore.Security.Permissions;
 
-namespace OrchardCore.Shortcodes
+namespace OrchardCore.Shortcodes;
+
+public sealed class Permissions : IPermissionProvider
 {
-    public class Permissions : IPermissionProvider
-    {
-        public static readonly Permission ManageShortcodeTemplates = new Permission("ManageShortcodeTemplates", "Manage shortcode templates", isSecurityCritical: true);
+    private readonly IEnumerable<Permission> _allPermissions =
+    [
+        ShortcodesPermissions.ManageShortcodeTemplates,
+    ];
 
-        public Task<IEnumerable<Permission>> GetPermissionsAsync()
-        {
-            return Task.FromResult(new[] { ManageShortcodeTemplates }.AsEnumerable());
-        }
+    [Obsolete("This will be removed in a future release. Instead use 'ShortcodesPermissions.ManageShortcodeTemplates'.")]
+    public static readonly Permission ManageShortcodeTemplates = ShortcodesPermissions.ManageShortcodeTemplates;
 
-        public IEnumerable<PermissionStereotype> GetDefaultStereotypes()
+    public Task<IEnumerable<Permission>> GetPermissionsAsync()
+        => Task.FromResult(_allPermissions);
+
+    public IEnumerable<PermissionStereotype> GetDefaultStereotypes() =>
+    [
+        new PermissionStereotype
         {
-            return new[]
-            {
-                new PermissionStereotype
-                {
-                    Name = "Administrator",
-                    Permissions = new[] { ManageShortcodeTemplates }
-                },
-                new PermissionStereotype
-                {
-                    Name = "Editor",
-                    Permissions = new[] { ManageShortcodeTemplates }
-                }
-            };
-        }
-    }
+            Name = OrchardCoreConstants.Roles.Administrator,
+            Permissions = _allPermissions,
+        },
+        new PermissionStereotype
+        {
+            Name = OrchardCoreConstants.Roles.Editor,
+            Permissions = _allPermissions,
+        },
+    ];
 }

@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OrchardCore.Admin;
 using OrchardCore.ContentFields.Settings;
@@ -9,59 +7,107 @@ using OrchardCore.ContentFields.ViewModels;
 using OrchardCore.ContentManagement;
 using OrchardCore.ContentManagement.Metadata;
 using OrchardCore.ContentManagement.Metadata.Models;
+using OrchardCore.Contents;
 
-namespace OrchardCore.ContentFields.Controllers
+namespace OrchardCore.ContentFields.Controllers;
+
+[Admin]
+public sealed class ContentPickerAdminController : Controller
 {
-    [Admin]
-    public class ContentPickerAdminController : Controller
+    private readonly IContentDefinitionManager _contentDefinitionManager;
+    private readonly IContentManager _contentManager;
+    private readonly IEnumerable<IContentPickerResultProvider> _resultProviders;
+    private readonly IAuthorizationService _authorizationService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public ContentPickerAdminController(
+        IContentDefinitionManager contentDefinitionManager,
+        IContentManager contentManager,
+        IEnumerable<IContentPickerResultProvider> resultProviders,
+        IAuthorizationService authorizationService,
+        IHttpContextAccessor httpContextAccessor)
     {
-        private readonly IContentDefinitionManager _contentDefinitionManager;
-        private readonly IEnumerable<IContentPickerResultProvider> _resultProviders;
+        _contentDefinitionManager = contentDefinitionManager;
+        _contentManager = contentManager;
+        _resultProviders = resultProviders;
+        _authorizationService = authorizationService;
+        _httpContextAccessor = httpContextAccessor;
+    }
 
-        public ContentPickerAdminController(
-            IContentDefinitionManager contentDefinitionManager,
-            IEnumerable<IContentPickerResultProvider> resultProviders
-            )
+    [Admin("ContentFields/SearchContentItems", "ContentPicker")]
+    public async Task<IActionResult> SearchContentItems(string part, string field, string query)
+    {
+        if (string.IsNullOrWhiteSpace(part) || string.IsNullOrWhiteSpace(field))
         {
-            _contentDefinitionManager = contentDefinitionManager;
-            _resultProviders = resultProviders;
+            return BadRequest("Part and field are required parameters");
         }
 
-        public async Task<IActionResult> SearchContentItems(string part, string field, string query)
+        var partFieldDefinition = (await _contentDefinitionManager.GetPartDefinitionAsync(part))?.Fields
+            .FirstOrDefault(f => f.Name == field);
+
+        var fieldSettings = partFieldDefinition?.GetSettings<ContentPickerFieldSettings>();
+        if (fieldSettings == null)
         {
-            if (string.IsNullOrWhiteSpace(part) || String.IsNullOrWhiteSpace(field))
+            return BadRequest("Unable to find field definition");
+        }
+
+        var editor = partFieldDefinition.Editor() ?? "Default";
+
+        var resultProvider = _resultProviders.FirstOrDefault(p => p.Name == editor)
+            ?? _resultProviders.FirstOrDefault(p => p.Name == "Default");
+
+        if (resultProvider == null)
+        {
+            return new ObjectResult(new List<ContentPickerResult>());
+        }
+
+        var contentTypes = fieldSettings.DisplayedContentTypes;
+
+        if (fieldSettings.DisplayedStereotypes != null && fieldSettings.DisplayedStereotypes.Length > 0)
+        {
+            contentTypes = (await _contentDefinitionManager.ListTypeDefinitionsAsync())
+                .Where(contentType =>
+                {
+                    var hasStereotype = contentType.TryGetStereotype(out var stereotype);
+
+                    return hasStereotype && fieldSettings.DisplayedStereotypes.Contains(stereotype);
+                }).Select(contentType => contentType.Name)
+                .ToArray();
+        }
+
+        var results = await resultProvider.Search(new ContentPickerSearchContext
+        {
+            Query = query,
+            DisplayAllContentTypes = fieldSettings.DisplayAllContentTypes,
+            ContentTypes = contentTypes,
+            PartFieldDefinition = partFieldDefinition,
+        });
+
+        var selectedItems = new List<VueMultiselectItemViewModel>();
+        var user = _httpContextAccessor.HttpContext?.User;
+
+        var missingIds = results
+            .Where(r => r.ContentItem == null)
+            .Select(r => r.ContentItemId)
+            .Distinct();
+
+        var fetchedItems = (await _contentManager.GetAsync(missingIds))
+            .ToDictionary(c => c.ContentItemId);
+
+        foreach (var result in results)
+        {
+            var contentItem = result.ContentItem ?? fetchedItems.GetValueOrDefault(result.ContentItemId);
+            var isViewable = contentItem != null && await _authorizationService.AuthorizeAsync(user, CommonPermissions.EditContent, contentItem);
+
+            selectedItems.Add(new VueMultiselectItemViewModel()
             {
-                return BadRequest("Part and field are required parameters");
-            }
-
-            var partFieldDefinition = _contentDefinitionManager.GetPartDefinition(part)?.Fields
-                .FirstOrDefault(f => f.Name == field);
-
-            var fieldSettings = partFieldDefinition?.GetSettings<ContentPickerFieldSettings>();
-            if (fieldSettings == null)
-            {
-                return BadRequest("Unable to find field definition");
-            }
-
-            var editor = partFieldDefinition.Editor() ?? "Default";
-
-            var resultProvider = _resultProviders.FirstOrDefault(p => p.Name == editor)
-                ?? _resultProviders.FirstOrDefault(p => p.Name == "Default");
-
-            if (resultProvider == null)
-            {
-                return new ObjectResult(new List<ContentPickerResult>());
-            }
-
-            var results = await resultProvider.Search(new ContentPickerSearchContext
-            {
-                Query = query,
-                DisplayAllContentTypes = fieldSettings.DisplayAllContentTypes,
-                ContentTypes = fieldSettings.DisplayedContentTypes,
-                PartFieldDefinition = partFieldDefinition
+                Id = result.ContentItemId,
+                DisplayText = result.DisplayText,
+                HasPublished = result.HasPublished,
+                IsViewable = isViewable,
             });
-
-            return new ObjectResult(results.Select(r => new VueMultiselectItemViewModel() { Id = r.ContentItemId, DisplayText = r.DisplayText, HasPublished = r.HasPublished }));
         }
+
+        return new ObjectResult(selectedItems);
     }
 }

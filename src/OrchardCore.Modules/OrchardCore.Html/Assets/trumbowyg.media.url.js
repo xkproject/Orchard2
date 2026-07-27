@@ -14,9 +14,10 @@
                         fn: function () {
                             trumbowyg.saveRange();
                             $("#mediaApp").detach().appendTo('#mediaModalBody .modal-body');
-                            $("#mediaApp").show();
+                            document.getElementById("mediaApp").classList.remove("d-none");
                             mediaApp.selectedMedias = [];
-                            var modal = $('#mediaModalBody').modal();
+                            var modal = new bootstrap.Modal($("#mediaModalBody"));
+                            modal.show();
                             //disable an reset on click event over the button to avoid issue if press button multiple times or have multiple editor
                             $('#mediaBodySelectButton').off('click');
                             $('#mediaBodySelectButton').on('click', function (v) {
@@ -26,7 +27,7 @@
                                 
                                 $(window).trigger('scroll');
 
-                                for (i = 0; i < mediaApp.selectedMedias.length; i++) {
+                                for (let i = 0; i < mediaApp.selectedMedias.length; i++) {
                                     var img = document.createElement("img");
                                     img.src = mediaApp.selectedMedias[i].url;
                                     img.alt = mediaApp.selectedMedias[i].name;
@@ -38,7 +39,7 @@
                                 //avoid image to be selected after add it
                                 trumbowyg.$c.focus();
 
-                                $('#mediaModalBody').modal('hide');
+                                modal.hide();
                                 return true;
                             });
                         }

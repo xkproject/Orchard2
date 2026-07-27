@@ -1,49 +1,27 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using OrchardCore.Apis.GraphQL;
 using OrchardCore.Security.Permissions;
 
-namespace OrchardCore.ContentManagement.GraphQL
+namespace OrchardCore.ContentManagement.GraphQL;
+
+public sealed class Permissions : IPermissionProvider
 {
-    public class Permissions : IPermissionProvider
-    {
-        public static readonly Permission ApiViewContent = new Permission("ApiViewContent", "Access view content endpoints");
+    private readonly IEnumerable<Permission> _allPermissions =
+    [
+        GraphQLPermissions.ApiViewContent,
+    ];
 
-        public Task<IEnumerable<Permission>> GetPermissionsAsync()
-        {
-            return Task.FromResult(new[]
-            {
-                ApiViewContent
-            }
-            .AsEnumerable());
-        }
+    [Obsolete("This will be removed in a future release. Instead use 'GraphQLPermissions.ApiViewContent'.")]
+    public static readonly Permission ApiViewContent = GraphQLPermissions.ApiViewContent;
 
-        public IEnumerable<PermissionStereotype> GetDefaultStereotypes()
+    public Task<IEnumerable<Permission>> GetPermissionsAsync()
+        => Task.FromResult(_allPermissions);
+
+    public IEnumerable<PermissionStereotype> GetDefaultStereotypes() =>
+    [
+        new PermissionStereotype
         {
-            return new[] {
-                new PermissionStereotype {
-                    Name = "Administrator",
-                    Permissions = new[] { ApiViewContent }
-                },
-                new PermissionStereotype {
-                    Name = "Editor"
-                },
-                new PermissionStereotype {
-                    Name = "Moderator"
-                },
-                new PermissionStereotype {
-                    Name = "Author"
-                },
-                new PermissionStereotype {
-                    Name = "Contributor"
-                },
-                new PermissionStereotype {
-                    Name = "Authenticated"
-                },
-                new PermissionStereotype {
-                    Name = "Anonymous"
-                }
-            };
-        }
-    }
+            Name = OrchardCoreConstants.Roles.Administrator,
+            Permissions = _allPermissions,
+        },
+    ];
 }

@@ -1,74 +1,88 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
 using OrchardCore.ContentManagement;
+using OrchardCore.Indexing;
+using OrchardCore.Indexing.Core;
+using OrchardCore.Lucene.Core;
 using OrchardCore.Lucene.Settings;
 
-namespace OrchardCore.Lucene.Services
+namespace OrchardCore.Lucene.Services;
+
+public class LuceneContentPickerResultProvider : IContentPickerResultProvider
 {
-    public class LuceneContentPickerResultProvider : IContentPickerResultProvider
+    private readonly IIndexProfileStore _indexStore;
+    private readonly LuceneIndexManager _luceneIndexManager;
+    private readonly ILuceneIndexStore _luceneIndexStore;
+
+    public LuceneContentPickerResultProvider(
+        IIndexProfileStore indexStore,
+        LuceneIndexManager luceneIndexManager,
+        ILuceneIndexStore luceneIndexStore)
     {
-        private readonly LuceneIndexManager _luceneIndexProvider;
+        _indexStore = indexStore;
+        _luceneIndexManager = luceneIndexManager;
+        _luceneIndexStore = luceneIndexStore;
+    }
 
-        public LuceneContentPickerResultProvider(LuceneIndexManager luceneIndexProvider)
+    public string Name => LuceneConstants.ProviderName;
+
+    public async Task<IEnumerable<ContentPickerResult>> Search(ContentPickerSearchContext searchContext)
+    {
+        var indexName = "Search";
+
+        var fieldSettings = searchContext.PartFieldDefinition?.GetSettings<ContentPickerFieldLuceneEditorSettings>();
+
+        if (!string.IsNullOrWhiteSpace(fieldSettings?.Index))
         {
-            _luceneIndexProvider = luceneIndexProvider;
+            indexName = fieldSettings.Index;
         }
 
-        public string Name => "Lucene";
-
-        public async Task<IEnumerable<ContentPickerResult>> Search(ContentPickerSearchContext searchContext)
+        if (string.IsNullOrWhiteSpace(fieldSettings?.Index))
         {
-            var indexName = "Search";
-
-            var fieldSettings = searchContext.PartFieldDefinition?.GetSettings<ContentPickerFieldLuceneEditorSettings>();
-            if (!string.IsNullOrWhiteSpace(fieldSettings?.Index))
-            {
-                indexName = fieldSettings.Index;
-            }
-
-            if (!_luceneIndexProvider.Exists(indexName))
-            {
-                return new List<ContentPickerResult>();
-            }
-
-            var results = new List<ContentPickerResult>();
-
-            await _luceneIndexProvider.SearchAsync(indexName, searcher =>
-            {
-                Query query = null;
-
-                if (string.IsNullOrWhiteSpace(searchContext.Query))
-                {
-                    query = new MatchAllDocsQuery();
-                }
-                else
-                {
-                    query = new WildcardQuery(new Term("Content.ContentItem.DisplayText.Analyzed", searchContext.Query.ToLowerInvariant() + "*"));
-                }
-
-                var filter = new FieldCacheTermsFilter("Content.ContentItem.ContentType", searchContext.ContentTypes.ToArray());
-
-                var docs = searcher.Search(query, filter, 50, Sort.RELEVANCE);
-
-                foreach (var hit in docs.ScoreDocs)
-                {
-                    var doc = searcher.Doc(hit.Doc);
-
-                    results.Add(new ContentPickerResult
-                    {
-                        ContentItemId = doc.GetField("ContentItemId").GetStringValue(),
-                        DisplayText = doc.GetField("Content.ContentItem.DisplayText").GetStringValue(),
-                        HasPublished = doc.GetField("Content.ContentItem.Published").GetStringValue() == "true" ? true : false
-                    });
-                }
-
-                return Task.CompletedTask;
-            });
-
-            return results.OrderBy(x => x.DisplayText);
+            return [];
         }
+
+        var index = await _indexStore.FindByIndexNameAndProviderAsync(fieldSettings.Index, LuceneConstants.ProviderName);
+
+        if (index is null || index.Type != IndexingConstants.ContentsIndexSource || !await _luceneIndexManager.ExistsAsync(index.IndexFullName))
+        {
+            return [];
+        }
+
+        var results = new List<ContentPickerResult>();
+
+        await _luceneIndexStore.SearchAsync(index, searcher =>
+        {
+            Query query = null;
+
+            if (string.IsNullOrWhiteSpace(searchContext.Query))
+            {
+                query = new MatchAllDocsQuery();
+            }
+            else
+            {
+                query = new WildcardQuery(new Term("Content.ContentItem.DisplayText.Normalized", searchContext.Query.ToLowerInvariant() + "*"));
+            }
+
+            var filter = new FieldCacheTermsFilter("Content.ContentItem.ContentType", searchContext.ContentTypes.ToArray());
+
+            var docs = searcher.Search(query, filter, 50, Sort.RELEVANCE);
+
+            foreach (var hit in docs.ScoreDocs)
+            {
+                var doc = searcher.Doc(hit.Doc);
+
+                results.Add(new ContentPickerResult
+                {
+                    ContentItemId = doc.GetField("ContentItemId").GetStringValue(),
+                    DisplayText = doc.GetField("Content.ContentItem.DisplayText.keyword").GetStringValue(),
+                    HasPublished = doc.GetField("Content.ContentItem.Published").GetStringValue().Equals("true", StringComparison.OrdinalIgnoreCase),
+                });
+            }
+
+            return Task.CompletedTask;
+        });
+
+        return results.OrderBy(x => x.DisplayText);
     }
 }

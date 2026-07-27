@@ -1,7 +1,10 @@
 @using OrchardCore.ContentManagement
 @{
     ContentItem contentItem = Model.ContentItem;
-    var linkMenuItemPart = contentItem.As<LinkMenuItemPart>();
+    if (!contentItem.TryGet<LinkMenuItemPart>(out var linkMenuItemPart))
+    {
+        return;
+    }
 
     TagBuilder tag = Tag(Model, "a");
 
@@ -14,6 +17,11 @@
     if (url.StartsWith("~/", StringComparison.Ordinal))
     {
         url = Url.Content(linkMenuItemPart.Url);
+    }
+
+    if (!string.IsNullOrEmpty(linkMenuItemPart.Target))
+    {
+        tag.Attributes["target"] = linkMenuItemPart.Target;
     }
 
     tag.Attributes["href"] = url;

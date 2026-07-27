@@ -6,10 +6,10 @@ Widgets are used by different modules that need to render specialized pieces of 
 
 ## Creating custom Widgets
 
-Many types of Widgets can be created and the default recipes do create some custom ones like `Paragraph`, `Blockquote`, and `MediaWidget` that you can 
+Many types of Widgets can be created and the default recipes do create some custom ones like `Paragraph`, `Blockquote`, and `MediaWidget` that you can
 use as examples.
 
-Widgets are content items, and as such they can be composed of content fields and content parts. For instance the `Paragraph` widget that is included with the 
+Widgets are content items, and as such they can be composed of content fields and content parts. For instance the `Paragraph` widget that is included with the
 `TheBlogTheme` recipe is made out of an HTML field with a WYSIWYG editor.
 
 Widgets can then be composed from the Admin UI during the lifetime of the site, from migrations files to include them as part of custom modules, or recipe files
@@ -21,18 +21,18 @@ for Widgets will treat this content item accordingly. This is how the `Layers` m
 Because `Widget` is a stereotype, all Widget content items are rendered from a main shape named `Widget`.
 This main shape's template has access to these properties:
 
-| Property | Description |
-| --------- | ------------ |
-| `Model.ContentItem` | The Widget content item. |
-| `Model.Content` | A list of inner shapes to display. It's populated by all the fields and parts the widget is composed of. |
+| Property            | Description                                                                                              |
+|---------------------|----------------------------------------------------------------------------------------------------------|
+| `Model.ContentItem` | The Widget content item.                                                                                 |
+| `Model.Content`     | A list of inner shapes to display. It's populated by all the fields and parts the widget is composed of. |
 
 It also contains these specific zones, which are not used most of the time and can be ignored when creating custom templates for the website front-end.
 
-| Property | Description |
-| --------- | ------------ |
-| `Model.Header` | The shapes to render in the widget's header. |
-| `Model.Meta` | The shapes to render in the widget's metadata zone. |
-| `Model.Footer` | The shapes to render in the widget's footer. |
+| Property       | Description                                         |
+|----------------|-----------------------------------------------------|
+| `Model.Header` | The shapes to render in the widget's header.        |
+| `Model.Meta`   | The shapes to render in the widget's metadata zone. |
+| `Model.Footer` | The shapes to render in the widget's footer.        |
 
 The shape also contains all the properties common to all shapes like `Classes`, `Id` and `Attributes`.
 
@@ -53,7 +53,7 @@ The `Widget` shape is used to render a Widget. The default template will render 
 </div>
 ```
 
-If the HTML contains `<div class="widget-container">` then your widget has been rendered by the `Layers` modules which will add this automatically, as it needs to 
+If the HTML contains `<div class="widget-container">` then your widget has been rendered by the `Layers` modules which will add this automatically, as it needs to
 be able to render a title, and uses it as a container for both the title and the widget's actual content.
 
 The actual template for the `Widget` shape can be found in `src/OrchardCore.Modules/OrchardCore.Widgets/Views/Widgets.cshtml` but can be simplified to this:
@@ -80,8 +80,8 @@ The actual template for the `Widget` shape can be found in `src/OrchardCore.Modu
 
 Alternates are available per Content Type.
 
-| Definition | Template | Filename|
-| ---------- | --------- | ------------ |
+| Definition              | Template            | Filename                  |
+|-------------------------|---------------------|---------------------------|
 | `Widget__[ContentType]` | `Widget__Paragraph` | `Widget-Paragraph.cshtml` |
 
 ### Customizing the `Widget_Wrapper` template
@@ -106,7 +106,15 @@ A common requirement is to remove these tags, which can be done by creating this
 
 Optionally, you can change these alternates:
 
-| Definition | Template | Filename|
-| ---------- | --------- | ------------ |
-| `Widget_Wrapper__[ContentType]` | `Widget_Wrapper__Paragraph` | `Widget-Paragraph.Wrapper.cshtml` |
+| Definition                            | Template                       | Filename                            |
+|---------------------------------------|--------------------------------|-------------------------------------|
+| `Widget_Wrapper__[ContentType]`       | `Widget_Wrapper__Paragraph`    | `Widget-Paragraph.Wrapper.cshtml`   |
 | `Widget_Wrapper__Zone__[ContentZone]` | `Widget_Wrapper__Zone__Footer` | `Widget-Zone-Footer.Wrapper.cshtml` |
+
+## Videos
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/9gARrrvoAY4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/NCvytsdED_o" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/mN4H6hIBzWI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>

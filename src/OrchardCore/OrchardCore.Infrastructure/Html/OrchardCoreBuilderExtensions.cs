@@ -1,28 +1,31 @@
 using OrchardCore.Infrastructure.Html;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection;
+
+public static partial class OrchardCoreBuilderExtensions
 {
-    public static partial class OrchardCoreBuilderExtensions
+    /// <summary>
+    /// Adds html script sanitization services.
+    /// </summary>
+    /// <param name="builder">The <see cref="OrchardCoreBuilder"/>.</param>
+    public static OrchardCoreBuilder AddHtmlSanitizer(this OrchardCoreBuilder builder)
     {
-        /// <summary>
-        /// Adds html script sanitization services.
-        /// </summary>
-        /// <param name="builder">The <see cref="OrchardCoreBuilder"/>.</param>
-        public static OrchardCoreBuilder AddHtmlSanitizer(this OrchardCoreBuilder builder)
+        builder.ConfigureServices(services =>
         {
-            builder.ConfigureServices(services =>
+            services.AddOptions<HtmlSanitizerOptions>();
+
+            services.ConfigureHtmlSanitizer((sanitizer) =>
             {
-                services.AddOptions<HtmlSanitizerOptions>();
+                sanitizer.AllowedAttributes.Add("class");
+                sanitizer.AllowedTags.Remove("form");
 
-                services.ConfigureHtmlSanitizer((sanitizer) =>
-                {
-                    sanitizer.AllowedAttributes.Add("class");
-                });
-
-                services.AddSingleton<IHtmlSanitizerService, HtmlSanitizerService>();
+                sanitizer.AllowedSchemes.Add("mailto");
+                sanitizer.AllowedSchemes.Add("tel");
             });
 
-            return builder;
-        }
+            services.AddSingleton<IHtmlSanitizerService, HtmlSanitizerService>();
+        });
+
+        return builder;
     }
 }

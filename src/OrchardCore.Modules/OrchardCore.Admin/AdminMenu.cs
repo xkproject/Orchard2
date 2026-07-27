@@ -1,39 +1,55 @@
-using System;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Localization;
 using OrchardCore.Admin.Drivers;
 using OrchardCore.Navigation;
 
-namespace OrchardCore.Admin
+namespace OrchardCore.Admin;
+
+public sealed class AdminMenu : AdminNavigationProvider
 {
-    public class AdminMenu : INavigationProvider
+    private static readonly RouteValueDictionary _routeValues = new()
     {
-        private readonly IStringLocalizer S;
+        { "area", "OrchardCore.Settings" },
+        { "groupId", AdminSiteSettingsDisplayDriver.GroupId },
+    };
 
-        public AdminMenu(IStringLocalizer<AdminMenu> localizer)
+    internal readonly IStringLocalizer S;
+
+    public AdminMenu(IStringLocalizer<AdminMenu> stringLocalizer)
+    {
+        S = stringLocalizer;
+    }
+
+    protected override ValueTask BuildAsync(NavigationBuilder builder)
+    {
+        if (NavigationHelper.UseLegacyFormat())
         {
-            S = localizer;
-        }
-
-        public Task BuildNavigationAsync(string name, NavigationBuilder builder)
-        {
-            if (!String.Equals(name, "admin", StringComparison.OrdinalIgnoreCase))
-            {
-                return Task.CompletedTask;
-            }
-
             builder
-                .Add(S["Configuration"], design => design
-                    .Add(S["Settings"], settings => settings
-                        .Add(S["Admin"], S["Admin"].PrefixPosition(), admin => admin
-                        .AddClass("admin").Id("admin")
-                            .Action("Index", "Admin", new { area = "OrchardCore.Settings", groupId = AdminSiteSettingsDisplayDriver.GroupId })
-                            .Permission(PermissionsAdminSettings.ManageAdminSettings)
-                            .LocalNav()
-                        )
-                    ));
+            .Add(S["Configuration"], configuration => configuration
+                .Add(S["Settings"], settings => settings
+                    .Add(S["Admin"], S["Admin"].PrefixPosition(), admin => admin
+                        .AddClass("admin")
+                        .Id("admin")
+                        .Action("Index", "Admin", _routeValues)
+                        .Permission(AdminPermissions.ManageAdminSettings)
+                        .LocalNav()
+                    )
+                )
+            );
 
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
+
+        builder
+            .Add(S["Settings"], settings => settings
+                .Add(S["Admin"], S["Admin"].PrefixPosition(), admin => admin
+                    .AddClass("admin").Id("admin")
+                    .Action("Index", "Admin", _routeValues)
+                    .Permission(AdminPermissions.ManageAdminSettings)
+                    .LocalNav()
+                )
+            );
+
+        return ValueTask.CompletedTask;
     }
 }

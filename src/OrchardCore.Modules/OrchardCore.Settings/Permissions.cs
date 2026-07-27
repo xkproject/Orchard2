@@ -1,32 +1,29 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using OrchardCore.Security.Permissions;
 
-namespace OrchardCore.Settings
+namespace OrchardCore.Settings;
+
+public sealed class Permissions : IPermissionProvider
 {
-    public class Permissions : IPermissionProvider
-    {
-        public static readonly Permission ManageSettings = new Permission("ManageSettings", "Manage settings");
+    private readonly IEnumerable<Permission> _allPermissions =
+    [
+        SettingsPermissions.ManageSettings,
+    ];
 
-        // This permission is not exposed, it's just used for the APIs to generate/check custom ones
-        public static readonly Permission ManageGroupSettings = new Permission("ManageResourceSettings", "Manage settings", new[] { ManageSettings });
+    [Obsolete("This will be removed in a future release. Instead use 'SettingsPermissions.ManageSettings'.")]
+    public static readonly Permission ManageSettings = SettingsPermissions.ManageSettings;
 
-        public Task<IEnumerable<Permission>> GetPermissionsAsync()
+    [Obsolete("This will be removed in a future release. Instead use 'SettingsPermissions.ManageGroupSettings'.")]
+    public static readonly Permission ManageGroupSettings = SettingsPermissions.ManageGroupSettings;
+
+    public Task<IEnumerable<Permission>> GetPermissionsAsync()
+        => Task.FromResult(_allPermissions);
+
+    public IEnumerable<PermissionStereotype> GetDefaultStereotypes() =>
+    [
+        new PermissionStereotype
         {
-            return Task.FromResult(new[] { ManageSettings }.AsEnumerable());
-        }
-
-        public IEnumerable<PermissionStereotype> GetDefaultStereotypes()
-        {
-            return new[]
-            {
-                new PermissionStereotype
-                {
-                    Name = "Administrator",
-                    Permissions = new[] { ManageSettings }
-                }
-            };
-        }
-    }
+            Name = OrchardCoreConstants.Roles.Administrator,
+            Permissions = _allPermissions,
+        },
+    ];
 }

@@ -1,25 +1,28 @@
-using System.IO;
-using OrchardCore.Liquid;
+using Microsoft.Extensions.Options;
+using OrchardCore.Modules.Services;
 
-namespace OrchardCore.Media.Services
+namespace OrchardCore.Media.Services;
+
+public class SlugifyMediaNameNormalizerService : IMediaNameNormalizerService
 {
-    public class SlugifyMediaNameNormalizerService : IMediaNameNormalizerService
+    private readonly ISlugService _slugService;
+    private readonly MediaSlugifyOptions _options;
+
+    public SlugifyMediaNameNormalizerService(
+        ISlugService slugService,
+        IOptions<MediaSlugifyOptions> options)
     {
-        private readonly ISlugService _slugService;
+        _slugService = slugService;
+        _options = options.Value;
+    }
 
-        public SlugifyMediaNameNormalizerService(ISlugService slugService)
-        {
-            _slugService = slugService;
-        }
+    public string NormalizeFolderName(string folderName)
+    {
+        return _slugService.Slugify(folderName, _options.Transliterate);
+    }
 
-        public string NormalizeFolderName(string folderName)
-        {
-            return _slugService.Slugify(folderName);
-        }
-
-        public string NormalizeFileName(string fileName)
-        {
-            return _slugService.Slugify(Path.GetFileNameWithoutExtension(fileName)) + Path.GetExtension(fileName);
-        }
+    public string NormalizeFileName(string fileName)
+    {
+        return _slugService.Slugify(Path.GetFileNameWithoutExtension(fileName), _options.Transliterate) + Path.GetExtension(fileName);
     }
 }

@@ -1,29 +1,45 @@
-using System;
 using OrchardCore.Security.Permissions;
 
-namespace OrchardCore.Users
+namespace OrchardCore.Users;
+
+[Obsolete("This class is deprecated, use `UsersPermissions` instead.")]
+public static class CommonPermissions
 {
-    public class CommonPermissions
-    {
-        /// <summary>
-        /// When authorizing request ManageUsers and pass an <see cref="IUser"/>
-        /// Do not request a dynamic permission unless you are checking if the user can manage a specific role.
-        /// </summary>
-        public static readonly Permission ManageUsers = new Permission("ManageUsers", "Manage Users", true);
+    /// <summary>
+    /// When authorizing request ManageUsers and pass an <see cref="IUser"/>
+    /// Do not request a dynamic permission unless you are checking if the user can manage a specific role.
+    /// </summary>
+    public static readonly Permission ManageUsers = UsersPermissions.ManageUsers;
 
-        /// <summary>
-        /// View users only allows listing or viewing a users profile.
-        /// </summary>
-        public static readonly Permission ViewUsers = new Permission("View Users", "View Users", new[] { ManageUsers });
+    /// <summary>
+    /// Allows viewing user profiles.
+    /// </summary>
+    public static readonly Permission ViewUsers = UsersPermissions.ViewUsers;
 
-        // Dynamic permission template.
-        private static readonly Permission ManageUsersInRole = new Permission("ManageUsersInRole_{0}", "Manage Users in Role - {0}", new[] { ManageUsers });
+    public static readonly Permission EditUsers = UsersPermissions.EditUsers;
 
-        public static Permission CreatePermissionForManageUsersInRole(string name)
-            => new Permission(
-                    String.Format(ManageUsersInRole.Name, name),
-                    String.Format(ManageUsersInRole.Description, name),
-                    ManageUsersInRole.ImpliedBy
-                );
-    }
+    public static readonly Permission DeleteUsers = UsersPermissions.DeleteUsers;
+
+    public static readonly Permission ListUsers = UsersPermissions.ListUsers;
+
+    public static readonly Permission AssignRoleToUsers = UsersPermissions.AssignRoleToUsers;
+
+    public static readonly Permission DisableTwoFactorAuthenticationForUsers = UsersPermissions.DisableTwoFactorAuthenticationForUsers;
+
+    public static readonly Permission EditOwnUser = UsersPermissions.EditOwnUser;
+
+    public static Permission CreateEditUsersInRolePermission(string roleName) =>
+        UsersPermissions.CreateEditUsersInRolePermission(roleName);
+
+    public static Permission CreateDeleteUsersInRolePermission(string roleName) =>
+        UsersPermissions.CreateDeleteUsersInRolePermission(roleName);
+
+    public static Permission CreateListUsersInRolePermission(string roleName) =>
+        UsersPermissions.CreateListUsersInRolePermission(roleName);
+
+    public static Permission CreateAssignRoleToUsersPermission(string roleName) =>
+        UsersPermissions.CreateEditUsersInRolePermission(roleName);
+
+    public static Permission CreatePermissionForManageUsersInRole(string name) =>
+        UsersPermissions.CreatePermissionForManageUsersInRole(name);
 }

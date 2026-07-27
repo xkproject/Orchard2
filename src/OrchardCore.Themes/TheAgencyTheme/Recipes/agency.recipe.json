@@ -29,6 +29,7 @@
         "OrchardCore.Recipes",
         "OrchardCore.Resources",
         "OrchardCore.Roles",
+        "OrchardCore.Security",
         "OrchardCore.Settings",
         "OrchardCore.Themes",
         "OrchardCore.Users",
@@ -68,6 +69,31 @@
       "name": "themes",
       "admin": "TheAdmin",
       "site": "TheAgencyTheme"
+    },
+    {
+      "name": "Roles",
+      "Roles": [
+        {
+          "Name": "Moderator",
+          "Description": "Grants users the ability to moderate content.",
+          "Permissions": []
+        },
+        {
+          "Name": "Editor",
+          "Description": "Grants users the ability to edit existing content.",
+          "Permissions": []
+        },
+        {
+          "Name": "Author",
+          "Description": "Grants users the ability to create content.",
+          "Permissions": []
+        },
+        {
+          "Name": "Contributor",
+          "Description": "Grants users the ability to contribute content.",
+          "Permissions": []
+        }
+      ]
     },
     {
       "name": "settings",
@@ -418,7 +444,7 @@
           "Name": "RawHtml",
           "DisplayName": "Html",
           "Settings": {
-            "ContentTypeSettings": {           
+            "ContentTypeSettings": {
               "Draftable": true,
               "Versionable": true,
               "Securable": true,
@@ -582,7 +608,7 @@
                 },
                 "MediaFieldSettings": {
                   "Required": true,
-                  "Multiple":  false
+                  "Multiple": false
                 }
               }
             },
@@ -860,7 +886,7 @@
                 "ConditionId": "[js: uuid()]"
               }
             ]
-          },          
+          },
           "Description": "The widgets in this layer are displayed on any page of this site."
         },
         {
@@ -875,7 +901,7 @@
                 "ConditionId": "[js: uuid()]"
               }
             ]
-          },          
+          },
           "Description": "The widgets in this layer are only displayed on the homepage."
         }
       ]
@@ -1592,7 +1618,7 @@
           "Mode": 0,
           "Format": 0,
           "Quality": 100
-        },        
+        },
         "small": {
           "Hint": "A small image (240px x 240px)",
           "Width": 240,
@@ -1600,7 +1626,7 @@
           "Mode": 0,
           "Format": 0,
           "Quality": 100
-        },        
+        },
         "extrasmall": {
           "Hint": "A extra small image (160px x 160px)",
           "Width": 160,
@@ -1610,6 +1636,6 @@
           "Quality": 100
         }
       }
-    }  
+    }
   ]
 }

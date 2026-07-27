@@ -6,42 +6,42 @@
 
 The following shapes are rendered when the `HtmlBodyPart` is attached to a content type:
 
-| Name | Display Type | Default Location | Model Type |
-| ------| ------------ |----------------- | ---------- |
-| `HtmlBodyPart` | `Detail` | `Content:5` | `HtmlBodyPartViewModel` |
-| `HtmlBodyPart` | `Summary` | `Content:10` | `HtmlBodyPartViewModel` |
+| Name           | Display Type | Default Location | Model Type              |
+|----------------|--------------|------------------|-------------------------|
+| `HtmlBodyPart` | `Detail`     | `Content:5`      | `HtmlBodyPartViewModel` |
+| `HtmlBodyPart` | `Summary`    | `Content:10`     | `HtmlBodyPartViewModel` |
 
 ### HtmlBodyPartViewModel
 
 The following properties are available on the `HtmlBodyPartViewModel` class:
 
-| Property | Type | Description |
-| --------- | ---- |------------ |
-| `Body` | `string` | The content that was edited. It might contain tokens. |
-| `Html` | `string` | The HTML content once all tokens have been processed. |
-| `ContentItem` | `ContentItem` | The content item of the part. |
-| `HtmlBodyPart` | `HtmlBodyPart` | The `HtmlBodyPart` instance. |
-| `TypePartSettings` | `HtmlBodyPartSettings` | The settings of the part. |
+| Property           | Type                   | Description                                           |
+|--------------------|------------------------|-------------------------------------------------------|
+| `Body`             | `string`               | The content that was edited. It might contain tokens. |
+| `Html`             | `string`               | The HTML content once all tokens have been processed. |
+| `ContentItem`      | `ContentItem`          | The content item of the part.                         |
+| `HtmlBodyPart`     | `HtmlBodyPart`         | The `HtmlBodyPart` instance.                          |
+| `TypePartSettings` | `HtmlBodyPartSettings` | The settings of the part.                             |
 
 ### HtmlBodyPart
 
 The following properties are available on `HtmlBodyPart`:
 
-| Name | Type | Description |
-| -----| ---- |------------ |
-| `Body` | `string` | The HTML content in the body. It can contain Liquid tags so using it directly might result in unexpected results. Prefer rendering the `HtmlBodyPart` shape instead. |
-| `Content` | The raw content of the part. |
+| Name          | Type                                   | Description                                                                                                                                                          |
+|---------------|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Body`        | `string`                               | The HTML content in the body. It can contain Liquid tags so using it directly might result in unexpected results. Prefer rendering the `HtmlBodyPart` shape instead. |
+| `Content`     | The raw content of the part.           |
 | `ContentItem` | The content item containing this part. |
 
 ## Sanitization
 
 By default all HTML input is sanitized when the `HtmlBodyPart` is saved.
 
-You can disable this by unchecking the `Sanitize HTML` setting, or further configuring the [HTML Sanitizer](../../core/Sanitizer/README.md)
+You can disable this by unchecking the `Sanitize HTML` setting, or further configuring the [HTML Sanitizer](../Sanitizer/README.md)
 
 ## Editors
 
-The __HtmlBody Part__ editor can be different for each content type. In the __HtmlBody Part__ settings of a 
+The __HtmlBody Part__ editor can be different for each content type. In the __HtmlBody Part__ settings of a
 content type, just select the one that needs to be used.
 
 There are three predefined editor names:
@@ -52,7 +52,7 @@ There are three predefined editor names:
 
 #### Video
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/lnjdRildsL8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/lnjdRildsL8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ### Custom Editors
 
@@ -65,7 +65,7 @@ render the actual HTML for the editor.
 
 #### Declaration
 
-To declare a new editor, create a shape named `HtmlBodyPart_Option__{Name}` where `{Name}` is a value 
+To declare a new editor, create a shape named `HtmlBodyPart_Option__{Name}` where `{Name}` is a value
 of your choosing. This will be represented by a file named `HtmlBodyPart-{Name}.Option.cshtml`.
 
 Sample content:
@@ -84,10 +84,10 @@ To define what HTML to render when the editor is selected from the settings, a s
 Sample content:
 
 ```csharp
-@using OrchardCore.Html.ViewModels;
+@using OrchardCore.Html.ViewModels
 @model HtmlBodyPartViewModel
 
-<fieldset class="form-group">
+<fieldset class="mb-3">
     <label asp-for="Body">@T["Body"]</label>
     <textarea asp-for="Body" rows="5" class="form-control"></textarea>
     <span class="hint">@T["The body of the content item."]</span>

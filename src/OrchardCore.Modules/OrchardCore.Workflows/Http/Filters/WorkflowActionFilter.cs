@@ -1,96 +1,133 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 using OrchardCore.Locking.Distributed;
 using OrchardCore.Workflows.Helpers;
 using OrchardCore.Workflows.Http.Services;
 using OrchardCore.Workflows.Services;
 
-namespace OrchardCore.Workflows.Http.Filters
-{
-    internal class WorkflowActionFilter : IAsyncActionFilter
-    {
-        private readonly IWorkflowManager _workflowManager;
-        private readonly IWorkflowTypeRouteEntries _workflowTypeRouteEntries;
-        private readonly IWorkflowInstanceRouteEntries _workflowRouteEntries;
-        private readonly IWorkflowTypeStore _workflowTypeStore;
-        private readonly IWorkflowStore _workflowStore;
-        private readonly IDistributedLock _distributedLock;
+namespace OrchardCore.Workflows.Http.Filters;
 
-        public WorkflowActionFilter(
-            IWorkflowManager workflowManager,
-            IWorkflowTypeRouteEntries workflowTypeRouteEntries,
-            IWorkflowInstanceRouteEntries workflowRouteEntries,
-            IWorkflowTypeStore workflowTypeStore,
-            IWorkflowStore workflowStore,
-            IDistributedLock distributedLock
-        )
+internal sealed class WorkflowActionFilter : IAsyncActionFilter
+{
+    private readonly IWorkflowManager _workflowManager;
+    private readonly IWorkflowTypeRouteEntries _workflowTypeRouteEntries;
+    private readonly IWorkflowInstanceRouteEntries _workflowRouteEntries;
+    private readonly IWorkflowTypeStore _workflowTypeStore;
+    private readonly IWorkflowStore _workflowStore;
+    private readonly IDistributedLock _distributedLock;
+    private readonly ILogger<WorkflowActionFilter> _logger;
+
+    public WorkflowActionFilter(
+        IWorkflowManager workflowManager,
+        IWorkflowTypeRouteEntries workflowTypeRouteEntries,
+        IWorkflowInstanceRouteEntries workflowRouteEntries,
+        IWorkflowTypeStore workflowTypeStore,
+        IWorkflowStore workflowStore,
+        IDistributedLock distributedLock,
+        ILogger<WorkflowActionFilter> logger
+    )
+    {
+        _workflowManager = workflowManager;
+        _workflowTypeRouteEntries = workflowTypeRouteEntries;
+        _workflowRouteEntries = workflowRouteEntries;
+        _workflowTypeStore = workflowTypeStore;
+        _workflowStore = workflowStore;
+        _distributedLock = distributedLock;
+        _logger = logger;
+    }
+
+    public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    {
+        var httpMethod = context.HttpContext.Request.Method;
+        var routeValues = context.RouteData.Values;
+
+        var workflowTypeEntriesTask = _workflowTypeRouteEntries.GetWorkflowRouteEntriesAsync(httpMethod, routeValues);
+
+        if (!workflowTypeEntriesTask.IsCompletedSuccessfully)
         {
-            _workflowManager = workflowManager;
-            _workflowTypeRouteEntries = workflowTypeRouteEntries;
-            _workflowRouteEntries = workflowRouteEntries;
-            _workflowTypeStore = workflowTypeStore;
-            _workflowStore = workflowStore;
-            _distributedLock = distributedLock;
+            return AwaitedWorkflowTypeEntries(this, routeValues, next, httpMethod, workflowTypeEntriesTask);
         }
 
-        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        var workflowTypeEntries = workflowTypeEntriesTask.Result;
+
+        var workflowEntriesTask = _workflowRouteEntries.GetWorkflowRouteEntriesAsync(httpMethod, routeValues);
+
+        if (!workflowEntriesTask.IsCompletedSuccessfully)
         {
-            var httpMethod = context.HttpContext.Request.Method;
-            var routeValues = context.RouteData.Values;
-            var workflowTypeEntries = await _workflowTypeRouteEntries.GetWorkflowRouteEntriesAsync(httpMethod, routeValues);
-            var workflowEntries = await _workflowRouteEntries.GetWorkflowRouteEntriesAsync(httpMethod, routeValues);
+            return AwaitedWorkflowEntries(this, routeValues, next, workflowTypeEntries, workflowEntriesTask);
+        }
 
-            if (workflowTypeEntries.Any())
+        var workflowEntries = workflowEntriesTask.Result;
+
+        if (!workflowTypeEntries.Any() && !workflowEntries.Any())
+        {
+            return next();
+        }
+
+        return ProcessWorkflowsAsync(routeValues, workflowTypeEntries, workflowEntries, next);
+
+        static async Task AwaitedWorkflowTypeEntries(
+            WorkflowActionFilter workflowActionFilter,
+            RouteValueDictionary routeValues,
+            ActionExecutionDelegate next,
+            string httpMethod,
+            Task<IEnumerable<Models.WorkflowRoutesEntry>> workflowTypeEntriesTask)
+        {
+            var workflowTypeEntries = await workflowTypeEntriesTask;
+            var workflowEntries = await workflowActionFilter._workflowRouteEntries.GetWorkflowRouteEntriesAsync(httpMethod, routeValues);
+
+            if (!workflowTypeEntries.Any() && !workflowEntries.Any())
             {
-                var workflowTypeIds = workflowTypeEntries.Select(x => Int32.Parse(x.WorkflowId)).ToList();
-                var workflowTypes = (await _workflowTypeStore.GetAsync(workflowTypeIds)).ToDictionary(x => x.Id);
-                var correlationId = routeValues.GetValue<string>("correlationid");
-
-                foreach (var entry in workflowTypeEntries)
-                {
-                    if (workflowTypes.TryGetValue(Int32.Parse(entry.WorkflowId), out var workflowType))
-                    {
-                        var activity = workflowType.Activities.Single(x => x.ActivityId == entry.ActivityId);
-
-                        if (activity.IsStart)
-                        {
-                            // If a singleton, try to acquire a lock per workflow type.
-                            (var locker, var locked) = await _distributedLock.TryAcquireWorkflowTypeLockAsync(workflowType);
-                            if (!locked)
-                            {
-                                continue;
-                            }
-
-                            await using var acquiredLock = locker;
-
-                            // Check if this is a workflow singleton and there's already an halted instance on any activity.
-                            if (workflowType.IsSingleton && await _workflowStore.HasHaltedInstanceAsync(workflowType.WorkflowTypeId))
-                            {
-                                continue;
-                            }
-
-                            await _workflowManager.StartWorkflowAsync(workflowType, activity, null, correlationId);
-                        }
-                    }
-                }
+                await next();
+                return;
             }
 
-            if (workflowEntries.Any())
-            {
-                var workflowIds = workflowEntries.Select(x => x.WorkflowId).ToList();
-                var workflows = (await _workflowStore.GetAsync(workflowIds)).ToDictionary(x => x.WorkflowId);
-                var correlationId = routeValues.GetValue<string>("correlationid");
+            await workflowActionFilter.ProcessWorkflowsAsync(routeValues, workflowTypeEntries, workflowEntries, next);
+        }
 
-                foreach (var entry in workflowEntries)
+        static async Task AwaitedWorkflowEntries(
+            WorkflowActionFilter workflowActionFilter,
+            RouteValueDictionary routeValues,
+            ActionExecutionDelegate next,
+            IEnumerable<Models.WorkflowRoutesEntry> workflowTypeEntries,
+            Task<IEnumerable<Models.WorkflowRoutesEntry>> workflowEntriesTask)
+        {
+            var workflowEntries = await workflowEntriesTask;
+
+            if (!workflowTypeEntries.Any() && !workflowEntries.Any())
+            {
+                await next();
+                return;
+            }
+
+            await workflowActionFilter.ProcessWorkflowsAsync(routeValues, workflowTypeEntries, workflowEntries, next);
+        }
+    }
+
+    private async Task ProcessWorkflowsAsync(RouteValueDictionary routeValues, IEnumerable<Models.WorkflowRoutesEntry> workflowTypeEntries, IEnumerable<Models.WorkflowRoutesEntry> workflowEntries, ActionExecutionDelegate next)
+    {
+        if (workflowTypeEntries.Any())
+        {
+            var workflowTypeIds = workflowTypeEntries.Select(x => long.Parse(x.WorkflowId)).ToList();
+            var workflowTypes = (await _workflowTypeStore.GetAsync(workflowTypeIds)).ToDictionary(x => x.Id);
+            var correlationId = routeValues.GetValue<string>("correlationid");
+
+            foreach (var entry in workflowTypeEntries)
+            {
+                if (workflowTypes.TryGetValue(long.Parse(entry.WorkflowId), out var workflowType))
                 {
-                    if (workflows.TryGetValue(entry.WorkflowId, out var workflow) &&
-                        (String.IsNullOrWhiteSpace(correlationId) ||
-                        workflow.CorrelationId == correlationId))
+                    var activity = workflowType.Activities.SingleOrDefault(x => x.ActivityId == entry.ActivityId);
+                    if (activity is null)
                     {
-                        // If atomic, try to acquire a lock per workflow instance.
-                        (var locker, var locked) = await _distributedLock.TryAcquireWorkflowLockAsync(workflow);
+                        _logger.LogWarning("The activity with id '{ActivityId}' could not be found in the workflow type '{WorkflowTypeId}'.", entry.ActivityId, workflowType.Id);
+                        continue;
+                    }
+
+                    if (activity.IsStart)
+                    {
+                        // If a singleton, try to acquire a lock per workflow type.
+                        (var locker, var locked) = await _distributedLock.TryAcquireWorkflowTypeLockAsync(workflowType);
                         if (!locked)
                         {
                             continue;
@@ -98,24 +135,56 @@ namespace OrchardCore.Workflows.Http.Filters
 
                         await using var acquiredLock = locker;
 
-                        // If atomic, check if the workflow still exists and is still correlated.
-                        var haltedWorkflow = workflow.IsAtomic ? await _workflowStore.GetAsync(workflow.Id) : workflow;
-                        if (haltedWorkflow == null || (!String.IsNullOrWhiteSpace(correlationId) && haltedWorkflow.CorrelationId != correlationId))
+                        // Check if this is a workflow singleton and there's already an halted instance on any activity.
+                        if (workflowType.IsSingleton && await _workflowStore.HasHaltedInstanceAsync(workflowType.WorkflowTypeId))
                         {
                             continue;
                         }
 
-                        // And if it is still halted on this activity.
-                        var blockingActivity = haltedWorkflow.BlockingActivities.SingleOrDefault(x => x.ActivityId == entry.ActivityId);
-                        if (blockingActivity != null)
-                        {
-                            await _workflowManager.ResumeWorkflowAsync(haltedWorkflow, blockingActivity);
-                        }
+                        await _workflowManager.StartWorkflowAsync(workflowType, activity, null, correlationId);
                     }
                 }
             }
-
-            await next();
         }
+
+        if (workflowEntries.Any())
+        {
+            var workflowIds = workflowEntries.Select(x => x.WorkflowId).ToList();
+            var workflows = (await _workflowStore.GetAsync(workflowIds)).ToDictionary(x => x.WorkflowId);
+            var correlationId = routeValues.GetValue<string>("correlationid");
+
+            foreach (var entry in workflowEntries)
+            {
+                if (workflows.TryGetValue(entry.WorkflowId, out var workflow) &&
+                    (string.IsNullOrWhiteSpace(correlationId) ||
+                    workflow.CorrelationId == correlationId))
+                {
+                    // If atomic, try to acquire a lock per workflow instance.
+                    (var locker, var locked) = await _distributedLock.TryAcquireWorkflowLockAsync(workflow);
+                    if (!locked)
+                    {
+                        continue;
+                    }
+
+                    await using var acquiredLock = locker;
+
+                    // If atomic, check if the workflow still exists and is still correlated.
+                    var haltedWorkflow = workflow.IsAtomic ? await _workflowStore.GetAsync(workflow.Id) : workflow;
+                    if (haltedWorkflow == null || (!string.IsNullOrWhiteSpace(correlationId) && haltedWorkflow.CorrelationId != correlationId))
+                    {
+                        continue;
+                    }
+
+                    // And if it is still halted on this activity.
+                    var blockingActivity = haltedWorkflow.BlockingActivities.SingleOrDefault(x => x.ActivityId == entry.ActivityId);
+                    if (blockingActivity != null)
+                    {
+                        await _workflowManager.ResumeWorkflowAsync(haltedWorkflow, blockingActivity);
+                    }
+                }
+            }
+        }
+
+        await next();
     }
 }

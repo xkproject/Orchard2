@@ -2,33 +2,42 @@
 
 ## OpenID Connect Module
 
-`OrchardCore.OpenId` provides the following features:
+`OrchardCore.OpenId` provides robust OpenID Connect functionality, enabling Orchard Core to act as an OpenID Connect server and client. The following features are available:
 
-- Core Components
-- Authorization Server
-- Management Interface
-- Token Validation
-- OIDC Client
+- **OpenID Connect Core Services**
+- **OpenID Connect Authorization Server**
+- **OpenID Connect Management UI**
+- **OpenID Connect Authorization Server**
+- **OpenID Connect Client Integration**
 
-## Core Components
+## Core OpenID Connect Services
 
-Registers the core components used by the OpenID module.
+This feature provides the essential services that underpin all other OpenID Connect features within Orchard Core. It includes fundamental components needed for secure communication, token handling, and user authentication.
 
-## Management Interface
+## OpenID Connect Management UI
 
-Allows adding, editing and removing the registered applications.
+Adds a management interface to the Orchard Core admin dashboard, enabling users to manage OpenID Connect applications, define and modify scopes, and configure application permissions through a user-friendly UI.
 
-## Authorization Server
+## OpenID Connect Authorization Server
 
-Enables authentication of external applications using the OpenID Connect/OAuth 2.0 standards.  
-It is based on the [`OpenIddict`](https://github.com/openiddict/openiddict-core) library allowing.  
-Orchard Core to act as identity provider to support token authentication without the need of an external identity provider.  
+Allows Orchard Core to function as an OpenID Connect authorization server, also referred to as an identity provider (IdP). This feature enables authentication and the issuance of tokens, conforming to OpenID Connect and OAuth 2.0 standards.
 
-- Orchard Core can also be used as an identity provider for centralizing the user access permissions to external applications.
-- Orchard Core services.
-  - The authorization server feature maintains its own private JWT/validation handler instance for the userinfo API endpoint. This way, you don't have to enable the token validation feature for current tenant.
+Key points:
+- Orchard Core can serve as a centralized identity provider, allowing external applications to authenticate users and manage access control.
+- Powered by the [`OpenIddict`](https://github.com/openiddict/openiddict-core) library, this feature supports token-based authentication without requiring an external identity provider.
+- The authorization server takes care of validating the access tokens received by the `/connect/userinfo` API endpoint, so you don't need to enable the token validation feature for the current tenant.
+- To validate issued tokens, ensure the 'OpenID Connect Token Validation' feature is activated.
 
-Flows supported: [code/implicit/hybrid flows](http://openid.net/specs/openid-connect-core-1_0.html) and [client credentials/resource owner password grants](https://tools.ietf.org/html/rfc6749).
+Supported flows include:
+- [Authorization Code Flow](http://openid.net/specs/openid-connect-core-1_0.html)
+- [Implicit Flow](http://openid.net/specs/openid-connect-core-1_0.html)
+- [Hybrid Flow](http://openid.net/specs/openid-connect-core-1_0.html)
+- [Client Credentials Grant](https://tools.ietf.org/html/rfc6749)
+- [Resource Owner Password Grant](https://tools.ietf.org/html/rfc6749)
+
+## OpenID Connect Token Validation
+
+This feature is responsible for validating tokens issued either by Orchard Core's own OpenID Connect authorization server or by other trusted servers. It supports JSON Web Tokens (JWT) and OpenID Connect discovery, ensuring secure and reliable token validation across distributed applications.
 
 ### Configuration
 
@@ -56,6 +65,7 @@ to allow third-party resource servers to use the JWT tokens produced by the Orch
 - Allow Authorization Code Flow: It requires that the Authorization and Token Endpoints are enabled. More info at <http://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth>
 - Allow Implicit Flow: It requires that the Authorization Endpoint is enabled. More info at <http://openid.net/specs/openid-connect-core-1_0.html#ImplicitFlowAuth>
 - Allow Refresh Token Flow: It allows to refresh access token using a refresh token. It can be used in combination with Password Flow, Authorization Code Flow and Hybrid Flow. More info at <http://openid.net/specs/openid-connect-core-1_0.html#RefreshTokens>
+- Require Proof Key for Code Exchange: Global setting that applies PKCE to all registered clients whether or not the 'Require PKCE' flag was set in the Application settings page.
 
 A sample of OpenID Connect Settings recipe step:
 
@@ -73,19 +83,24 @@ A sample of OpenID Connect Settings recipe step:
       "EncryptionCertificateThumbprint": "BC34460ABEA2D576EA68E8FFCFEEB3F45C94FB0F",
       "EnableTokenEndpoint": true,
       "EnableAuthorizationEndpoint": false,
+      "EnableIntrospectionEndpoint": false,
       "EnableLogoutEndpoint": true,
+      "EnablePushedAuthorizationEndpoint": false,
+      "EnableRevocationEndpoint": false,
       "EnableUserInfoEndpoint": true,
       "AllowPasswordFlow": true,
       "AllowClientCredentialsFlow": false,
       "AllowAuthorizationCodeFlow": false,
       "AllowRefreshTokenFlow": false,
-      "AllowImplicitFlow": false
+      "AllowImplicitFlow": false,
+      "RequireProofKeyForCodeExchange": false,
+      "RequirePushedAuthorizationRequests": false
 }
 ```
 
-### Client OpenID Connect Apps Configuration
+### OpenID Connect Client Integration Configuration
 
-OpenID Connect apps can be set through OpenID Connect Apps menu in the admin dashboard (through the Management Interface feature) 
+OpenID Connect apps can be set through OpenID Connect Apps menu in the admin dashboard (through the Management Interface feature)
 and also through a recipe step.
 
 OpenID Connect apps require the following configuration.
@@ -109,6 +124,7 @@ OpenID Connect apps require the following configuration.
 - Redirect Uri: callback URL.
 - Skip Consent: sets whether a consent form has to be completed by the user after log in.
 - Advanced Parameters: Allows setting additional parameters that can be sent with the authorize request. Note: The default parameters are set from the options above.
+- Require PKCE: Applies PKCE for the registered application.  Ensure that the client library being used suppports PKCE.  
 
 A sample of OpenID Connect App recipe step:
 
@@ -127,7 +143,9 @@ A sample of OpenID Connect App recipe step:
       "AllowClientCredentialsFlow": false,
       "AllowAuthorizationCodeFlow": false,
       "AllowRefreshTokenFlow": false,
-      "AllowImplicitFlow": false
+      "AllowImplicitFlow": false,
+      "RequireProofKeyForCodeExchange": false,
+      "RequirePushedAuthorizationRequests": false
 }
 ```
 
@@ -137,12 +155,12 @@ Scopes can be set through OpenID Connect Scopes menu in the admin dashboard (thr
 
 OpenID Connect Scopes require the following configuration.
 
-| Property | Description |
-| -------- | ----------- |
-| Name | Unique name of the scope. |
-| Display Name | Display name associated with the current scope. |
-| Description | Describe how this scope is used in the system. |
-| Tenants | Build the audience based on tenants names. |
+| Property             | Description                                                       |
+|----------------------|-------------------------------------------------------------------|
+| Name                 | Unique name of the scope.                                         |
+| Display Name         | Display name associated with the current scope.                   |
+| Description          | Describe how this scope is used in the system.                    |
+| Tenants              | Build the audience based on tenants names.                        |
 | Additional resources | Build the audience based on the space separated strings provided. |
 
 A sample of OpenID Connect Scope recipe step:
@@ -242,11 +260,11 @@ To use the certificate on an Azure hosted site.
 
 Token Validation require the following configuration.
 
-| Property | Description |
-| -------- | ----------- |
+| Property                    | Description                                                                                                      |
+|-----------------------------|------------------------------------------------------------------------------------------------------------------|
 | Authorization server tenant | The tenant that runs OpenID Connect Server. If none is selected, then the following properties must be provided. |
-| Authority | The address of the remote OpenID Connect server that issued the token. |
-| Audience | Defines the intended recipient of the token that must be checked. |
+| Authority                   | The address of the remote OpenID Connect server that issued the token.                                           |
+| Audience                    | Defines the intended recipient of the token that must be checked.                                                |
 
 A sample of Token Validation Settings recipe step:
 
@@ -260,7 +278,7 @@ A sample of Token Validation Settings recipe step:
 
 ## OIDC Client
 
-Authenticates users from an external OpenID Connect identity provider. 
+Authenticates users from an external OpenID Connect identity provider.
 If the site allows to register new users, a local user is linked and the external login is linked.
 If an "email" claim is received, and a local user is found, then the external login is linked to that account, after authenticating.
 

@@ -1,37 +1,56 @@
-using System;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Localization;
 using OrchardCore.Navigation;
 using OrchardCore.Taxonomies.Settings;
 
-namespace OrchardCore.Taxonomies
+namespace OrchardCore.Taxonomies;
+
+public sealed class AdminMenu : AdminNavigationProvider
 {
-    public class AdminMenu : INavigationProvider
+    private static readonly RouteValueDictionary _routeValues = new()
     {
-        private readonly IStringLocalizer S;
+        { "area", "OrchardCore.Settings" },
+        { "groupId", TaxonomyContentsAdminListSettingsDisplayDriver.GroupId },
+    };
 
-        public AdminMenu(IStringLocalizer<AdminMenu> localizer)
+    internal readonly IStringLocalizer S;
+
+    public AdminMenu(IStringLocalizer<AdminMenu> stringLocalizer)
+    {
+        S = stringLocalizer;
+    }
+
+    protected override ValueTask BuildAsync(NavigationBuilder builder)
+    {
+        if (NavigationHelper.UseLegacyFormat())
         {
-            S = localizer;
+            builder
+            .Add(S["Configuration"], configuration => configuration
+                .Add(S["Settings"], "1", settings => settings
+                    .Add(S["Taxonomy Filters"], S["Taxonomy Filters"].PrefixPosition(), filters => filters
+                        .AddClass("taxonomyfilters")
+                        .Id("taxonomyfilters")
+                        .Permission(Permissions.ManageTaxonomies)
+                        .Action("Index", "Admin", _routeValues)
+                        .LocalNav()
+                    )
+                )
+            );
+
+            return ValueTask.CompletedTask;
         }
 
-        public Task BuildNavigationAsync(string name, NavigationBuilder builder)
-        {
-            if (!String.Equals(name, "admin", StringComparison.OrdinalIgnoreCase))
-            {
-                return Task.CompletedTask;
-            }
+        builder
+            .Add(S["Settings"], settings => settings
+                .Add(S["Taxonomy Filters"], S["Taxonomy Filters"].PrefixPosition(), filters => filters
+                    .AddClass("taxonomyfilters")
+                    .Id("taxonomyfilters")
+                    .Permission(Permissions.ManageTaxonomies)
+                    .Action("Index", "Admin", _routeValues)
+                    .LocalNav()
+                )
+            );
 
-            builder.Add(S["Configuration"], configuration => configuration
-                       .Add(S["Settings"], "1", settings => settings
-                            .Add(S["Taxonomy Filters"], S["Taxonomy Filters"].PrefixPosition(), admt => admt
-                            .AddClass("taxonomyfilters").Id("taxonomyfilters")
-                                .Permission(Permissions.ManageTaxonomies)
-                                .Action("Index", "Admin", new { area = "OrchardCore.Settings", groupId = TaxonomyContentsAdminListSettingsDisplayDriver.GroupId })
-                                .LocalNav()
-                    )));
-
-            return Task.CompletedTask;
-        }
+        return ValueTask.CompletedTask;
     }
 }

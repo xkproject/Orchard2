@@ -1,8 +1,11 @@
 @using OrchardCore.Forms.Models
 @model ShapeViewModel<TextAreaPart>
 @{
-    var formElementPart = Model.Value.ContentItem.As<FormElementPart>();
-    var formInputElementPart = Model.Value.ContentItem.As<FormInputElementPart>();
+    if (!Model.Value.ContentItem.TryGet<FormElementPart>(out var formElementPart) ||
+        !Model.Value.ContentItem.TryGet<FormInputElementPart>(out var formInputElementPart))
+    {
+        return;
+    }
     var elementId = formElementPart.Id;
     var fieldName = formInputElementPart.Name;
     var fieldId = !string.IsNullOrEmpty(elementId) ? elementId : !string.IsNullOrEmpty(fieldName) ? Html.GenerateIdFromName(fieldName) : default(string);
@@ -14,8 +17,8 @@
         fieldValue = fieldEntry.AttemptedValue;
         if (fieldEntry.Errors.Count > 0)
         {
-            fieldClass = "form-control input-validation-error";
+            fieldClass = "form-control input-validation-error is-invalid";
         }
     }
 }
-<textarea id="@fieldId" name="@fieldName" class="@fieldClass" placeholder="@Model.Value.Placeholder">@fieldValue</textarea>
+<textarea id="@fieldId" name="@fieldName" class="@fieldClass" placeholder="@Model.Value.Placeholder" rows="@(Model.Value.Rows.HasValue ? Model.Value.Rows : null)">@fieldValue</textarea>
