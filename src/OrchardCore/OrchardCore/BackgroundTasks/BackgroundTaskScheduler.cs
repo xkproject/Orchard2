@@ -28,6 +28,14 @@ public sealed class BackgroundTaskScheduler
 
     public bool CanRun()
     {
+        // A task that is not enabled may have no schedule defined, and an invalid crontab
+        // expression should not prevent the other tasks from being scheduled.
+        var schedule = CrontabSchedule.TryParse(Settings.Schedule);
+        if (schedule is null)
+        {
+            return false;
+        }
+
         var now = DateTime.UtcNow;
         var referenceTime = ReferenceTime;
 
@@ -37,7 +45,7 @@ public sealed class BackgroundTaskScheduler
             referenceTime = _clock.ConvertToTimeZone(ReferenceTime, TimeZone).DateTime;
         }
 
-        var nextStartTime = CrontabSchedule.Parse(Settings.Schedule).GetNextOccurrence(referenceTime);
+        var nextStartTime = schedule.GetNextOccurrence(referenceTime);
         if (now >= nextStartTime)
         {
             if (Settings.Enable && !Released && Updated)
