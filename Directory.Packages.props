@@ -70,11 +70,11 @@
     <PackageVersion Include="Testcontainers.Azurite" Version="4.13.0" />
     <PackageVersion Include="Testcontainers.LocalStack" Version="4.13.0" />
     <PackageVersion Include="xunit.v3.mtp-v2" Version="3.2.2" />
-    <PackageVersion Include="YesSql" Version="6.0.0" />
-    <PackageVersion Include="YesSql.Abstractions" Version="6.0.0" />
-    <PackageVersion Include="YesSql.Core" Version="6.0.0" />
-    <PackageVersion Include="YesSql.Filters.Abstractions" Version="6.0.0" />
-    <PackageVersion Include="YesSql.Filters.Query" Version="6.0.0" />
+    <PackageVersion Include="YesSql" Version="6.0.1-distribwebapi.1" />
+    <PackageVersion Include="YesSql.Abstractions" Version="6.0.1-distribwebapi.1" />
+    <PackageVersion Include="YesSql.Core" Version="6.0.1-distribwebapi.1" />
+    <PackageVersion Include="YesSql.Filters.Abstractions" Version="6.0.1-distribwebapi.1" />
+    <PackageVersion Include="YesSql.Filters.Query" Version="6.0.1-distribwebapi.1" />
     <PackageVersion Include="ZString" Version="2.6.0" />
   </ItemGroup>
   <ItemGroup>
