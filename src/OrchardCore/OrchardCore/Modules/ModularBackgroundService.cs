@@ -1,9 +1,4 @@
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -13,408 +8,461 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using OrchardCore.BackgroundTasks;
 using OrchardCore.Environment.Shell;
-using OrchardCore.Environment.Shell.Builders;
-using OrchardCore.Environment.Shell.Models;
+using OrchardCore.Locking;
 using OrchardCore.Locking.Distributed;
 using OrchardCore.Settings;
 
-namespace OrchardCore.Modules
+namespace OrchardCore.Modules;
+
+internal sealed class ModularBackgroundService : BackgroundService
 {
-    internal class ModularBackgroundService : BackgroundService
+    private readonly ConcurrentDictionary<string, BackgroundTaskScheduler> _schedulers = new();
+    private readonly ConcurrentDictionary<string, IChangeToken> _changeTokens = new();
+
+    private readonly IShellHost _shellHost;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly BackgroundServiceOptions _options;
+    private readonly ILogger _logger;
+    private readonly IClock _clock;
+
+    public ModularBackgroundService(
+        IShellHost shellHost,
+        IHttpContextAccessor httpContextAccessor,
+        IOptions<BackgroundServiceOptions> options,
+        ILogger<ModularBackgroundService> logger,
+        IClock clock)
     {
-        private static readonly TimeSpan PollingTime = TimeSpan.FromMinutes(1);
-        private static readonly TimeSpan MinIdleTime = TimeSpan.FromSeconds(10);
+        _shellHost = shellHost;
+        _httpContextAccessor = httpContextAccessor;
+        _options = options.Value;
+        _logger = logger;
+        _clock = clock;
+    }
 
-        private readonly ConcurrentDictionary<string, BackgroundTaskScheduler> _schedulers =
-            new ConcurrentDictionary<string, BackgroundTaskScheduler>();
-
-        private readonly ConcurrentDictionary<string, IChangeToken> _changeTokens =
-            new ConcurrentDictionary<string, IChangeToken>();
-
-        private readonly IShellHost _shellHost;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly BackgroundServiceOptions _options;
-        private readonly ILogger _logger;
-        private readonly IClock _clock;
-
-        public ModularBackgroundService(
-            IShellHost shellHost,
-            IHttpContextAccessor httpContextAccessor,
-            IOptions<BackgroundServiceOptions> options,
-            ILogger<ModularBackgroundService> logger,
-            IClock clock)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        stoppingToken.Register(() =>
         {
-            _shellHost = shellHost;
-            _httpContextAccessor = httpContextAccessor;
-            _options = options.Value;
-            _logger = logger;
-            _clock = clock;
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            stoppingToken.Register(() =>
+            if (_logger.IsEnabled(LogLevel.Information))
             {
                 _logger.LogInformation("'{ServiceName}' is stopping.", nameof(ModularBackgroundService));
-            });
-
-            if (_options.ShellWarmup)
-            {
-                // Ensure all ShellContext are loaded and available.
-                await _shellHost.InitializeAsync();
             }
+        });
 
-            while (GetRunningShells().Count() < 1)
-            {
-                try
-                {
-                    await Task.Delay(MinIdleTime, stoppingToken);
-                }
-                catch (TaskCanceledException)
-                {
-                    break;
-                }
-            }
-
-            var previousShells = Enumerable.Empty<ShellContext>();
-
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                try
-                {
-                    var runningShells = GetRunningShells();
-                    await UpdateAsync(previousShells, runningShells, stoppingToken);
-                    previousShells = runningShells;
-
-                    var pollingDelay = Task.Delay(PollingTime, stoppingToken);
-
-                    await RunAsync(runningShells, stoppingToken);
-                    await WaitAsync(pollingDelay, stoppingToken);
-                }
-                catch (Exception ex) when (!ex.IsFatal())
-                {
-                    _logger.LogError(ex, "Error while executing '{ServiceName}'", nameof(ModularBackgroundService));
-                }
-            }
-        }
-
-        private async Task RunAsync(IEnumerable<ShellContext> runningShells, CancellationToken stoppingToken)
-        {
-            await GetShellsToRun(runningShells).ForEachAsync(async shell =>
-            {
-                var tenant = shell.Settings.Name;
-
-                var schedulers = GetSchedulersToRun(tenant);
-
-                _httpContextAccessor.HttpContext = shell.CreateHttpContext();
-
-                foreach (var scheduler in schedulers)
-                {
-                    if (stoppingToken.IsCancellationRequested)
-                    {
-                        break;
-                    }
-
-                    var shellScope = await _shellHost.GetScopeAsync(shell.Settings);
-
-                    if (!_options.ShellWarmup && shellScope.ShellContext.Pipeline == null)
-                    {
-                        break;
-                    }
-
-                    var distributedLock = shellScope.ShellContext.ServiceProvider.GetRequiredService<IDistributedLock>();
-
-                    // Try to acquire a lock before using the scope, so that a next process gets the last committed data.
-                    (var locker, var locked) = await distributedLock.TryAcquireBackgroundTaskLockAsync(scheduler.Settings);
-                    if (!locked)
-                    {
-                        _logger.LogInformation("Timeout to acquire a lock on background task '{TaskName}' on tenant '{TenantName}'.", scheduler.Name, tenant);
-                        return;
-                    }
-
-                    await using var acquiredLock = locker;
-
-                    await shellScope.UsingAsync(async scope =>
-                    {
-                        var taskName = scheduler.Name;
-
-                        var task = scope.ServiceProvider.GetServices<IBackgroundTask>().GetTaskByName(taskName);
-
-                        if (task == null)
-                        {
-                            return;
-                        }
-
-                        var siteService = scope.ServiceProvider.GetService<ISiteService>();
-                        if (siteService != null)
-                        {
-                            try
-                            {
-                                _httpContextAccessor.HttpContext.SetBaseUrl((await siteService.GetSiteSettingsAsync()).BaseUrl);
-                            }
-                            catch (Exception ex) when (!ex.IsFatal())
-                            {
-                                _logger.LogError(ex, "Error while getting the base url from the site settings of the tenant '{TenantName}'.", tenant);
-                            }
-                        }
-
-                        var context = new BackgroundTaskEventContext(taskName, scope);
-                        var handlers = scope.ServiceProvider.GetServices<IBackgroundTaskEventHandler>();
-
-                        await handlers.InvokeAsync((handler, context, token) => handler.ExecutingAsync(context, token), context, stoppingToken, _logger);
-
-                        try
-                        {
-                            _logger.LogInformation("Start processing background task '{TaskName}' on tenant '{TenantName}'.", taskName, tenant);
-
-                            scheduler.Run();
-                            await task.DoWorkAsync(scope.ServiceProvider, stoppingToken);
-
-                            _logger.LogInformation("Finished processing background task '{TaskName}' on tenant '{TenantName}'.", taskName, tenant);
-                        }
-                        catch (Exception ex) when (!ex.IsFatal())
-                        {
-                            _logger.LogError(ex, "Error while processing background task '{TaskName}' on tenant '{TenantName}'.", taskName, tenant);
-                            context.Exception = ex;
-
-                            await scope.HandleExceptionAsync(ex);
-                        }
-
-                        await handlers.InvokeAsync((handler, context, token) => handler.ExecutedAsync(context, token), context, stoppingToken, _logger);
-                    });
-                }
-            });
-        }
-
-        private async Task UpdateAsync(IEnumerable<ShellContext> previousShells, IEnumerable<ShellContext> runningShells, CancellationToken stoppingToken)
-        {
-            var referenceTime = DateTime.UtcNow;
-
-            await GetShellsToUpdate(previousShells, runningShells).ForEachAsync(async shell =>
-            {
-                var tenant = shell.Settings.Name;
-
-                if (stoppingToken.IsCancellationRequested)
-                {
-                    return;
-                }
-
-                _httpContextAccessor.HttpContext = shell.CreateHttpContext();
-
-                var shellScope = await _shellHost.GetScopeAsync(shell.Settings);
-
-                if (!_options.ShellWarmup && shellScope.ShellContext.Pipeline == null)
-                {
-                    return;
-                }
-
-                await shellScope.UsingAsync(async scope =>
-                {
-                    var tasks = scope.ServiceProvider.GetServices<IBackgroundTask>();
-
-                    CleanSchedulers(tenant, tasks);
-
-                    if (!tasks.Any())
-                    {
-                        return;
-                    }
-
-                    var settingsProvider = scope.ServiceProvider.GetService<IBackgroundTaskSettingsProvider>();
-                    _changeTokens[tenant] = settingsProvider?.ChangeToken ?? NullChangeToken.Singleton;
-
-                    ITimeZone timeZone = null;
-
-                    var siteService = scope.ServiceProvider.GetService<ISiteService>();
-                    if (siteService != null)
-                    {
-                        try
-                        {
-                            timeZone = _clock.GetTimeZone((await siteService.GetSiteSettingsAsync()).TimeZoneId);
-                        }
-                        catch (Exception ex) when (!ex.IsFatal())
-                        {
-                            _logger.LogError(ex, "Error while getting the time zone from the site settings of the tenant '{TenantName}'.", tenant);
-                        }
-                    }
-
-                    foreach (var task in tasks)
-                    {
-                        var taskName = task.GetTaskName();
-
-                        if (!_schedulers.TryGetValue(tenant + taskName, out var scheduler))
-                        {
-                            _schedulers[tenant + taskName] = scheduler = new BackgroundTaskScheduler(tenant, taskName, referenceTime, _clock);
-                        }
-
-                        scheduler.TimeZone = timeZone;
-
-                        if (!scheduler.Released && scheduler.Updated)
-                        {
-                            continue;
-                        }
-
-                        BackgroundTaskSettings settings = null;
-
-                        if (settingsProvider != null)
-                        {
-                            try
-                            {
-                                settings = await settingsProvider.GetSettingsAsync(task);
-                            }
-                            catch (Exception ex) when (!ex.IsFatal())
-                            {
-                                _logger.LogError(ex, "Error while updating settings of background task '{TaskName}' on tenant '{TenantName}'.", taskName, tenant);
-                            }
-                        }
-
-                        settings ??= task.GetDefaultSettings();
-
-                        if (scheduler.Released || !scheduler.Settings.Schedule.Equals(settings.Schedule))
-                        {
-                            scheduler.ReferenceTime = referenceTime;
-                        }
-
-                        scheduler.Settings = settings;
-                        scheduler.Released = false;
-                        scheduler.Updated = true;
-                    }
-                });
-            });
-        }
-
-        private async Task WaitAsync(Task pollingDelay, CancellationToken stoppingToken)
+        if (_options.ShellWarmup)
         {
             try
             {
-                await Task.Delay(MinIdleTime, stoppingToken);
-                await pollingDelay;
+                // Ensure all tenants are pre-loaded.
+                await _shellHost.InitializeAsync();
             }
-            catch (OperationCanceledException)
+            catch (Exception ex) when (!ex.IsFatal())
             {
+                _logger.LogError(ex, "Failed to warm up the tenants from '{ServiceName}'.", nameof(ModularBackgroundService));
             }
         }
 
-        private IEnumerable<ShellContext> GetRunningShells()
+        while (GetRunningShells().Length == 0)
         {
-            return _shellHost.ListShellContexts().Where(s => s.Settings.State == TenantState.Running && (_options.ShellWarmup || s.Pipeline != null)).ToArray();
-        }
-
-        private IEnumerable<ShellContext> GetShellsToRun(IEnumerable<ShellContext> shells)
-        {
-            var tenantsToRun = _schedulers.Where(s => s.Value.CanRun()).Select(s => s.Value.Tenant).Distinct().ToArray();
-            return shells.Where(s => tenantsToRun.Contains(s.Settings.Name)).ToArray();
-        }
-
-        private IEnumerable<ShellContext> GetShellsToUpdate(IEnumerable<ShellContext> previousShells, IEnumerable<ShellContext> runningShells)
-        {
-            var released = previousShells.Where(s => s.Released).Select(s => s.Settings.Name).ToArray();
-
-            if (released.Any())
+            try
             {
-                UpdateSchedulers(released, s => s.Released = true);
+                await Task.Delay(_options.MinimumIdleTime, stoppingToken);
             }
-
-            var changed = _changeTokens.Where(t => t.Value.HasChanged).Select(t => t.Key).ToArray();
-
-            if (changed.Any())
+            catch (TaskCanceledException)
             {
-                UpdateSchedulers(changed, s => s.Updated = false);
-            }
-
-            var valid = previousShells.Select(s => s.Settings.Name).Except(released).Except(changed);
-            var tenantsToUpdate = runningShells.Select(s => s.Settings.Name).Except(valid).ToArray();
-
-            return runningShells.Where(s => tenantsToUpdate.Contains(s.Settings.Name)).ToArray();
-        }
-
-        private IEnumerable<BackgroundTaskScheduler> GetSchedulersToRun(string tenant)
-        {
-            return _schedulers.Where(s => s.Value.Tenant == tenant && s.Value.CanRun()).Select(s => s.Value).ToArray();
-        }
-
-        private void UpdateSchedulers(IEnumerable<string> tenants, Action<BackgroundTaskScheduler> action)
-        {
-            var keys = _schedulers.Where(kv => tenants.Contains(kv.Value.Tenant)).Select(kv => kv.Key).ToArray();
-
-            foreach (var key in keys)
-            {
-                if (_schedulers.TryGetValue(key, out BackgroundTaskScheduler scheduler))
-                {
-                    action(scheduler);
-                }
+                break;
             }
         }
 
-        private void CleanSchedulers(string tenant, IEnumerable<IBackgroundTask> tasks)
+        var previousShells = Array.Empty<(string Tenant, long UtcTicks)>();
+        while (!stoppingToken.IsCancellationRequested)
         {
-            var validKeys = tasks.Select(task => tenant + task.GetTaskName()).ToArray();
-
-            var keys = _schedulers.Where(kv => kv.Value.Tenant == tenant).Select(kv => kv.Key).ToArray();
-
-            foreach (var key in keys)
+            // Init the delay first to be also waited on exception.
+            var pollingDelay = Task.Delay(_options.PollingTime, stoppingToken);
+            try
             {
-                if (!validKeys.Contains(key))
-                {
-                    _schedulers.TryRemove(key, out var scheduler);
-                }
+                var runningShells = GetRunningShells();
+                await UpdateAsync(previousShells, runningShells, stoppingToken);
+                await RunAsync(runningShells, stoppingToken);
+                previousShells = runningShells;
             }
+            catch (Exception ex) when (!ex.IsFatal())
+            {
+                _logger.LogError(ex, "Error while executing '{ServiceName}'.", nameof(ModularBackgroundService));
+            }
+
+            await WaitAsync(pollingDelay, stoppingToken);
         }
     }
 
-    internal static class HttpContextExtensions
+    private async Task RunAsync(IEnumerable<(string Tenant, long UtcTicks)> runningShells, CancellationToken stoppingToken)
     {
-        public static void SetBaseUrl(this HttpContext context, string baseUrl)
+        await Parallel.ForEachAsync(GetShellsToRun(runningShells), async (tenant, cancellationToken) =>
         {
-            if (Uri.TryCreate(baseUrl, UriKind.Absolute, out var uri))
+            // Check if the shell is still registered and running.
+            if (!_shellHost.TryGetShellContext(tenant, out var shell) || !shell.Settings.IsRunning())
             {
-                context.Request.Scheme = uri.Scheme;
-                context.Request.Host = new HostString(uri.Host, uri.Port);
-                context.Request.PathBase = uri.AbsolutePath;
-
-                if (!String.IsNullOrWhiteSpace(uri.Query))
-                {
-                    context.Request.QueryString = new QueryString(uri.Query);
-                }
+                return;
             }
-        }
+
+            // Create a new 'HttpContext' to be used in the background.
+            _httpContextAccessor.HttpContext = shell.CreateHttpContext();
+
+            var schedulers = GetSchedulersToRun(tenant);
+            foreach (var scheduler in schedulers)
+            {
+                if (stoppingToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                // Try to create a shell scope on this shell context.
+                var (shellScope, success) = await _shellHost.TryGetScopeAsync(shell.Settings.Name);
+                if (!success)
+                {
+                    break;
+                }
+
+                // Check if the shell has no pipeline and should not be warmed up.
+                if (!_options.ShellWarmup && !shellScope.ShellContext.HasPipeline())
+                {
+                    await shellScope.TerminateShellAsync();
+                    break;
+                }
+
+                var locked = false;
+                ILocker locker = null;
+                try
+                {
+                    // Try to acquire a lock before using the scope, so that a next process gets the last committed data.
+                    var distributedLock = shellScope.ShellContext.ServiceProvider.GetRequiredService<IDistributedLock>();
+                    (locker, locked) = await distributedLock.TryAcquireBackgroundTaskLockAsync(scheduler.Settings);
+                    if (!locked)
+                    {
+                        await shellScope.TerminateShellAsync();
+                        if (_logger.IsEnabled(LogLevel.Information))
+                        {
+                            _logger.LogInformation("Timeout to acquire a lock on background task '{TaskName}' on tenant '{TenantName}'.", scheduler.Name, tenant);
+                        }
+                        break;
+                    }
+                }
+                catch (Exception ex) when (!ex.IsFatal())
+                {
+                    await shellScope.TerminateShellAsync();
+                    _logger.LogError(ex, "Failed to acquire a lock on background task '{TaskName}' on tenant '{TenantName}'.", scheduler.Name, tenant);
+                    break;
+                }
+
+                await using var acquiredLock = locker;
+
+                await shellScope.UsingAsync(async scope =>
+                {
+                    var taskName = scheduler.Name;
+
+                    var task = scope.ServiceProvider.GetServices<IBackgroundTask>().GetTaskByName(taskName);
+                    if (task is null)
+                    {
+                        return;
+                    }
+
+                    var siteService = scope.ServiceProvider.GetService<ISiteService>();
+                    if (siteService is not null)
+                    {
+                        try
+                        {
+                            // Use the base url, if defined, to override the 'Scheme', 'Host' and 'PathBase'.
+                            SetBaseUrl(_httpContextAccessor.HttpContext, (await siteService.GetSiteSettingsAsync()).BaseUrl);
+                        }
+                        catch (Exception ex) when (!ex.IsFatal())
+                        {
+                            _logger.LogError(ex, "Error while getting the base url from the site settings of the tenant '{TenantName}'.", tenant);
+                        }
+                    }
+
+                    try
+                    {
+                        if (scheduler.Settings.UsePipeline)
+                        {
+                            if (!scope.ShellContext.HasPipeline())
+                            {
+                                // Build the shell pipeline to configure endpoint data sources.
+                                await scope.ShellContext.BuildPipelineAsync();
+                            }
+
+                            // Run the pipeline to make the 'HttpContext' aware of endpoints.
+                            await scope.ShellContext.Pipeline.Invoke(_httpContextAccessor.HttpContext);
+                        }
+                    }
+                    catch (Exception ex) when (!ex.IsFatal())
+                    {
+                        _logger.LogError(ex, "Error while running in the background the pipeline of tenant '{TenantName}'.", tenant);
+                    }
+
+                    var context = new BackgroundTaskEventContext(taskName, scope);
+                    var handlers = scope.ServiceProvider.GetServices<IBackgroundTaskEventHandler>();
+
+                    await handlers.InvokeAsync((handler, context, token) => handler.ExecutingAsync(context, token), context, stoppingToken, _logger);
+
+                    try
+                    {
+                        if (_logger.IsEnabled(LogLevel.Information))
+                        {
+                            _logger.LogInformation("Start processing background task '{TaskName}' on tenant '{TenantName}'.", taskName, tenant);
+                        }
+
+                        scheduler.Run();
+                        await task.DoWorkAsync(scope.ServiceProvider, stoppingToken);
+
+                        if (_logger.IsEnabled(LogLevel.Information))
+                        {
+                            _logger.LogInformation("Finished processing background task '{TaskName}' on tenant '{TenantName}'.", taskName, tenant);
+                        }
+                    }
+                    catch (Exception ex) when (!ex.IsFatal())
+                    {
+                        _logger.LogError(ex, "Error while processing background task '{TaskName}' on tenant '{TenantName}'.", taskName, tenant);
+                        context.Exception = ex;
+
+                        await scope.HandleExceptionAsync(ex);
+                    }
+
+                    await handlers.InvokeAsync((handler, context, token) => handler.ExecutedAsync(context, token), context, stoppingToken, _logger);
+                });
+            }
+
+            // Clear the 'HttpContext' for this async flow.
+            _httpContextAccessor.HttpContext = null;
+        });
     }
 
-    internal static class ShellExtensions
+    private async Task UpdateAsync(
+        (string Tenant, long UtcTicks)[] previousShells,
+        (string Tenant, long UtcTicks)[] runningShells, CancellationToken stoppingToken)
     {
-        public static HttpContext CreateHttpContext(this ShellContext shell)
-        {
-            var context = shell.Settings.CreateHttpContext();
+        var referenceTime = DateTime.UtcNow;
 
-            context.Features.Set(new ShellContextFeature
+        await Parallel.ForEachAsync(GetShellsToUpdate(previousShells, runningShells), async (tenant, cancellationToken) =>
+        {
+            if (stoppingToken.IsCancellationRequested)
             {
-                ShellContext = shell,
-                OriginalPathBase = String.Empty,
-                OriginalPath = "/"
+                return;
+            }
+
+            // Check if the shell is still registered and running.
+            if (!_shellHost.TryGetShellContext(tenant, out var shell) || !shell.Settings.IsRunning())
+            {
+                return;
+            }
+
+            // Try to create a shell scope on this shell context.
+            var (shellScope, success) = await _shellHost.TryGetScopeAsync(shell.Settings.Name);
+            if (!success)
+            {
+                return;
+            }
+
+            // Check if the shell has no pipeline and should not be warmed up.
+            if (!_options.ShellWarmup && !shellScope.ShellContext.HasPipeline())
+            {
+                await shellScope.TerminateShellAsync();
+                return;
+            }
+
+            // Create a new 'HttpContext' to be used in the background.
+            _httpContextAccessor.HttpContext = shell.CreateHttpContext();
+
+            await shellScope.UsingAsync(async scope =>
+            {
+                var tasks = scope.ServiceProvider.GetServices<IBackgroundTask>();
+
+                CleanSchedulers(tenant, tasks);
+
+                if (!tasks.Any())
+                {
+                    return;
+                }
+
+                var settingsProvider = scope.ServiceProvider.GetService<IBackgroundTaskSettingsProvider>();
+                _changeTokens[tenant] = settingsProvider?.ChangeToken ?? NullChangeToken.Singleton;
+
+                ITimeZone timeZone = null;
+                var siteService = scope.ServiceProvider.GetService<ISiteService>();
+                if (siteService is not null)
+                {
+                    try
+                    {
+                        timeZone = _clock.GetTimeZone((await siteService.GetSiteSettingsAsync()).TimeZoneId);
+                    }
+                    catch (Exception ex) when (!ex.IsFatal())
+                    {
+                        _logger.LogError(ex, "Error while getting the time zone from the site settings of the tenant '{TenantName}'.", tenant);
+                    }
+                }
+
+                foreach (var task in tasks)
+                {
+                    var taskName = task.GetTaskName();
+                    var tenantTaskName = tenant + taskName;
+                    if (!_schedulers.TryGetValue(tenantTaskName, out var scheduler))
+                    {
+                        _schedulers[tenantTaskName] = scheduler = new BackgroundTaskScheduler(tenant, taskName, referenceTime, _clock);
+                    }
+
+                    scheduler.TimeZone = timeZone;
+                    if (!scheduler.Released && scheduler.Updated)
+                    {
+                        continue;
+                    }
+
+                    BackgroundTaskSettings settings = null;
+                    if (settingsProvider is not null)
+                    {
+                        try
+                        {
+                            settings = await settingsProvider.GetSettingsAsync(task);
+                        }
+                        catch (Exception ex) when (!ex.IsFatal())
+                        {
+                            _logger.LogError(ex, "Error while updating settings of background task '{TaskName}' on tenant '{TenantName}'.", taskName, tenant);
+                        }
+                    }
+
+                    settings ??= task.GetDefaultSettings();
+                    if (scheduler.Released || !scheduler.Settings.Schedule.Equals(settings.Schedule, StringComparison.Ordinal))
+                    {
+                        scheduler.ReferenceTime = referenceTime;
+                    }
+
+                    scheduler.Settings = settings;
+                    scheduler.Released = false;
+                    scheduler.Updated = true;
+                }
             });
 
-            return context;
-        }
+            // Clear the 'HttpContext' for this async flow.
+            _httpContextAccessor.HttpContext = null;
+        });
+    }
 
-        public static HttpContext CreateHttpContext(this ShellSettings settings)
+    private async Task WaitAsync(Task pollingDelay, CancellationToken stoppingToken)
+    {
+        try
         {
-            var context = new DefaultHttpContext().UseShellScopeServices();
+            await Task.Delay(_options.MinimumIdleTime, stoppingToken);
+            await pollingDelay;
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
 
-            context.Request.Scheme = "https";
+    private (string Tenant, long UtcTicks)[] GetRunningShells() => _shellHost
+        .ListShellContexts()
+        .Where(shell => shell.Settings.IsRunning() && (_options.ShellWarmup || shell.HasPipeline()))
+        .Select(shell => (shell.Settings.Name, shell.UtcTicks))
+        .ToArray();
 
-            var urlHost = settings.RequestUrlHost?.Split(new[] { ',', ' ' },
-                StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+    private string[] GetShellsToRun(IEnumerable<(string Tenant, long UtcTicks)> shells)
+    {
+        var tenantsToRun = _schedulers
+            .Where(scheduler => scheduler.Value.CanRun())
+            .Select(scheduler => scheduler.Value.Tenant)
+            .Distinct()
+            .ToArray();
 
-            context.Request.Host = new HostString(urlHost ?? "localhost");
+        return shells
+            .Select(shell => shell.Tenant)
+            .Where(tenant => tenantsToRun.Contains(tenant))
+            .ToArray();
+    }
 
-            if (!String.IsNullOrWhiteSpace(settings.RequestUrlPrefix))
+    private string[] GetShellsToUpdate((string Tenant, long UtcTicks)[] previousShells, (string Tenant, long UtcTicks)[] runningShells)
+    {
+        var previousTenants = previousShells.Select(shell => shell.Tenant);
+
+        var releasedTenants = new List<string>();
+        foreach (var (tenant, utcTicks) in previousShells)
+        {
+            if (_shellHost.TryGetShellContext(tenant, out var existing) &&
+                existing.UtcTicks == utcTicks &&
+                !existing.Released)
             {
-                context.Request.PathBase = "/" + settings.RequestUrlPrefix;
+                continue;
             }
 
-            context.Request.Path = "/";
-            context.Items["IsBackground"] = true;
+            releasedTenants.Add(tenant);
+        }
 
-            return context;
+        if (releasedTenants.Count > 0)
+        {
+            UpdateSchedulers(releasedTenants.ToArray(), scheduler => scheduler.Released = true);
+        }
+
+        var changedTenants = _changeTokens.Where(token => token.Value.HasChanged).Select(token => token.Key).ToArray();
+        if (changedTenants.Length > 0)
+        {
+            UpdateSchedulers(changedTenants, scheduler => scheduler.Updated = false);
+        }
+
+        var runningTenants = runningShells.Select(shell => shell.Tenant);
+        var validTenants = previousTenants.Except(releasedTenants).Except(changedTenants);
+        var tenantsToUpdate = runningTenants.Except(validTenants).ToArray();
+
+        return runningTenants.Where(tenant => tenantsToUpdate.Contains(tenant)).ToArray();
+    }
+
+    private BackgroundTaskScheduler[] GetSchedulersToRun(string tenant) => _schedulers
+        .Where(scheduler => scheduler.Value.Tenant == tenant && scheduler.Value.CanRun())
+        .Select(scheduler => scheduler.Value)
+        .ToArray();
+
+    private void UpdateSchedulers(string[] tenants, Action<BackgroundTaskScheduler> action)
+    {
+        var keys = _schedulers.Where(kv => tenants.Contains(kv.Value.Tenant)).Select(kv => kv.Key).ToArray();
+        foreach (var key in keys)
+        {
+            if (_schedulers.TryGetValue(key, out var scheduler))
+            {
+                action(scheduler);
+            }
+        }
+    }
+
+    private void CleanSchedulers(string tenant, IEnumerable<IBackgroundTask> tasks)
+    {
+        var validKeys = tasks.Select(task => tenant + task.GetTaskName()).ToArray();
+
+        var keys = _schedulers.Where(kv => kv.Value.Tenant == tenant).Select(kv => kv.Key).ToArray();
+        foreach (var key in keys)
+        {
+            if (!validKeys.Contains(key))
+            {
+                _schedulers.TryRemove(key, out _);
+            }
+        }
+    }
+
+    private static void SetBaseUrl(HttpContext context, string baseUrl)
+    {
+        if (!Uri.TryCreate(baseUrl, UriKind.Absolute, out var uri))
+        {
+            return;
+        }
+
+        context.Request.Scheme = uri.Scheme;
+        context.Request.Host = new HostString(uri.Host, uri.Port);
+
+        // Set the PathBase only if it's not just "/". Otherwise, the original path base is kept, which may
+        // contain the RequestUrlPrefix if any.
+        if (uri.AbsolutePath != "/")
+        {
+            context.Request.PathBase = uri.AbsolutePath;
+        }
+
+        if (!string.IsNullOrWhiteSpace(uri.Query))
+        {
+            context.Request.QueryString = new QueryString(uri.Query);
         }
     }
 }

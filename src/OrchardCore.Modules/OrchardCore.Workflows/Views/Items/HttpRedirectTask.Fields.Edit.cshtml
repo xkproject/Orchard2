@@ -1,17 +1,21 @@
-@using OrchardCore.Workflows.Http.ViewModels;
+@using OrchardCore.Workflows.Http.ViewModels
 @model HttpRedirectTaskViewModel
 
-<div class="form-group" asp-validation-class-for="Location">
-    <label asp-for="Location">@T["Location"]</label>
-    <input type="text" asp-for="Location" class="form-control code" />
-    <span asp-validation-for="Location"></span>
-    <span class="hint">@T["The URL to redirect to. With Liquid support."]</span>
+<div class="ocat-wrapper" asp-validation-class-for="Location">
+    <label asp-for="Location" class="ocat-label">@T["Location"]</label>
+    <div class="ocat-end">
+        <input type="text" asp-for="Location" class="form-control code" />
+        <span asp-validation-for="Location"></span>
+        <span class="hint">@T["The URL to redirect to. With Liquid support."]</span>
+    </div>
 </div>
 
-<div class="form-group" asp-validation-class-for="Permanent">
-    <label asp-for="Permanent">
-        <input type="checkbox" asp-for="Permanent" />
-        @T["Permanent"]
-    </label>
-    <span class="hint">@T["Check if the redirect should be permanent (301). Leave unchecked for a temporary redirect (302)."]</span>
+<div class="ocat-wrapper" asp-validation-class-for="Permanent">
+    <div class="ocat-end-offset">
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" asp-for="Permanent" />
+            <label asp-for="Permanent" class="form-check-label">@T["Permanent"]</label>
+        </div>
+        <span class="hint dashed">@T["Check if the redirect should be permanent (301). Leave unchecked for a temporary redirect (302)."]</span>
+    </div>
 </div>

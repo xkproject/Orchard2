@@ -1,51 +1,49 @@
 using OrchardCore.DisplayManagement.Shapes;
-using Xunit;
 
-namespace OrchardCore.Tests.DisplayManagement
+namespace OrchardCore.Tests.DisplayManagement;
+
+public class NilTests
 {
-    public class NilTests
+    [Fact]
+    public void Nil_Default_EqualToNull()
     {
-        [Fact]
-        public void NilShouldEqualToNull()
-        {
-            var nil = Nil.Instance;
+        var nil = Nil.Instance;
 
-            Assert.True(nil == null);
-            Assert.False(nil != null);
+        Assert.True(nil == null);
+        Assert.False(nil != null);
 
-            Assert.True(nil == Nil.Instance);
-            Assert.False(nil != Nil.Instance);
-        }
+        Assert.True(nil == Nil.Instance);
+        Assert.False(nil != Nil.Instance);
+    }
 
-        [Fact]
-        public void NilShouldBeRecursive()
-        {
-            dynamic nil = Nil.Instance;
+    [Fact]
+    public void Nil_Default_BeRecursive()
+    {
+        dynamic nil = Nil.Instance;
 
-            Assert.True(nil == null);
-            Assert.True(nil.Foo == null);
-            Assert.True(nil.Foo.Bar == null);
-        }
+        Assert.True(nil == null);
+        Assert.True(nil.Foo == null);
+        Assert.True(nil.Foo.Bar == null);
+    }
 
-        [Fact]
-        public void CallingToStringOnNilShouldReturnEmpty()
-        {
-            var nil = Nil.Instance;
-            Assert.Equal("", nil.ToString());
-        }
+    [Fact]
+    public void CallingToStringOnNil_Default_ReturnsEmpty()
+    {
+        var nil = Nil.Instance;
+        Assert.Equal("", nil.ToString());
+    }
 
-        [Fact]
-        public void CallingToStringOnDynamicNilShouldReturnEmpty()
-        {
-            dynamic nil = Nil.Instance;
-            Assert.Equal("", nil.Foo.Bar.ToString());
-        }
+    [Fact]
+    public void CallingToStringOnDynamicNil_Default_ReturnsEmpty()
+    {
+        dynamic nil = Nil.Instance;
+        Assert.Equal("", nil.Foo.Bar.ToString());
+    }
 
-        [Fact]
-        public void ConvertingToStringShouldReturnNullString()
-        {
-            dynamic nil = Nil.Instance;
-            Assert.True((string)nil == null);
-        }
+    [Fact]
+    public void ConvertingToString_Default_ReturnsNullString()
+    {
+        dynamic nil = Nil.Instance;
+        Assert.True((string)nil == null);
     }
 }

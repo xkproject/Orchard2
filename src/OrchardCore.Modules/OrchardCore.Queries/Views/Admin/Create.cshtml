@@ -9,10 +9,12 @@
         @await DisplayAsync(Model.Editor.Content)
     }
 
-    @if (Model.Editor.Content != null)
+    @if (Model.Editor.Actions != null)
     {
-        <div class="form-group">
-            @await DisplayAsync(Model.Editor.Actions)
+        <div class="ocat-wrapper">
+            <div class="ocat-end-offset">
+                @await DisplayAsync(Model.Editor.Actions)
+            </div>
         </div>
     }
 

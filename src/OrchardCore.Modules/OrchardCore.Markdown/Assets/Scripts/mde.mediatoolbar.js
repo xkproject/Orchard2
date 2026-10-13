@@ -85,9 +85,10 @@ $(function () {
             name: "image",
             action: function (editor) {
                 $("#mediaApp").detach().appendTo('#mediaModalMarkdown .modal-body');
-                $("#mediaApp").show();
+                document.getElementById("mediaApp").classList.remove("d-none");
                 mediaApp.selectedMedias = [];
-                var modal = $('#mediaModalMarkdown').modal();
+                var modal = new bootstrap.Modal($('#mediaModalMarkdown'));
+                modal.show();
                 $('#mediaMarkdownSelectButton').on('click', function (v) {
                     var mediaMarkdownContent = "";
                     for (i = 0; i < mediaApp.selectedMedias.length; i++) {
@@ -95,7 +96,7 @@ $(function () {
                     }
                     var cm = editor.codemirror;
                     cm.replaceSelection(mediaMarkdownContent)
-                    $('#mediaModalMarkdown').modal('hide');
+                    modal.hide();
                     $(this).off('click');
                 });
             },
@@ -117,7 +118,7 @@ $(function () {
             title: "Numbered List"
         },
         {
-            name: "table",
+            name: "mdtable",
             action: EasyMDE.drawTable,
             className: "fas fa-table fa-sm",
             title: "Insert Table"

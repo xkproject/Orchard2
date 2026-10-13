@@ -19,7 +19,7 @@ You will add a Liquid Widget to the Content Type Definitions and create a templa
 
 - Navigate to the Orchard Core CMS admin area <https://localhost:5001/admin>
 
-- Through the admin menu select _Content -> Content Definition -> Content Types_
+- Through the admin menu select _Design -> Content Definition -> Content Types_
 
 - Select `Create new type` and enter the Display Name `Liquid Widget`. The technical name will auto populate, removing the spaces. Then select `Create`
 
@@ -49,7 +49,7 @@ The standard template contains wrapper divs and you may wish to customize how th
 </div>
 ```
 
-To customize this template 
+To customize this template
 
 - Navigate to _Design -> Templates_
 

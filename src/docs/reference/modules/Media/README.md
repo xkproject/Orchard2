@@ -118,9 +118,9 @@ The quality used when compressing the image.
 
 #### `format` (or fifth argument)
 
-The image format to use when processing the ouput of an image.
+The image format to use when processing the output of an image.
 
-Supported formats include `bmp`, `gif`, `jpg`, `png`, `tga`.
+Supported formats include `gif`, `jpg`, `png`, and `webp`.
 
 Can be combined with the `quality` argument to convert an image to a `JPG` and reduce the quality.
 
@@ -151,13 +151,13 @@ The anchor of the new image.
 
 The background color of the new image when `mode` is `pad` or `boxpad`. Examples of valid values: `white`, `ffff00`, `ffff0080`, `128,64,32` and `128,64,32,16`.
 
-#### bgcolor Input
+#### `bgcolor` Input
 
 ```
 {{ 'animals/kittens.jpg' | asset_url | resize_url: width:100, height:240, mode:'pad', bgcolor:'white' }}
 ```
 
-#### bgcolor Output
+#### `bgcolor` Output
 
 `<img src="~/media/animals/kittens.jpg?width=100&height=240&rmode=pad&bgcolor=white" />`
 
@@ -187,6 +187,9 @@ Appends a version hash for an asset. Can be piped together with the other media 
 
 ## Razor Helpers
 
+!!! note
+    When using tag helpers in Razor, you must take a direct reference to the `OrchardCore.Media` NuGet package in each theme or module that uses the tag helpers. This is not required when using Liquid.
+
 To obtain the correct URL for an asset, use the `AssetUrl` helper extension method on the view's base `Orchard` property, e.g.:
 
 `@Orchard.AssetUrl(Model.Paths[0])`
@@ -195,11 +198,11 @@ To obtain the correct URL for a resized asset use `AssetUrl` with the optional w
 
 `@Orchard.AssetUrl(Model.Paths[0], width: 100 , height: 240, resizeMode: ResizeMode.Crop)`
 
-To obtain the correct URL for a resized asset use `AssetUrl` with the optional width, height, resizeMode, quality and format parameters, e.g.:
+To obtain the correct URL for a resized asset use `AssetUrl` with the optional `width`, `height`, `resizeMode`, `quality` and `format` parameters, e.g.:
 
 `@Orchard.AssetUrl(Model.Paths[0], width: 100 , height: 240, resizeMode: ResizeMode.Crop, quality: 50, format: Format.Jpg)`
 
-To obtain the correct URL for a resized asset use `AssetUrl` with the optional width, height, resizeMode and bgcolor, e.g.:
+To obtain the correct URL for a resized asset use `AssetUrl` with the optional `width`, `height`, `resizeMode` and `bgcolor`, e.g.:
 
 `@Orchard.AssetUrl(Model.Paths[0], width: 100 , height: 240, resizeMode: ResizeMode.Pad, bgcolor: "white")`
 
@@ -221,13 +224,13 @@ To use [Image Anchors](#image-anchors), use the `GetAnchors` helper extension me
 
 ### Razor image resizing tag helpers
 
-To use the image tag helpers add `@addTagHelper *, OrchardCore.Media` to `_ViewImports.cshtml`, and take a direct reference to the `OrchardCore.Media` nuget package.
+To use the image tag helpers, add `@addTagHelper *, OrchardCore.Media` to `_ViewImports.cshtml`, and take a direct reference to the `OrchardCore.Media` NuGet package.
 
 `asset-src` is used to obtain the correct URL for the asset and set the `src` attribute. Width, height, resize mode, quality and format can be set using `img-width`, `img-height`, `img-resize-mode`, `img-quality`, and `img-format` respectively. e.g.:
 
 `<img asset-src="Model.Paths[0]" alt="..." img-width="100" img-height="240" img-resize-mode="Crop" img-quality="50" img-format="Jpg" />`
 
-Alternatively the Asset Url can be resolved independently and the `src` attribute used:
+Alternatively the Asset URL can be resolved independently and the `src` attribute used:
 
 `<img src="@Orchard.AssetUrl(Model.Paths[0])" alt="..." img-width="100" img-height="240" img-resize-mode="Crop" img-quality="50" img-format="Jpg" />`
 
@@ -257,7 +260,7 @@ To use a [Image Anchor](#image-anchors) set the `asset-src` property and the `im
 
 `<img asset-src="Model.Paths[0]" alt="..." asp-append-version="true" />`
 
-Alternatively the Asset Url can be resolved independently and the `src` attribute used:
+Alternatively the Asset URL can be resolved independently and the `src` attribute used:
 
 `<img src="@Orchard.AssetUrl(Model.Paths[0])" alt="..." asp-append-version="true" />`
 
@@ -267,8 +270,31 @@ Or when using the MVC tag helpers and the image is resolved from static assets, 
 
 > The Razor Helper is accessible on the `Orchard` property if the view is using Orchard Core's Razor base class, or by injecting `OrchardCore.IOrchardHelper` in all other cases.
 
+### Razor Anchor Tag Helper
+
+The `AnchorTagHelper` in the Media module allows you to generate links (`<a>`) to files in the Media Library using logical paths, automatically resolving the correct URL.
+
+
+`asset-href` attribute is used to specify a logical path in the Media Library. It will be converted to a public `href` URL at render time, e.g.:
+
+`<a asset-href="demo/site-gusta-la-oscuridad-Libro.png" class="btn btn-link btn-sm view-button">View</a>`
+
+Rendered HTML:
+
+`<a href="/media/demo/site-gusta-la-oscuridad-Libro.png?v=-xU7_qsnn4HeHXjHT1gPmep-7Ik68F_ZKYcNO9ChXXg" class="btn btn-link btn-sm view-button"> View </a>`
+
+`target` defines where the link will open. By default, it behaves like a normal `<a>` tag (`_self`), but you can set `_blank` to open in a new tab, e.g.:
+
+`<a href="demo/site-gusta-la-oscuridad-Libro.png?v=-xU7_qsnn4HeHXjHT1gPmep-7Ik68F_ZKYcNO9ChXXg" target="_blank" class="btn btn-link btn-sm view-button"> View </a>`
+
+Rendered HTML:
+
+`<a href="/media/demo/site-gusta-la-oscuridad-Libro.png?v=-xU7_qsnn4HeHXjHT1gPmep-7Ik68F_ZKYcNO9ChXXg" target="_blank" class="btn btn-link btn-sm view-button"> View </a>`
+
 !!! note
-    When using tag helpers in Razor, you must take a direct reference to the `OrchardCore.Media` nuget package in each theme or module that uses the tag helpers. This is not required when using Liquid.
+    - The generated URL includes a version query string for cache busting.
+    - You can use standard HTML attributes like `class`, `target`, `rel`, etc.
+
 
 ## Deployment Step Editor
 
@@ -284,79 +310,98 @@ Keep these things in mind when working with the deployment step editor:
 The following configuration values are used by default and can be customized:
 
 ```json
-    "OrchardCore_Media": {
+{
+  "OrchardCore_Media": {
+    // The accepted sizes for custom width and height.
+    // When the 'UseTokenizedQueryString' is True (default) all sizes are valid.
+    "SupportedSizes": [
+      16,
+      32,
+      50,
+      100,
+      160,
+      240,
+      480,
+      600,
+      1024,
+      2048
+    ],
+    // The number of days to store images in the browser cache.
+    // NB: To control cache headers for module static assets, refer to the Orchard Core Modules Section.
+    "MaxBrowserCacheDays": 30,
+    // The number of days to store secure media files in the browser cache.
+    // Set to 0 (default) to disable caching secure files.
+    "MaxSecureFilesBrowserCacheDays": 0,
+    // The number of days a cached resized media item will be valid for, before being rebuilt on request.
+    "MaxCacheDays": 365,
+    // The maximum size of an uploaded file in bytes. 
+    // NB: You might still need to configure the limit in IIS (https://docs.microsoft.com/en-us/iis/configuration/system.webserver/security/requestfiltering/requestlimits/)
+    "MaxFileSize": 30000000,
+    // A CDN base url that will be prefixed to the request path when serving images.
+    "CdnBaseUrl": "https://your-cdn.com",
+    // The path used when serving media assets.
+    "AssetsRequestPath": "/media",
+    // The name of the folder used to store media assets inside the App_Data folder.
+    "AssetsPath": "Media",
+    // Whether to use a token in the query string to prevent disc filling.
+    "UseTokenizedQueryString": true,
+    // The list of allowed file extensions
+    "AllowedFileExtensions": [
+      // Images
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".gif",
+      ".ico",
+      ".svg",
+      // Documents
+      ".pdf",
+      // Portable Document Format; Adobe Acrobat
+      ".doc",
+      // Microsoft Word Document
+      ".docx",
+      ".ppt",
+      // Microsoft PowerPoint Presentation
+      ".pptx",
+      ".pps",
+      ".ppsx",
+      ".odt",
+      // OpenDocument Text Document
+      ".xls",
+      // Microsoft Excel Document
+      ".xlsx",
+      ".psd",
+      // Adobe Photoshop Document
 
-      // The accepted sizes for custom width and height.
-      // When the 'UseTokenizedQueryString' is True (default) all sizes are valid.
-      "SupportedSizes": [ 16, 32, 50, 100, 160, 240, 480, 600, 1024, 2048 ],
-
-      // The number of days to store images in the browser cache.
-      // NB: To control cache headers for module static assets, refer to the Orchard Core Modules Section.
-      "MaxBrowserCacheDays": 30,
-
-      // The number of days a cached resized media item will be valid for, before being rebuilt on request.
-      "MaxCacheDays": 365,
-
-      // The maximum size of an uploaded file in bytes. 
-      // NB: You might still need to configure the limit in IIS (https://docs.microsoft.com/en-us/iis/configuration/system.webserver/security/requestfiltering/requestlimits/)
-      "MaxFileSize": 30000000,
-
-      // A CDN base url that will be prefixed to the request path when serving images.
-      "CdnBaseUrl": "https://your-cdn.com",
-
-      // The path used when serving media assets.
-      "AssetsRequestPath": "/media",
-
-      // The path used to store media assets. The path can be relative to the tenant's App_Data folder, or absolute.
-      "AssetsPath": "Media",
-
-      // Whether to use a token in the query string to prevent disc filling.
-      "UseTokenizedQueryString": true,
-
-      // The list of allowed file extensions
-      "AllowedFileExtensions": [
-
-            // Images
-            ".jpg",
-            ".jpeg",
-            ".png",
-            ".gif",
-            ".ico",
-            ".svg",
-
-            // Documents
-            ".pdf", // Portable Document Format; Adobe Acrobat
-            ".doc", // Microsoft Word Document
-            ".docx",
-            ".ppt", // Microsoft PowerPoint Presentation
-            ".pptx",
-            ".pps",
-            ".ppsx",
-            ".odt", // OpenDocument Text Document
-            ".xls", // Microsoft Excel Document
-            ".xlsx",
-            ".psd", // Adobe Photoshop Document
-
-            // Audio
-            ".mp3",
-            ".m4a",
-            ".ogg",
-            ".wav",
-
-            // Video
-            ".mp4", // MPEG-4
-            ".m4v",
-            ".mov", // QuickTime
-            ".wmv", // Windows Media Video
-            ".avi",
-            ".mpg",
-            ".ogv", // Ogg
-            ".3gp", // 3GPP
-        ],
-
-      // The Content Security Policy to apply to assets served from the media library.
-      "ContentSecurityPolicy" : "default-src 'self'; style-src 'unsafe-inline'"
-    }
+      // Audio
+      ".mp3",
+      ".m4a",
+      ".ogg",
+      ".wav",
+      // Video
+      ".mp4",
+      // MPEG-4
+      ".m4v",
+      ".mov",
+      // QuickTime
+      ".wmv",
+      // Windows Media Video
+      ".avi",
+      ".mpg",
+      ".ogv",
+      // Ogg
+      ".3gp",
+      // 3GPP
+      ".webm"
+    ],
+    // The Content Security Policy to apply to assets served from the media library.
+    "ContentSecurityPolicy": "default-src 'self'; style-src 'unsafe-inline'",
+    // The maximum chunk size when uploading files in bytes. If 0, no chunked upload is used. This is useful to work around request size limitations of a hosting environment.
+    "MaxUploadChunkSize": 104857600,
+    // The lifetime of temporary files created during upload. Defaults to 1 hour.
+    "TemporaryFileLifetime": "01:00:00"
+  }
+}
 ```
 
 To configure the `StaticFileOptions` in more detail, including event handlers, for the Media Library `StaticFileMiddleware` apply:
@@ -365,11 +410,30 @@ To configure the `StaticFileOptions` in more detail, including event handlers, f
 services.PostConfigure<MediaOptions>(o => ...);
 ```
 
-To configure the `ImageSharpMiddleware` in more detail, including event handlers, apply:
+On-demand image resizing is performed by a built-in middleware backed by an `IImageProcessingEngine` service. Resized images are produced by that engine and stored through an `IResizedImageCache` implementation, so no additional middleware configuration is required.
 
+### Image processing engines
+
+The image processing engine is a pluggable service contract (`IImageProcessingEngine`, defined in `OrchardCore.Media.Abstractions`). The middleware parses the validated request into an engine-agnostic `ImageProcessingCommands` instance and hands it to the registered engine, so engines never deal with query strings, tokens or cache keys.
+
+Two engines ship with Orchard Core:
+
+| Engine | Provided by | Backed by | Default |
+| --- | --- | --- | --- |
+| NetVips | `OrchardCore.Media` (built in) | [NetVips](https://github.com/kleisauke/net-vips), a managed binding over the native [libvips](https://www.libvips.org/) library | Yes |
+| ImageSharp (v3) | `OrchardCore.Media.ImageSharpV3` feature | [SixLabors.ImageSharp](https://github.com/SixLabors/ImageSharp) `3.1.x` | No |
+
+The NetVips engine is registered by default. To use ImageSharp instead, enable the **Media ImageSharp Image Processing** feature (`OrchardCore.Media.ImageSharpV3`); it replaces the default engine registration. Only one engine should be enabled at a time.
+
+To provide your own engine, implement `IImageProcessingEngine` and replace the registration after the `OrchardCore.Media` module's services are configured:
+
+```csharp
+services.Replace(ServiceDescriptor.Singleton<IImageProcessingEngine, MyImageProcessingEngine>());
 ```
-services.PostConfigure<ImageSharpMiddlewareOptions>(o => ...);
-```
+
+### Supported output formats
+
+Both engines support resizing to `jpg`/`jpeg`, `png`, `gif` and `webp`. Any other or unspecified format falls back to JPEG. The `bmp` and `tga` formats are no longer supported.
 
 !!! note
     The Media Library `StaticFileOptions` configuration is separated from the configuration for static files contained in module `wwwroot` folders.
@@ -382,11 +446,11 @@ services.Configure<StaticFileOptions>(o => ...);
 
 ## Media Profiles
 
-Media profiles allow you to defined preset image resizing and formatting commands.
+Media profiles allow you to define preset image resizing and formatting commands.
 
-You can create a media profile from the _Configuration -> Media -> Media Profiles_ menu.
+You can create a media profile from the _Media -> Profiles_ menu.
 
-When specifying a media profile with either the liquid, razor helper, or tag helper you provide the profile name, and any additional commands which you want to apply to the media item.
+When specifying a media profile with either the Liquid, Razor helper, or tag helper, you provide the profile name and any additional commands which you want to apply to the media item.
 
 === "Liquid"
 
@@ -408,9 +472,6 @@ When specifying a media profile with either the liquid, razor helper, or tag hel
     <img asset-src="Model.Paths[0]" img-profile="medium" />
     <img asset-src="Model.Paths[0]" img-profile="medium" img-resize-mode="Crop"/>
     ```
-
-!!! note
-    Media Profiles are only available from the [Preview Feed](../../../getting-started/preview-package-source)
 
 ## Media Text
 
@@ -451,14 +512,11 @@ The `Anchors[]` is a less well known property of a `MediaField` and can be acces
 
 The `Anchors[]` is kept in sync with the `Paths[]` array and the index for a given path represents the index of a `Anchor` value.
 
-!!! note
-    Anchors are only available from the [Preview Feed](../../../getting-started/preview-package-source)
-
 ## Query string tokens
 
 When resizing images, the query string command values are, by default, signed with an HMAC signature that is unique to the tenant.
 
-This prevents prevent malicious clients from creating too many variations of the same image. 
+This prevents prevent malicious clients from creating too many variations of the same image.
 
 If the `UseTokenizedQueryString` is set to `false` the following features will be removed.
 
@@ -472,15 +530,22 @@ When the query string is signed with a token any width, height value may be used
 `<img src="/media/kittens.jpg?width=101&height=241&token=0J3hyv6jIPEsSdlvTCrf30fIdygkpmrF6mphqgYQyas%3D">`
 
 !!! note
-    Tokens are only available from the [Preview Feed](../../../getting-started/preview-package-source)
-    Prior to this the width or height values are limited to `16`, `32`, `50`, `100`, `160`, `240`, `480`, `600`, `1024`, `2048`.
+    Prior to tokens the width or height values are limited to `16`, `32`, `50`, `100`, `160`, `240`, `480`, `600`, `1024`, `2048`.
 
-## Media Indexing
+## Media Content Search
 
 Media can be optionally indexed for search as well if files are referenced via Media Fields. The following data can be indexed for each file referenced from a Media Field:
 
 - Media Text
-- Textual content of PDF files
+- Text extracted from additional file formats when the corresponding indexing feature is enabled
+
+File extraction is available through explicit features:
+
+- `OrchardCore.Media.Indexing.Pdf` for `.pdf`
+- `OrchardCore.Media.Indexing.Text` for `.txt` and `.md`
+- `OrchardCore.Media.Indexing.OpenXML` for `.docx` and `.pptx`
+
+Enable the feature that corresponds to the file types you want to extract and index.
 
 !!! note
     Standalone files, i.e. files that are just uploaded to the Media Library but never referenced from a content item via a Media Field, can't be indexed.
@@ -495,15 +560,200 @@ To set up indexing for Media do the following:
 3. Configure the new field to be used for search. You can do this from the admin under Search, Settings, Search, and adding the name of the new field under "Default search fields" (arriving at something like "Content.ContentItem.FullText, BlogPost.File.MediaText, BlogPost.File.FileText").
 4. Try searching for content only available in the Media Text of selected media files, or referenced PDF files. You should see corresponding results.
 
+## Manage Media Permissions
+
+The Media module uses a small permission hierarchy to distinguish between media library access, folder management, and read-only access.
+
+`ManageMediaContent` is the minimum permission required to open and use the Media Library. If a user does not have this permission, the library cannot be accessed and none of the media actions in the library are available.
+
+The available media permissions are:
+
+| Permission | Description | Notes |
+| --- | --- | --- |
+| `ManageMediaFolder` | Manage All Media Folders | Grants the broadest media folder management access. Viewing permissions are also implied by it. |
+| `ManageOthersMediaContent` | Manage Media For Others | Implied by `ManageMediaFolder`. Lets a user manage media owned by others. |
+| `ManageOwnMediaContent` | Manage Own Media | Implied by `ManageOthersMediaContent`. Lets a user manage their own media. |
+| `ManageAttachedMediaFieldsFolder` | Manage Attached Media Fields Folder | Implied by `ManageMediaFolder`. Used for files stored under `mediafields/`. |
+| `ManageMediaContent` | Manage Media | Minimum permission for opening the Media Library. Implied by `ManageOwnMediaContent` and `ManageAttachedMediaFieldsFolder`. |
+| `ManageMediaProfiles` | Manage Media Profiles | Controls media profile management. |
+| `ViewMediaOptions` | View Media Options | Controls visibility of media options. |
+| `ManageAssetCache` | Manage Asset Cache Folder | Controls the media asset cache folder. |
+| `ViewMediaContent` | View media content in all folders | Implied by `ManageMediaFolder`. Also acts as the base view permission for Secure Media folders. |
+| `ViewRootMediaContent` | View media content in the root folder | Implied by `ViewMediaContent`. |
+| `ViewOthersMediaContent` | View others media content | Implied by `ManageMediaFolder`. |
+| `ViewOwnMediaContent` | View own media content | Implied by `ViewOthersMediaContent`. |
+
+The `ManageMediaFolder` permission is the broadest media permission and effectively grants all folder access. Because of that, it also implies the view permissions used by Secure Media.
+
+The `ViewMediaContent`, `ViewRootMediaContent`, `ViewOthersMediaContent`, and `ViewOwnMediaContent` permissions are only available when the **Secure Media** feature is enabled.
+
+## Secure Media
+
+The Secure Media feature enhances security and control over media files within the Media module.
+
+When enabled, administrators can add finer-grained view permissions for the root media folder and each first-level folder within the media root. This allows access to be restricted by folder even inside the Media Library, ensuring that only authorized users can view or manage media files in specific locations.
+
+New permissions to allow users to view their own media files, view media files uploaded by others, or both are created too. These are additional permissions on top of `ManageMediaContent`, not a replacement for it. You can manage them among the other permissions with the [Roles module](../Roles/README.md).
+
+These view permissions only exist when the **Secure Media** feature is enabled.
+
+Media files attached to content items will also adhere to the `ViewContent` permission of the respective content item automatically.
+
+### Handling Unauthorized Access
+
+A middleware component returns a 404 NotFound response for unauthenticated access attempts to secured media files. This not only restricts access but also conceals the existence of the file, enhancing privacy and security.
+
+### Configurable Cache-Control for Secured Files
+
+The `Cache-Control` header for secured files is set to `no-store` by default, preventing their caching. This can be changed with the `MaxSecureFilesBrowserCacheDays` configuration, [see above](#configuration).
+
+### Standard, Gallery, and Attached editors
+
+Media Fields support three common editing patterns with different editing experiences, storage behavior, and authorization behavior.
+
+#### Standard editor
+
+The **Standard** editor is the default editor. It doesn't upload files into a content-item-specific folder. Instead, it lets editors select files that already exist in the Media Library.
+
+When the **Secure Media** feature is enabled, access to those files is governed by media folder permissions such as the root media permission, first-level folder permissions, and the own/others media permissions where applicable.
+
+Use the **Standard** editor when you want multiple content items to reference shared media library assets.
+
+#### Gallery editor
+
+The **Gallery** editor also works with files that already exist in the Media Library instead of uploading them into a content-item-specific folder. It provides a gallery-oriented editing experience that is helpful when editors need to review, reorder, and manage multiple selected media items visually.
+
+Because the stored paths still point to Media Library assets, the **Gallery** editor follows the same **Secure Media** authorization model as the **Standard** editor. Access is still governed by media folder permissions rather than the owning content item's `ViewContent` permission.
+
+Use the **Gallery** editor when you want shared Media Library assets like the **Standard** editor, but with a more visual multi-item gallery editing experience.
+
+#### Attached editor
+
+Unlike the **Standard** and **Gallery** editors, the **Attached** editor uploads files as part of the content item editing flow. Orchard Core stores those files under:
+
+`mediafields/{ContentType}/{ContentItemId}/`
+
+For new uploads, the stored file name is hash-based, while cloned content items copy the files into the cloned item's own `mediafields/{ContentType}/{ContentItemId}/` folder.
+
+When the **Secure Media** feature is enabled, files under `mediafields/` automatically inherit the `ViewContent` permission of the associated content item. In other words, access to an attached file follows access to the content item that owns it.
+
+This means you don't need to grant separate folder permissions for attached uploads. If a user can't view the content item, Secure Media also prevents access to the attached file URL.
+
+Using the **Attached** editor requires the `ManageAttachedMediaFieldsFolder` permission. This permission is separate from the general `ManageMediaContent` permission and covers the `mediafields/` storage used by attached uploads.
+
+Use the **Attached** editor when the file should belong to a specific content item and automatically follow that item's `ViewContent` permission.
+
+### Recipe step: move-attached-media-fields
+
+If you switch an existing Media Field from the **Standard** or **Gallery** editor to the **Attached** editor, existing field values still point to their current Media Library paths until you migrate them.
+
+Use the `move-attached-media-fields` recipe step to move those referenced files into the attached media location and update the stored field paths on the affected content items.
+
+The step:
+
+- inspects content definitions for Media Fields that use the **Attached** editor,
+- processes either the specified content types or all content types when no filter is provided,
+- updates both latest and published versions of each content item,
+- runs in an HTTP background job, and
+- saves changes in batches of 50 content items.
+
+Example:
+
+```json
+{
+  "steps": [
+   {
+      "name": "move-attached-media-fields",
+      "ContentTypes": [ "Article", "Report" ]
+    }
+  ]
+}
+```
+
+Omit `ContentTypes` to evaluate every content type that contains a Media Field configured with the **Attached** editor.
+
+## File Upload Limit
+
+In ASP.NET Core, file upload size limits are enforced at multiple levels — FormOptions, Kestrel/IIS server settings, and sometimes controller-level attributes. By default:
+
+- MultipartBodyLengthLimit (FormOptions) → 128 MB for multipart form sections.
+- Kestrel MaxRequestBodySize → ~28.6 MB (30,000,000 bytes).
+- IIS maxAllowedContentLength → ~28.6 MB unless overridden.
+
+If a file exceeds these limits, you'll get errors like `InvalidDataException`: Multipart body length limit exceeded or HTTP 404.13 in IIS.
+
+To increase the limit, you can use one of the following approaches:
+
+1. IIS content length limit
+
+    ```xml
+    <system.webServer>
+      <security>
+        <requestFiltering>
+          <requestLimits maxAllowedContentLength="50000000" />
+        </requestFiltering>
+      </security>
+    </system.webServer>
+    ```
+
+2. ASP.NET Core Request length limit
+
+    2.1 For application running on IIS
+
+    ```csharp
+    services.Configure<IISServerOptions>(options =>
+    {
+        options.MaxRequestBodySize = 50000000;
+    });
+    ```
+
+    2.2 For application running on Kestrel
+
+    ```csharp
+    services.Configure<KestrelServerOptions>(options =>
+    {
+        options.Limits.MaxRequestBodySize = 50000000;
+    });
+    ```
+
+3. Form's `MultipartBodyLengthLimit`
+
+    ```csharp
+    services.Configure<FormOptions>(options =>
+    {
+        options.ValueLengthLimit = 50000000;
+        options.MultipartBodyLengthLimit = 50000000;
+        options.MultipartHeadersLengthLimit = 50000000;
+    });
+    ```
+
 ## Videos
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/BQHUlvPFRR4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/H0jBMH8tj3A" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/K0_i4vj00yM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/monQap7FuiU" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/LVsdTvurGEY" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## Media Indexing
+
+The base `Media Indexing` feature indexes media text stored by media fields. Additional file extraction is enabled by feature:
+
+| Feature | File types |
+|---|---|
+| `OrchardCore.Media.Indexing.Pdf` | `.pdf` |
+| `OrchardCore.Media.Indexing.Text` | `.txt`, `.md` |
+| `OrchardCore.Media.Indexing.OpenXML` | `.docx`, `.pptx` |
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/BQHUlvPFRR4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/K0_i4vj00yM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/bDxL2LPJPzk" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/Nb5GUqM7ZzI" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Credits
 
 To index PDF files the [PdfPig library](https://github.com/UglyToad/PdfPig/) is used.
-
+To index Microsoft Office files (i.e., .docx, .ppts) the [Open-XML-SDK](https://github.com/dotnet/Open-XML-SDK) is used.

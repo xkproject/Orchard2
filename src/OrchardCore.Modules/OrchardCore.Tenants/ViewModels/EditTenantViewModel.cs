@@ -1,32 +1,34 @@
-using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using OrchardCore.Recipes.Models;
 
-namespace OrchardCore.Tenants.ViewModels
+namespace OrchardCore.Tenants.ViewModels;
+
+public class EditTenantViewModel : TenantViewModel
 {
-    public class EditTenantViewModel
-    {
-        public string Description { get; set; }
+    public List<SelectListItem> FeatureProfilesItems { get; set; }
 
-        public string Name { get; set; }
+    public IEnumerable<RecipeDescriptor> Recipes { get; set; }
 
-        public string DatabaseProvider { get; set; }
+    public bool CanEditDatabasePresets { get; set; }
 
-        public string RequestUrlPrefix { get; set; }
+    public bool DatabaseConfigurationPreset { get; set; }
 
-        public string RequestUrlHost { get; set; }
+    [BindNever]
+    public bool DatabaseProviderPreset { get; set; }
 
-        public string ConnectionString { get; set; }
+    [BindNever]
+    public bool RequireTablePrefix { get; set; }
 
-        public string TablePrefix { get; set; }
+    [BindNever]
+    public bool HasTablePrefixPattern { get; set; }
 
-        public string RecipeName { get; set; }
-        public string FeatureProfile { get; set; }
-        public List<SelectListItem> FeatureProfiles { get; set; }
+    [BindNever]
+    public string ResolvedTablePrefix { get; set; }
 
-        public IEnumerable<RecipeDescriptor> Recipes { get; set; }
+    [BindNever]
+    public bool HasSchemaPattern { get; set; }
 
-        public bool CanEditDatabasePresets { get; set; }
-        public bool DatabaseConfigurationPreset { get; set; }
-    }
+    [BindNever]
+    public string ResolvedSchema { get; set; }
 }

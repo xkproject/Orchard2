@@ -1,54 +1,42 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using OrchardCore.Security.Permissions;
 
-namespace OrchardCore.OpenId
+namespace OrchardCore.OpenId;
+
+public sealed class Permissions : IPermissionProvider
 {
-    public class Permissions : IPermissionProvider
-    {
-        public static readonly Permission ManageApplications
-            = new Permission(nameof(ManageApplications), "View, add, edit and remove the OpenID Connect applications.");
+    private readonly IEnumerable<Permission> _allPermissions =
+    [
+        OpenIdPermissions.ManageApplications,
+        OpenIdPermissions.ManageScopes,
+        OpenIdPermissions.ManageClientSettings,
+        OpenIdPermissions.ManageServerSettings,
+        OpenIdPermissions.ManageValidationSettings,
+    ];
 
-        public static readonly Permission ManageScopes
-            = new Permission(nameof(ManageScopes), "View, add, edit and remove the OpenID Connect scopes.");
+    [Obsolete("This will be removed in a future release. Instead use 'OpenIdPermissions.ManageApplications'.")]
+    public static readonly Permission ManageApplications = OpenIdPermissions.ManageApplications;
 
-        public static readonly Permission ManageClientSettings
-            = new Permission(nameof(ManageClientSettings), "View and edit the OpenID Connect client settings.");
+    [Obsolete("This will be removed in a future release. Instead use 'OpenIdPermissions.ManageScopes'.")]
+    public static readonly Permission ManageScopes = OpenIdPermissions.ManageScopes;
 
-        public static readonly Permission ManageServerSettings
-            = new Permission(nameof(ManageServerSettings), "View and edit the OpenID Connect server settings.");
+    [Obsolete("This will be removed in a future release. Instead use 'OpenIdPermissions.ManageClientSettings'.")]
+    public static readonly Permission ManageClientSettings = OpenIdPermissions.ManageClientSettings;
 
-        public static readonly Permission ManageValidationSettings
-            = new Permission(nameof(ManageValidationSettings), "View and edit the OpenID Connect server settings.");
+    [Obsolete("This will be removed in a future release. Instead use 'OpenIdPermissions.ManageServerSettings'.")]
+    public static readonly Permission ManageServerSettings = OpenIdPermissions.ManageServerSettings;
 
-        public Task<IEnumerable<Permission>> GetPermissionsAsync()
+    [Obsolete("This will be removed in a future release. Instead use 'OpenIdPermissions.ManageValidationSettings'.")]
+    public static readonly Permission ManageValidationSettings = OpenIdPermissions.ManageValidationSettings;
+
+    public Task<IEnumerable<Permission>> GetPermissionsAsync()
+        => Task.FromResult(_allPermissions);
+
+    public IEnumerable<PermissionStereotype> GetDefaultStereotypes() =>
+    [
+        new PermissionStereotype
         {
-            return Task.FromResult(new[]
-            {
-                ManageApplications,
-                ManageScopes,
-                ManageClientSettings,
-                ManageServerSettings,
-                ManageValidationSettings
-            }
-            .AsEnumerable());
-        }
-
-        public IEnumerable<PermissionStereotype> GetDefaultStereotypes()
-        {
-            yield return new PermissionStereotype
-            {
-                Name = "Administrator",
-                Permissions = new[]
-                {
-                    ManageApplications,
-                    ManageScopes,
-                    ManageClientSettings,
-                    ManageServerSettings,
-                    ManageValidationSettings
-                }
-            };
-        }
-    }
+            Name = OrchardCoreConstants.Roles.Administrator,
+            Permissions = _allPermissions,
+        },
+    ];
 }

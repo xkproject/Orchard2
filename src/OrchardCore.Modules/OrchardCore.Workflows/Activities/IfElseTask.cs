@@ -1,46 +1,65 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Localization;
 using OrchardCore.Workflows.Abstractions.Models;
 using OrchardCore.Workflows.Models;
 using OrchardCore.Workflows.Services;
 
-namespace OrchardCore.Workflows.Activities
+namespace OrchardCore.Workflows.Activities;
+
+public class IfElseTask : TaskActivity<IfElseTask>
 {
-    public class IfElseTask : TaskActivity
+    private readonly IWorkflowScriptEvaluator _scriptEvaluator;
+    private readonly IWorkflowExpressionEvaluator _expressionEvaluator;
+    protected readonly IStringLocalizer S;
+
+    public IfElseTask(
+        IWorkflowScriptEvaluator scriptEvaluator,
+        IWorkflowExpressionEvaluator expressionEvaluator,
+        IStringLocalizer<IfElseTask> localizer)
     {
-        private readonly IWorkflowScriptEvaluator _scriptEvaluator;
-        private readonly IStringLocalizer S;
+        _scriptEvaluator = scriptEvaluator;
+        _expressionEvaluator = expressionEvaluator;
+        S = localizer;
+    }
 
-        public IfElseTask(IWorkflowScriptEvaluator scriptEvaluator, IStringLocalizer<IfElseTask> localizer)
+    public override LocalizedString DisplayText => S["If Else Task"];
+
+    public override LocalizedString Category => S["Control Flow"];
+
+    /// <summary>
+    /// A script evaluating to either true or false.
+    /// </summary>
+    public WorkflowExpression<bool> Condition
+    {
+        get => GetProperty(() => new WorkflowExpression<bool>());
+        set => SetProperty(value);
+    }
+
+    public WorkflowExpression<bool> LiquidCondition
+    {
+        get => GetProperty(() => new WorkflowExpression<bool>());
+        set => SetProperty(value);
+    }
+
+    public WorkflowScriptSyntax Syntax
+    {
+        get => GetProperty(() => WorkflowScriptSyntax.JavaScript);
+        set => SetProperty(value);
+    }
+
+    public override IEnumerable<Outcome> GetPossibleOutcomes(WorkflowExecutionContext workflowContext, ActivityContext activityContext)
+    {
+        return Outcomes(S["True"], S["False"]);
+    }
+
+    public override async Task<ActivityExecutionResult> ExecuteAsync(WorkflowExecutionContext workflowContext, ActivityContext activityContext)
+    {
+        var result = Syntax switch
         {
-            _scriptEvaluator = scriptEvaluator;
-            S = localizer;
-        }
-        public override string Name => nameof(IfElseTask);
+            WorkflowScriptSyntax.Liquid => await _expressionEvaluator.EvaluateAsync(LiquidCondition, workflowContext, null),
+            WorkflowScriptSyntax.JavaScript => await _scriptEvaluator.EvaluateAsync(Condition, workflowContext),
+            _ => throw new NotSupportedException($"The syntax {Syntax} isn't supported for IfElseTask.")
+        };
 
-        public override LocalizedString DisplayText => S["If Else Task"];
-
-        public override LocalizedString Category => S["Control Flow"];
-
-        /// <summary>
-        /// A script evaluating to either true or false.
-        /// </summary>
-        public WorkflowExpression<bool> Condition
-        {
-            get => GetProperty(() => new WorkflowExpression<bool>());
-            set => SetProperty(value);
-        }
-
-        public override IEnumerable<Outcome> GetPossibleOutcomes(WorkflowExecutionContext workflowContext, ActivityContext activityContext)
-        {
-            return Outcomes(S["True"], S["False"]);
-        }
-
-        public override async Task<ActivityExecutionResult> ExecuteAsync(WorkflowExecutionContext workflowContext, ActivityContext activityContext)
-        {
-            var result = await _scriptEvaluator.EvaluateAsync(Condition, workflowContext);
-            return Outcomes(result ? "True" : "False");
-        }
+        return Outcomes(result ? "True" : "False");
     }
 }

@@ -1,10 +1,11 @@
 using System.ComponentModel;
 
-namespace OrchardCore.Markdown.Settings
+namespace OrchardCore.Markdown.Settings;
+
+public class MarkdownBodyPartSettings
 {
-    public class MarkdownBodyPartSettings
-    {
-        [DefaultValue(true)]
-        public bool SanitizeHtml { get; set; } = true;
-    }
+    [DefaultValue(true)]
+    public bool SanitizeHtml { get; set; } = true;
+
+    public bool RenderLiquid { get; set; }
 }

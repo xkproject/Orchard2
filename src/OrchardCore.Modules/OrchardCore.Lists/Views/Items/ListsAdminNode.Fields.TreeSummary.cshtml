@@ -1,9 +1,21 @@
 @model ShapeViewModel<ListsAdminNode>
+@using OrchardCore.Localization.Data
+@using OrchardCore.ContentTypes
 @inject OrchardCore.ContentManagement.Metadata.IContentDefinitionManager ContentDefinitionManager
+@inject IDataLocalizer D
 
 @{
+    var displayName = Model.Value.ContentType;
 
-    var displayName = ContentDefinitionManager.GetTypeDefinition(Model.Value.ContentType);
+    if (!string.IsNullOrEmpty(Model.Value.ContentType))
+    {
+        var definition = await ContentDefinitionManager.GetTypeDefinitionAsync(Model.Value.ContentType);
+
+        if (definition != null)
+        {
+            displayName = D[definition.DisplayName, DataLocalizationContext.ContentType];
+        }
+    }
 }
 
 <div class="@(Model.Value.Enabled ? "" : "disabled")">

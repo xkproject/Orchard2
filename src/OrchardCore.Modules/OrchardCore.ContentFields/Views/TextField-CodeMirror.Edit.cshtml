@@ -1,21 +1,42 @@
 @model OrchardCore.ContentFields.ViewModels.EditTextFieldViewModel
-
+@using OrchardCore.ContentFields
+@using OrchardCore.Mvc.Utilities
+@using OrchardCore.Localization.Data
+@inject IDataLocalizer D
 @{
     var settings = Model.PartFieldDefinition.GetSettings<TextFieldSettings>();
     var culture = await Orchard.GetContentCultureAsync(Model.Field.ContentItem);
+    string localizedFieldName = D[Model.PartFieldDefinition.DisplayName(), DataLocalizationContext.ContentField(Model.PartFieldDefinition.PartDefinition.Name)];
 }
 
-<div class="form-group">
-    <label asp-for="Text">@Model.PartFieldDefinition.DisplayName()</label>
-    <textarea asp-for="Text" rows="5" class="form-control content-preview-text" dir="@culture.GetLanguageDirection()"></textarea>
-    @if (!String.IsNullOrEmpty(settings.Hint))
-    {
-        <span class="hint">@settings.Hint</span>
-    }
+@if (settings.Type == FieldBehaviorType.GeneratedHidden)
+{
+    <input type="hidden" asp-for="Text" />
+
+    return;
+}
+
+<div class="@($"ocat-wrapper field-wrapper field-wrapper-{Model.PartFieldDefinition.PartDefinition.Name.HtmlClassify()}-{Model.PartFieldDefinition.Name.HtmlClassify()}" + (Model.PartFieldDefinition.IsNamedPart() ? $" field-wrapper-{Model.PartFieldDefinition.ContentTypePartDefinition.Name.HtmlClassify()}-{Model.PartFieldDefinition.Name.HtmlClassify()}" : string.Empty))" id="@Html.IdFor(x => x.Text)_FieldWrapper">
+    <label asp-for="Text" class="ocat-label @(settings.Required ? "ocat-label-required" : "")">@localizedFieldName</label>
+    <div class="ocat-end">
+        @if (settings.Type == FieldBehaviorType.GeneratedDisabled)
+        {
+            <textarea asp-for="Text" rows="5" class="form-control content-preview-text" dir="@culture.GetLanguageDirection()" disabled></textarea>
+        }
+        else
+        {
+            <textarea asp-for="Text" rows="5" class="form-control content-preview-text" dir="@culture.GetLanguageDirection()"></textarea>
+        }
+        <span asp-validation-for="Text"></span>
+        @if (!string.IsNullOrEmpty(settings.Hint))
+        {
+            <span class="hint">@settings.Hint</span>
+        }
+    </div>
 </div>
 
 <style asp-name="codemirror"></style>
-<script asp-name="codemirror" depends-on="admin" at="Foot"></script>
+<script asp-name="codemirror" at="Foot"></script>
 <script asp-name="codemirror-addon-display-autorefresh" at="Foot"></script>
 <script asp-name="codemirror-addon-edit-closetag" at="Foot"></script>
 <script asp-name="codemirror-addon-selection-active-line" at="Foot"></script>
@@ -24,7 +45,15 @@
 <script asp-name="codemirror-mode-javascript" at="Foot"></script>
 <script asp-name="codemirror-mode-xml" at="Foot"></script>
 <script at="Foot">
-    $(function () {
+    function onDocumentReady(callback) {
+        if (document.readyState !== 'loading') {
+            callback();
+        } else {
+            document.addEventListener('DOMContentLoaded', callback);
+        }
+    }
+
+    onDocumentReady(function () {
         var optionsTextArea = document.getElementById('@Html.IdFor(x => x.Text)');
         // When part rendered by a flow part only the elements scripts are rendered, so the html element will not exist.
         if (optionsTextArea) {
@@ -38,9 +67,9 @@
                 mode: { name: "htmlmixed" }
             });
 
-            editor.on('change', function(cmEditor){
+            editor.on('change', function (cmEditor) {
                 cmEditor.save();
-                $(document).trigger('contentpreview:render');
+                document.dispatchEvent(new Event('contentpreview:render'));
             });
         }
     });

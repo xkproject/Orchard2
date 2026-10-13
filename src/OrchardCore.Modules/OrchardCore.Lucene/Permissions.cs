@@ -1,52 +1,58 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using OrchardCore.Indexing;
 using OrchardCore.Security.Permissions;
 
-namespace OrchardCore.Lucene
+namespace OrchardCore.Lucene;
+
+public sealed class Permissions : IPermissionProvider
 {
-    public class Permissions : IPermissionProvider
+    private readonly IIndexProfileStore _indexStore;
+
+    [Obsolete("This will be removed in a future release. Instead use 'LuceneSearchPermissions.ManageLuceneIndexes'.")]
+    public static readonly Permission ManageLuceneIndexes = LuceneSearchPermissions.ManageLuceneIndexes;
+
+    [Obsolete("This will be removed in a future release. Instead use 'LuceneSearchPermissions.QueryLuceneApi'.")]
+    public static readonly Permission QueryLuceneApi = LuceneSearchPermissions.QueryLuceneApi;
+
+    public Permissions(IIndexProfileStore indexStore)
     {
-        private readonly LuceneIndexSettingsService _luceneIndexSettingsService;
-
-        public static readonly Permission ManageIndexes = new Permission("ManageIndexes", "Manage Indexes");
-        public static readonly Permission QueryLuceneApi = new Permission("QueryLuceneApi", "Query Lucene Api", new[] { ManageIndexes });
-
-        public Permissions(LuceneIndexSettingsService luceneIndexSettingsService)
-        {
-            _luceneIndexSettingsService = luceneIndexSettingsService;
-        }
-
-        public async Task<IEnumerable<Permission>> GetPermissionsAsync()
-        {
-            var luceneIndexSettings = await _luceneIndexSettingsService.GetSettingsAsync();
-            var result = new List<Permission>();
-            foreach (var index in luceneIndexSettings)
-            {
-                var permission = new Permission("QueryLucene" + index.IndexName + "Index", "Query Lucene " + index.IndexName + " Index", new[] { ManageIndexes });
-                result.Add(permission);
-            }
-
-            result.Add(ManageIndexes);
-            result.Add(QueryLuceneApi);
-
-            return result;
-        }
-
-        public IEnumerable<PermissionStereotype> GetDefaultStereotypes()
-        {
-            return new[]
-            {
-                new PermissionStereotype
-                {
-                    Name = "Administrator",
-                    Permissions = new[] { ManageIndexes }
-                },
-                new PermissionStereotype
-                {
-                    Name = "Editor",
-                    Permissions = new[] { QueryLuceneApi }
-                }
-            };
-        }
+        _indexStore = indexStore;
     }
+
+    public async Task<IEnumerable<Permission>> GetPermissionsAsync()
+    {
+        var permissions = new List<Permission>()
+        {
+            LuceneSearchPermissions.ManageLuceneIndexes,
+            LuceneSearchPermissions.QueryLuceneApi,
+        };
+
+        var indexes = await _indexStore.GetByProviderAsync(LuceneConstants.ProviderName);
+
+        foreach (var index in indexes)
+        {
+            permissions.Add(LuceneIndexPermissionHelper.GetLuceneIndexPermission(index.IndexName));
+        }
+
+        return permissions;
+    }
+
+    public IEnumerable<PermissionStereotype> GetDefaultStereotypes() =>
+    [
+        new PermissionStereotype
+        {
+            Name = OrchardCoreConstants.Roles.Administrator,
+            Permissions =
+            [
+                LuceneSearchPermissions.ManageLuceneIndexes,
+            ],
+        },
+        new PermissionStereotype
+        {
+            Name = OrchardCoreConstants.Roles.Editor,
+            Permissions =
+            [
+                LuceneSearchPermissions.QueryLuceneApi,
+            ],
+        },
+    ];
 }

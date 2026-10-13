@@ -1,23 +1,29 @@
-using System.Threading.Tasks;
 using Fluid;
 using Fluid.Values;
+using OrchardCore.Infrastructure.Html;
 using OrchardCore.Liquid;
 using OrchardCore.Markdown.Services;
 
-namespace OrchardCore.Markdown.Filters
+namespace OrchardCore.Markdown.Filters;
+
+public class Markdownify : ILiquidFilter
 {
-    public class Markdownify : ILiquidFilter
+    private readonly IMarkdownService _markdownService;
+    private readonly IHtmlSanitizerService _htmlSanitizerService;
+
+    public Markdownify(
+        IMarkdownService markdownService,
+        IHtmlSanitizerService htmlSanitizerService)
     {
-        private readonly IMarkdownService _markdownService;
+        _markdownService = markdownService;
+        _htmlSanitizerService = htmlSanitizerService;
+    }
 
-        public Markdownify(IMarkdownService markdownService)
-        {
-            _markdownService = markdownService;
-        }
+    public ValueTask<FluidValue> ProcessAsync(FluidValue input, FilterArguments arguments, LiquidTemplateContext ctx)
+    {
+        var html = _markdownService.ToHtml(input.ToStringValue());
+        html = _htmlSanitizerService.Sanitize(html);
 
-        public ValueTask<FluidValue> ProcessAsync(FluidValue input, FilterArguments arguments, LiquidTemplateContext ctx)
-        {
-            return new ValueTask<FluidValue>(new StringValue(_markdownService.ToHtml(input.ToStringValue())));
-        }
+        return ValueTask.FromResult<FluidValue>(new StringValue(html));
     }
 }

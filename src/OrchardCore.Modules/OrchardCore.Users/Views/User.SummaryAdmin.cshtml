@@ -1,25 +1,48 @@
-<div class="properties">
-    @if (Model.Actions != null)
-    {
-        <div class="related float-right">
-            @await DisplayAsync(Model.Actions)
+<div class="d-flex justify-content-between flex-wrap">
+    <div class="d-flex flex-column">
+        <div>
+            @if (Model.Header != null)
+            {
+                <div class="header">@await DisplayAsync(Model.Header)</div>
+            }
+
+            @if (Model.Meta != null)
+            {
+                <div class="metadata">
+                    @await DisplayAsync(Model.Meta)
+                </div>
+            }
         </div>
-    }
 
-    @if (Model.Header != null)
-    {
-        <div class="header">@await DisplayAsync(Model.Header)</div>
-    }
+        @if (Model.Description != null)
+        {
+            <div>@await DisplayAsync(Model.Description)</div>
+        }
+    </div>
 
-    @if (Model.Meta != null)
+    <div>
+        @if (Model.Actions != null)
+        {
+            @await DisplayAsync(Model.Actions)
+        }
+
+        @if (Model.ActionsMenu != null && Model.ActionsMenu.HasItems)
+        {
+            <div class="btn-group" title="@T["Actions"]">
+                <button type="button" class="btn btn-sm btn-secondary dropdown-toggle actions" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span>@T["Actions"]</span>
+                </button>
+                <ul class="actions-menu dropdown-menu dropdown-menu-end">
+                    @await DisplayAsync(Model.ActionsMenu)
+                </ul>
+            </div>
+        }
+    </div>
+
+    @if (Model.Content != null)
     {
-        <div class="metadata">
-            @await DisplayAsync(Model.Meta)
+        <div class="w-100 primary">
+                @await DisplayAsync(Model.Content)
         </div>
     }
 </div>
-
-@if (Model.Content != null)
-{
-    <div class="primary">@await DisplayAsync(Model.Content)</div>
-}

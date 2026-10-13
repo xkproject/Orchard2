@@ -1,0 +1,6 @@
+@model OrchardCore.DisplayManagement.IShape
+@{
+    Model.Metadata.Type = "Content_Summary";
+    Model.Metadata.Alternates.Clear();
+    @await DisplayAsync(Model)
+}

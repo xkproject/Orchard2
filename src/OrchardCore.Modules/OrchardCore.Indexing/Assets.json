@@ -1,0 +1,8 @@
+[
+  {
+    "action": "min",
+    "name": "technical-name-generator",
+    "source": "Assets/js/technical-name-generator.js",
+    "tags": [ "indexing", "js" ]
+  }
+]

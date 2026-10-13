@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
@@ -10,447 +5,553 @@ using Microsoft.AspNetCore.Mvc.Localization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using OrchardCore.Admin;
 using OrchardCore.Data;
 using OrchardCore.DisplayManagement;
 using OrchardCore.DisplayManagement.Notify;
 using OrchardCore.Environment.Shell;
-using OrchardCore.Environment.Shell.Models;
+using OrchardCore.Environment.Shell.Removing;
 using OrchardCore.Modules;
+using OrchardCore.Mvc.ModelBinding;
 using OrchardCore.Navigation;
 using OrchardCore.Recipes.Services;
 using OrchardCore.Routing;
-using OrchardCore.Settings;
+using OrchardCore.Tenants.Services;
 using OrchardCore.Tenants.ViewModels;
 
-namespace OrchardCore.Tenants.Controllers
+namespace OrchardCore.Tenants.Controllers;
+
+[Admin("Tenants/{action}/{id?}", "Tenants{action}")]
+public sealed class AdminController : Controller
 {
-    public class AdminController : Controller
+    public const string CreateAndSetupValue = "createAndSetup";
+
+    private readonly IShellHost _shellHost;
+    private readonly IShellSettingsManager _shellSettingsManager;
+    private readonly IShellRemovalManager _shellRemovalManager;
+    private readonly IAuthorizationService _authorizationService;
+    private readonly ShellSettings _currentShellSettings;
+    private readonly IFeatureProfilesService _featureProfilesService;
+    private readonly IEnumerable<IRecipeHarvester> _recipeHarvesters;
+    private readonly IDataProtectionProvider _dataProtectorProvider;
+    private readonly IClock _clock;
+    private readonly INotifier _notifier;
+    private readonly ITenantValidator _tenantValidator;
+    private readonly PagerOptions _pagerOptions;
+    private readonly TenantsOptions _tenantsOptions;
+    private readonly TenantDatabasePatternResolver _tenantDatabasePatternResolver;
+    private readonly Dictionary<string, DatabaseProvider> _databaseProviderLookup;
+    private readonly ILogger _logger;
+    private readonly IShapeFactory _shapeFactory;
+
+    internal readonly IStringLocalizer S;
+    internal readonly IHtmlLocalizer H;
+
+    public AdminController(
+        IShellHost shellHost,
+        IShellSettingsManager shellSettingsManager,
+        IShellRemovalManager shellRemovalManager,
+        IAuthorizationService authorizationService,
+        ShellSettings currentShellSettings,
+        IFeatureProfilesService featureProfilesService,
+        IEnumerable<IRecipeHarvester> recipeHarvesters,
+        IDataProtectionProvider dataProtectorProvider,
+        IClock clock,
+        INotifier notifier,
+        ITenantValidator tenantValidator,
+        IEnumerable<DatabaseProvider> databaseProviders,
+        IOptions<PagerOptions> pagerOptions,
+        IOptions<TenantsOptions> tenantsOptions,
+        TenantDatabasePatternResolver tenantDatabasePatternResolver,
+        ILogger<AdminController> logger,
+        IShapeFactory shapeFactory,
+        IStringLocalizer<AdminController> stringLocalizer,
+        IHtmlLocalizer<AdminController> htmlLocalizer)
     {
-        private readonly IShellHost _shellHost;
-        private readonly IShellSettingsManager _shellSettingsManager;
-        private readonly IEnumerable<DatabaseProvider> _databaseProviders;
-        private readonly IAuthorizationService _authorizationService;
-        private readonly ShellSettings _currentShellSettings;
-        private readonly IFeatureProfilesService _featureProfilesService;
-        private readonly IEnumerable<IRecipeHarvester> _recipeHarvesters;
-        private readonly IDataProtectionProvider _dataProtectorProvider;
-        private readonly IClock _clock;
-        private readonly INotifier _notifier;
-        private readonly ISiteService _siteService;
+        _shellHost = shellHost;
+        _shellSettingsManager = shellSettingsManager;
+        _shellRemovalManager = shellRemovalManager;
+        _authorizationService = authorizationService;
+        _currentShellSettings = currentShellSettings;
+        _featureProfilesService = featureProfilesService;
+        _recipeHarvesters = recipeHarvesters;
+        _dataProtectorProvider = dataProtectorProvider;
+        _clock = clock;
+        _notifier = notifier;
+        _tenantValidator = tenantValidator;
+        _pagerOptions = pagerOptions.Value;
+        _tenantsOptions = tenantsOptions.Value;
+        _tenantDatabasePatternResolver = tenantDatabasePatternResolver;
+        _databaseProviderLookup = databaseProviders.ToDictionary(provider => provider.Value, StringComparer.OrdinalIgnoreCase);
+        _logger = logger;
+        _shapeFactory = shapeFactory;
+        S = stringLocalizer;
+        H = htmlLocalizer;
+    }
 
-        private readonly dynamic New;
-        private readonly IStringLocalizer S;
-        private readonly IHtmlLocalizer H;
-
-        public AdminController(
-            IShellHost shellHost,
-            IShellSettingsManager shellSettingsManager,
-            IEnumerable<DatabaseProvider> databaseProviders,
-            IAuthorizationService authorizationService,
-            ShellSettings currentShellSettings,
-            IFeatureProfilesService featureProfilesService,
-            IEnumerable<IRecipeHarvester> recipeHarvesters,
-            IDataProtectionProvider dataProtectorProvider,
-            IClock clock,
-            INotifier notifier,
-            ISiteService siteService,
-            IShapeFactory shapeFactory,
-            IStringLocalizer<AdminController> stringLocalizer,
-            IHtmlLocalizer<AdminController> htmlLocalizer)
+    [Admin("Tenants", "Tenants")]
+    public async Task<IActionResult> Index(TenantIndexOptions options, PagerParameters pagerParameters)
+    {
+        if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
         {
-            _shellHost = shellHost;
-            _authorizationService = authorizationService;
-            _shellSettingsManager = shellSettingsManager;
-            _databaseProviders = databaseProviders;
-            _currentShellSettings = currentShellSettings;
-            _dataProtectorProvider = dataProtectorProvider;
-            _featureProfilesService = featureProfilesService;
-            _recipeHarvesters = recipeHarvesters;
-            _clock = clock;
-            _notifier = notifier;
-            _siteService = siteService;
-
-            New = shapeFactory;
-            S = stringLocalizer;
-            H = htmlLocalizer;
+            return Forbid();
         }
 
-        public async Task<IActionResult> Index(TenantIndexOptions options, PagerParameters pagerParameters)
+        if (!_currentShellSettings.IsDefaultShell())
         {
-            if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
+            return Forbid();
+        }
+
+        var allSettings = _shellHost.GetAllSettings();
+        var dataProtector = _dataProtectorProvider.CreateProtector("Tokens").ToTimeLimitedDataProtector();
+
+        var pager = new Pager(pagerParameters, _pagerOptions.GetPageSize());
+
+        var filteredSettings = allSettings;
+
+        if (!string.IsNullOrWhiteSpace(options.Search))
+        {
+            filteredSettings = filteredSettings.Where(settings =>
+                settings.Name.IndexOf(options.Search, StringComparison.OrdinalIgnoreCase) > -1 ||
+                (settings.RequestUrlHost != null && settings.RequestUrlHost.IndexOf(options.Search, StringComparison.OrdinalIgnoreCase) > -1) ||
+                (settings.RequestUrlPrefix != null && settings.RequestUrlPrefix.IndexOf(options.Search, StringComparison.OrdinalIgnoreCase) > -1));
+        }
+
+        if (!string.IsNullOrWhiteSpace(options.Category))
+        {
+            filteredSettings = filteredSettings.Where(settings => settings["Category"]?.Equals(options.Category, StringComparison.OrdinalIgnoreCase) == true);
+        }
+
+        filteredSettings = options.Status switch
+        {
+            TenantsState.Disabled => filteredSettings.Where(settings => settings.IsDisabled()),
+            TenantsState.Running => filteredSettings.Where(settings => settings.IsRunning()),
+            TenantsState.Uninitialized => filteredSettings.Where(settings => settings.IsUninitialized()),
+            _ => filteredSettings,
+        };
+
+        var sortedSettings = (options.OrderBy switch
+        {
+            TenantsOrder.Name => filteredSettings.OrderBy(settings => settings.Name),
+            TenantsOrder.State => filteredSettings.OrderBy(settings => settings.State),
+            _ => filteredSettings.OrderByDescending(settings => settings.Name),
+        }).ToList();
+
+        var results = sortedSettings
+            .Skip(pager.GetStartIndex())
+            .Take(pager.PageSize)
+            .Select(settings =>
             {
-                return Forbid();
-            }
-
-            if (!IsDefaultShell())
-            {
-                return Forbid();
-            }
-
-            var allSettings = _shellHost.GetAllSettings().OrderBy(s => s.Name);
-            var dataProtector = _dataProtectorProvider.CreateProtector("Tokens").ToTimeLimitedDataProtector();
-
-            var siteSettings = await _siteService.GetSiteSettingsAsync();
-            var pager = new Pager(pagerParameters, siteSettings.PageSize);
-
-            var entries = allSettings.Select(x =>
+                var entry = new ShellSettingsEntry
                 {
-                    var entry = new ShellSettingsEntry
-                    {
-                        Description = x["Description"],
-                        Name = x.Name,
-                        ShellSettings = x,
-                        IsDefaultTenant = String.Equals(x.Name, ShellHelper.DefaultShellName, StringComparison.OrdinalIgnoreCase)
-                    };
+                    Category = settings["Category"],
+                    Description = settings["Description"],
+                    Name = settings.Name,
+                    ShellSettings = settings,
+                };
 
-                    if (x.State == TenantState.Uninitialized && !String.IsNullOrEmpty(x["Secret"]))
+                if (settings.IsUninitialized() && !string.IsNullOrEmpty(settings["Secret"]))
+                {
+                    entry.Token = dataProtector.Protect(settings["Secret"], _clock.UtcNow.Add(new TimeSpan(24, 0, 0)));
+                }
+
+                return entry;
+            }).ToList();
+
+        // Maintain previous route data when generating page links
+        var routeData = new RouteData();
+        routeData.Values.Add("Options.Status", options.Status);
+        routeData.Values.Add("Options.OrderBy", options.OrderBy);
+
+        if (!string.IsNullOrEmpty(options.Category))
+        {
+            routeData.Values.TryAdd("Options.Category", options.Category);
+        }
+
+        if (!string.IsNullOrEmpty(options.Search))
+        {
+            routeData.Values.TryAdd("Options.Search", options.Search);
+        }
+
+        var pagerShape = await _shapeFactory.PagerAsync(pager, sortedSettings.Count, routeData);
+
+        var model = new AdminIndexViewModel
+        {
+            ShellSettingsEntries = results,
+            Options = options,
+            Pager = pagerShape,
+        };
+
+        // We populate the SelectLists
+        model.Options.TenantsCategories = allSettings
+            .OrderBy(settings => settings.Name)
+            .GroupBy(settings => settings["Category"])
+            .Where(group => !string.IsNullOrEmpty(group.Key))
+            .Select(group => new SelectListItem(group.Key, group.Key, string.Equals(options.Category, group.Key, StringComparison.OrdinalIgnoreCase)))
+            .ToList();
+
+        model.Options.TenantsCategories.Insert(0, new SelectListItem(
+            S["All"],
+            string.Empty,
+            selected: string.IsNullOrEmpty(options.Category)));
+
+        model.Options.TenantsStates =
+        [
+            new SelectListItem() { Text = S["All states"], Value = nameof(TenantsState.All) },
+            new SelectListItem() { Text = S["Running"], Value = nameof(TenantsState.Running) },
+            new SelectListItem() { Text = S["Disabled"], Value = nameof(TenantsState.Disabled) },
+            new SelectListItem() { Text = S["Uninitialized"], Value = nameof(TenantsState.Uninitialized) }
+        ];
+
+        model.Options.TenantsSorts =
+        [
+            new SelectListItem() { Text = S["Name"], Value = nameof(TenantsOrder.Name) },
+            new SelectListItem() { Text = S["State"], Value = nameof(TenantsOrder.State) }
+        ];
+
+        model.Options.TenantsBulkAction =
+        [
+            new SelectListItem() { Text = S["Disable"], Value = nameof(TenantsBulkAction.Disable) },
+            new SelectListItem() { Text = S["Enable"], Value = nameof(TenantsBulkAction.Enable) },
+        ];
+
+        return View(model);
+    }
+
+    [HttpPost, ActionName("Index")]
+    [FormValueRequired("submit.Filter")]
+    public ActionResult IndexFilterPOST(AdminIndexViewModel model)
+        => RedirectToAction("Index", new RouteValueDictionary
+        {
+            { "Options.Category", model.Options.Category },
+            { "Options.Status", model.Options.Status },
+            { "Options.OrderBy", model.Options.OrderBy },
+            { "Options.Search", model.Options.Search },
+            { "Options.TenantsStates", model.Options.TenantsStates },
+        });
+
+    [HttpPost]
+    [FormValueRequired("submit.BulkAction")]
+    public async Task<IActionResult> Index(BulkActionViewModel model)
+    {
+        if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
+        {
+            return Forbid();
+        }
+
+        if (!_currentShellSettings.IsDefaultShell())
+        {
+            return Forbid();
+        }
+
+        if (model.BulkAction.ToString() == nameof(TenantsBulkAction.Remove) && !_tenantsOptions.TenantRemovalAllowed)
+        {
+            return Forbid();
+        }
+
+        var allSettings = _shellHost.GetAllSettings();
+
+        foreach (var tenantName in model.TenantNames ?? [])
+        {
+            if (!_shellHost.TryGetSettings(tenantName, out var shellSettings))
+            {
+                break;
+            }
+
+            switch (model.BulkAction.ToString())
+            {
+                case "Disable":
+                    if (shellSettings.IsDefaultShell())
                     {
-                        entry.Token = dataProtector.Protect(x["Secret"], _clock.UtcNow.Add(new TimeSpan(24, 0, 0)));
+                        await _notifier.WarningAsync(H["You cannot disable the default tenant."]);
+                    }
+                    else if (!shellSettings.IsRunning())
+                    {
+                        await _notifier.WarningAsync(H["The tenant '{0}' is already disabled.", shellSettings.Name]);
+                    }
+                    else
+                    {
+                        await _shellHost.UpdateShellSettingsAsync(shellSettings.AsDisabled());
                     }
 
-                    return entry;
-                }).ToList();
+                    break;
 
-            if (!String.IsNullOrWhiteSpace(options.Search))
-            {
-                entries = entries.Where(t => t.Name.IndexOf(options.Search, StringComparison.OrdinalIgnoreCase) > -1 ||
-                    (t.ShellSettings != null &&
-                     ((t.ShellSettings.RequestUrlHost != null && t.ShellSettings.RequestUrlHost.IndexOf(options.Search, StringComparison.OrdinalIgnoreCase) > -1) ||
-                     (t.ShellSettings.RequestUrlPrefix != null && t.ShellSettings.RequestUrlPrefix.IndexOf(options.Search, StringComparison.OrdinalIgnoreCase) > -1)))).ToList();
-            }
+                case "Enable":
+                    if (!shellSettings.IsDisabled())
+                    {
+                        await _notifier.WarningAsync(H["The tenant '{0}' is already enabled.", shellSettings.Name]);
+                    }
+                    else
+                    {
+                        await _shellHost.UpdateShellSettingsAsync(shellSettings.AsRunning());
+                    }
 
-            switch (options.Filter)
-            {
-                case TenantsFilter.Disabled:
-                    entries = entries.Where(t => t.ShellSettings.State == TenantState.Disabled).ToList();
                     break;
-                case TenantsFilter.Running:
-                    entries = entries.Where(t => t.ShellSettings.State == TenantState.Running).ToList();
-                    break;
-                case TenantsFilter.Uninitialized:
-                    entries = entries.Where(t => t.ShellSettings.State == TenantState.Uninitialized).ToList();
-                    break;
-            }
 
-            switch (options.OrderBy)
-            {
-                case TenantsOrder.Name:
-                    entries = entries.OrderBy(t => t.Name).ToList();
-                    break;
-                case TenantsOrder.State:
-                    entries = entries.OrderBy(t => t.ShellSettings?.State).ToList();
-                    break;
                 default:
-                    entries = entries.OrderByDescending(t => t.Name).ToList();
                     break;
             }
-            var count = entries.Count();
-
-            var results = entries
-                .Skip(pager.GetStartIndex())
-                .Take(pager.PageSize).ToList();
-
-            // Maintain previous route data when generating page links
-            var routeData = new RouteData();
-            routeData.Values.Add("Options.Filter", options.Filter);
-            routeData.Values.Add("Options.Search", options.Search);
-            routeData.Values.Add("Options.OrderBy", options.OrderBy);
-
-            var pagerShape = (await New.Pager(pager)).TotalItemCount(count).RouteData(routeData);
-
-            var model = new AdminIndexViewModel
-            {
-                ShellSettingsEntries = results,
-                Options = options,
-                Pager = pagerShape
-            };
-
-            // We populate the SelectLists
-            model.Options.TenantsStates = new List<SelectListItem>() {
-                new SelectListItem() { Text = S["All states"], Value = nameof(TenantsFilter.All) },
-                new SelectListItem() { Text = S["Running"], Value = nameof(TenantsFilter.Running) },
-                new SelectListItem() { Text = S["Disabled"], Value = nameof(TenantsFilter.Disabled) },
-                new SelectListItem() { Text = S["Uninitialized"], Value = nameof(TenantsFilter.Uninitialized) }
-            };
-
-            model.Options.TenantsSorts = new List<SelectListItem>() {
-                new SelectListItem() { Text = S["Name"], Value = nameof(TenantsOrder.Name) },
-                new SelectListItem() { Text = S["State"], Value = nameof(TenantsOrder.State) }
-            };
-
-            model.Options.TenantsBulkAction = new List<SelectListItem>() {
-                new SelectListItem() { Text = S["Disable"], Value = nameof(TenantsBulkAction.Disable) },
-                new SelectListItem() { Text = S["Enable"], Value = nameof(TenantsBulkAction.Enable) }
-            };
-
-            return View(model);
         }
 
-        [HttpPost, ActionName("Index")]
-        [FormValueRequired("submit.Filter")]
-        public ActionResult IndexFilterPOST(AdminIndexViewModel model)
+        return RedirectToAction(nameof(Index));
+    }
+
+    public async Task<IActionResult> Create()
+    {
+        if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
         {
-            return RedirectToAction("Index", new RouteValueDictionary {
-                { "Options.Filter", model.Options.Filter },
-                { "Options.OrderBy", model.Options.OrderBy },
-                { "Options.Search", model.Options.Search },
-                { "Options.TenantsStates", model.Options.TenantsStates }
-            });
+            return Forbid();
         }
 
-        [HttpPost]
-        [FormValueRequired("submit.BulkAction")]
-        public async Task<IActionResult> Index(BulkActionViewModel model)
+        if (!_currentShellSettings.IsDefaultShell())
         {
-            if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
-            {
-                return Forbid();
-            }
-
-            if (!IsDefaultShell())
-            {
-                return Forbid();
-            }
-
-            var allSettings = _shellHost.GetAllSettings();
-
-            foreach (var tenantName in model.TenantNames ?? Enumerable.Empty<string>())
-            {
-                var shellSettings = allSettings
-                    .Where(x => String.Equals(x.Name, tenantName, StringComparison.OrdinalIgnoreCase))
-                    .FirstOrDefault();
-
-                if (shellSettings == null)
-                {
-                    break;
-                }
-
-                switch (model.BulkAction.ToString())
-                {
-                    case "Disable":
-                        if (String.Equals(shellSettings.Name, ShellHelper.DefaultShellName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            await _notifier.WarningAsync(H["You cannot disable the default tenant."]);
-                        }
-                        else if (shellSettings.State != TenantState.Running)
-                        {
-                            await _notifier.WarningAsync(H["The tenant '{0}' is already disabled.", shellSettings.Name]);
-                        }
-                        else
-                        {
-                            shellSettings.State = TenantState.Disabled;
-                            await _shellHost.UpdateShellSettingsAsync(shellSettings);
-                        }
-
-                        break;
-
-                    case "Enable":
-                        if (shellSettings.State != TenantState.Disabled)
-                        {
-                            await _notifier.WarningAsync(H["The tenant '{0}' is already enabled.", shellSettings.Name]);
-                        }
-                        else
-                        {
-                            shellSettings.State = TenantState.Running;
-                            await _shellHost.UpdateShellSettingsAsync(shellSettings);
-                        }
-
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-
-            return RedirectToAction(nameof(Index));
+            return Forbid();
         }
 
-        public async Task<IActionResult> Create()
+        var recipeCollections = await Task.WhenAll(_recipeHarvesters.Select(x => x.HarvestRecipesAsync()));
+        var recipes = recipeCollections.SelectMany(x => x).Where(x => x.IsSetupRecipe).OrderBy(r => r.DisplayName).ToArray();
+
+        // Creates a default shell settings based on the configuration.
+        using var shellSettings = _shellSettingsManager
+            .CreateDefaultSettings()
+            .AsUninitialized()
+            .AsDisposable();
+
+        var currentFeatureProfiles = shellSettings.GetFeatureProfiles();
+        var featureProfiles = await GetFeatureProfilesAsync(currentFeatureProfiles);
+
+        var model = new EditTenantViewModel
         {
-            if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
-            {
-                return Forbid();
-            }
+            Recipes = recipes,
+            RequestUrlHost = shellSettings.RequestUrlHost,
+            RequestUrlPrefix = shellSettings.RequestUrlPrefix,
+            RecipeName = shellSettings["RecipeName"],
+            FeatureProfiles = currentFeatureProfiles,
+            FeatureProfilesItems = featureProfiles,
+            DatabaseProvider = shellSettings["DatabaseProvider"],
+            ConnectionString = shellSettings["ConnectionString"],
+            TablePrefix = shellSettings["TablePrefix"],
+            Schema = shellSettings["Schema"],
+            RequireTablePrefix = _tenantsOptions.RequireTablePrefix,
+            HasTablePrefixPattern = !string.IsNullOrWhiteSpace(_tenantsOptions.TablePrefixPattern),
+            HasSchemaPattern = !string.IsNullOrWhiteSpace(_tenantsOptions.SchemaPattern),
+        };
 
-            if (!IsDefaultShell())
-            {
-                return Forbid();
-            }
+        ApplyPresetDatabaseConfiguration(model);
+        ApplyConfiguredDatabasePatterns(model);
 
+        model.Recipes = recipes;
 
-            var recipeCollections = await Task.WhenAll(_recipeHarvesters.Select(x => x.HarvestRecipesAsync()));
-            var recipes = recipeCollections.SelectMany(x => x).Where(x => x.IsSetupRecipe).OrderBy(r => r.DisplayName).ToArray();
+        return View(model);
+    }
 
-            // Creates a default shell settings based on the configuration.
-            var shellSettings = _shellSettingsManager.CreateDefaultSettings();
-
-            var currentFeatureProfile = shellSettings["FeatureProfile"];
-
-            var featureProfiles = await GetFeatureProfilesAsync(currentFeatureProfile);
-
-            var model = new EditTenantViewModel
-            {
-                Recipes = recipes,
-                RequestUrlHost = shellSettings.RequestUrlHost,
-                RequestUrlPrefix = shellSettings.RequestUrlPrefix,
-                TablePrefix = shellSettings["TablePrefix"],
-                RecipeName = shellSettings["RecipeName"],
-                FeatureProfile = currentFeatureProfile,
-                FeatureProfiles = featureProfiles
-            };
-            SetConfigurationShellValues(model);
-
-            model.Recipes = recipes;
-
-            return View(model);
+    [HttpPost]
+    public async Task<IActionResult> Create(EditTenantViewModel model, string action)
+    {
+        if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
+        {
+            return Forbid();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create(EditTenantViewModel model)
+        if (!_currentShellSettings.IsDefaultShell())
         {
-            if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
-            {
-                return Forbid();
-            }
+            return Forbid();
+        }
 
-            if (!IsDefaultShell())
-            {
-                return Forbid();
-            }
+        model.RequireTablePrefix = _tenantsOptions.RequireTablePrefix;
+        model.HasTablePrefixPattern = !string.IsNullOrWhiteSpace(_tenantsOptions.TablePrefixPattern);
+        model.HasSchemaPattern = !string.IsNullOrWhiteSpace(_tenantsOptions.SchemaPattern);
+        ApplyPresetDatabaseConfiguration(model);
+        ApplyConfiguredDatabasePatterns(model);
 
-            if (ModelState.IsValid)
+        if (ModelState.IsValid)
+        {
+            try
             {
-                await ValidateViewModel(model, true);
+                await ValidateViewModelAsync(model, true);
             }
+            catch (Exception ex) when (!ex.IsFatal())
+            {
+                _logger.LogError(ex, "An error occurred while validating the tenant '{TenantName}'.", model.Name);
+                ModelState.AddModelError(string.Empty, S["An error occurred while validating the tenant database settings."]);
+            }
+        }
 
-            if (ModelState.IsValid)
+        if (ModelState.IsValid)
+        {
+            try
             {
                 // Creates a default shell settings based on the configuration.
-                var shellSettings = _shellSettingsManager.CreateDefaultSettings();
+                using var shellSettings = _shellSettingsManager
+                    .CreateDefaultSettings()
+                    .AsUninitialized()
+                    .AsDisposable();
 
                 shellSettings.Name = model.Name;
                 shellSettings.RequestUrlHost = model.RequestUrlHost;
                 shellSettings.RequestUrlPrefix = model.RequestUrlPrefix;
-                shellSettings.State = TenantState.Uninitialized;
 
-                SetConfigurationShellValues(model);
+                shellSettings["Category"] = model.Category;
                 shellSettings["Description"] = model.Description;
                 shellSettings["ConnectionString"] = model.ConnectionString;
                 shellSettings["TablePrefix"] = model.TablePrefix;
+                shellSettings["Schema"] = model.Schema;
                 shellSettings["DatabaseProvider"] = model.DatabaseProvider;
                 shellSettings["Secret"] = Guid.NewGuid().ToString();
                 shellSettings["RecipeName"] = model.RecipeName;
-                shellSettings["FeatureProfile"] = model.FeatureProfile;
+                shellSettings["FeatureProfile"] = string.Join(',', model.FeatureProfiles ?? []);
 
                 await _shellHost.UpdateShellSettingsAsync(shellSettings);
 
+                if (action == CreateAndSetupValue)
+                {
+                    var dataProtector = _dataProtectorProvider.CreateProtector("Tokens").ToTimeLimitedDataProtector();
+
+                    var entry = new ShellSettingsEntry
+                    {
+                        Name = shellSettings.Name,
+                        ShellSettings = shellSettings,
+                        Token = dataProtector.Protect(shellSettings["Secret"], _clock.UtcNow.Add(new TimeSpan(24, 0, 0))),
+                    };
+
+                    return Redirect(HttpContext.GetEncodedUrl(entry));
+                }
+
                 return RedirectToAction(nameof(Index));
             }
+            catch (Exception ex) when (!ex.IsFatal())
+            {
+                _logger.LogError(ex, "An error occurred while saving the tenant '{TenantName}'.", model.Name);
+                ModelState.AddModelError(string.Empty, S["An error occurred while saving the tenant settings."]);
+            }
+        }
 
+        var recipeCollections = await Task.WhenAll(_recipeHarvesters.Select(x => x.HarvestRecipesAsync()));
+        var recipes = recipeCollections.SelectMany(x => x).Where(x => x.IsSetupRecipe).OrderBy(r => r.DisplayName).ToArray();
+        model.Recipes = recipes;
+        model.FeatureProfilesItems = await GetFeatureProfilesAsync(model.FeatureProfiles);
+
+        // If we got this far, something failed, redisplay form
+        return View(model);
+    }
+
+    public async Task<IActionResult> Edit(string id)
+    {
+        if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
+        {
+            return Forbid();
+        }
+
+        if (!_currentShellSettings.IsDefaultShell())
+        {
+            return Forbid();
+        }
+
+        if (!_shellHost.TryGetSettings(id, out var shellSettings))
+        {
+            return NotFound();
+        }
+
+        var currentFeatureProfiles = shellSettings.GetFeatureProfiles();
+
+        var featureProfiles = await GetFeatureProfilesAsync(currentFeatureProfiles);
+
+        var model = new EditTenantViewModel
+        {
+            Category = shellSettings["Category"],
+            Description = shellSettings["Description"],
+            Name = shellSettings.Name,
+            RequestUrlHost = shellSettings.RequestUrlHost,
+            RequestUrlPrefix = shellSettings.RequestUrlPrefix,
+            FeatureProfiles = currentFeatureProfiles,
+            FeatureProfilesItems = featureProfiles,
+            RequireTablePrefix = _tenantsOptions.RequireTablePrefix,
+            HasTablePrefixPattern = !string.IsNullOrWhiteSpace(_tenantsOptions.TablePrefixPattern),
+            HasSchemaPattern = !string.IsNullOrWhiteSpace(_tenantsOptions.SchemaPattern),
+        };
+
+        // The user can change the 'preset' database information only if the
+        // tenant has not been initialized yet
+        if (shellSettings.IsUninitialized())
+        {
             var recipeCollections = await Task.WhenAll(_recipeHarvesters.Select(x => x.HarvestRecipesAsync()));
             var recipes = recipeCollections.SelectMany(x => x).Where(x => x.IsSetupRecipe).OrderBy(r => r.DisplayName).ToArray();
             model.Recipes = recipes;
-            model.FeatureProfiles = await GetFeatureProfilesAsync(model.FeatureProfile);
 
-            // If we got this far, something failed, redisplay form
-            return View(model);
+            model.DatabaseProvider = shellSettings["DatabaseProvider"];
+            model.TablePrefix = shellSettings["TablePrefix"];
+            model.Schema = shellSettings["Schema"];
+            model.ConnectionString = GetDisplayedConnectionString(shellSettings["ConnectionString"]);
+            model.RecipeName = shellSettings["RecipeName"];
+            ApplyPresetDatabaseConfiguration(model);
+            ApplyConfiguredDatabasePatterns(model);
+            model.CanEditDatabasePresets = !model.DatabaseConfigurationPreset;
         }
 
-        public async Task<IActionResult> Edit(string id)
+        return View(model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Edit(EditTenantViewModel model)
+    {
+        if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
         {
-            if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
-            {
-                return Forbid();
-            }
-
-            if (!IsDefaultShell())
-            {
-                return Forbid();
-            }
-
-            var shellSettings = _shellHost.GetAllSettings()
-                .Where(x => String.Equals(x.Name, id, StringComparison.OrdinalIgnoreCase))
-                .FirstOrDefault();
-
-            if (shellSettings == null)
-            {
-                return NotFound();
-            }
-
-            var currentFeatureProfile = shellSettings["FeatureProfile"];
-
-            var featureProfiles = await GetFeatureProfilesAsync(currentFeatureProfile);
-
-            var model = new EditTenantViewModel
-            {
-                Description = shellSettings["Description"],
-                Name = shellSettings.Name,
-                RequestUrlHost = shellSettings.RequestUrlHost,
-                RequestUrlPrefix = shellSettings.RequestUrlPrefix,
-                FeatureProfile = currentFeatureProfile,
-                FeatureProfiles = featureProfiles
-            };
-
-            // The user can change the 'preset' database information only if the
-            // tenant has not been initialized yet
-            if (shellSettings.State == TenantState.Uninitialized)
-            {
-                var recipeCollections = await Task.WhenAll(_recipeHarvesters.Select(x => x.HarvestRecipesAsync()));
-                var recipes = recipeCollections.SelectMany(x => x).Where(x => x.IsSetupRecipe).OrderBy(r => r.DisplayName).ToArray();
-                model.Recipes = recipes;
-
-                model.DatabaseProvider = shellSettings["DatabaseProvider"];
-                model.TablePrefix = shellSettings["TablePrefix"];
-                model.ConnectionString = shellSettings["ConnectionString"];
-                model.RecipeName = shellSettings["RecipeName"];
-                model.CanEditDatabasePresets = true;
-                SetConfigurationShellValues(model);
-            }
-
-            return View(model);
+            return Forbid();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Edit(EditTenantViewModel model)
+        if (!_currentShellSettings.IsDefaultShell())
         {
-            if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
+            return Forbid();
+        }
+
+        if (!_shellHost.TryGetSettings(model.Name, out var shellSettings))
+        {
+            return NotFound();
+        }
+
+        if (shellSettings.IsUninitialized())
+        {
+            model.ConnectionString = TenantConnectionStringRedactor.RestoreIfRedacted(shellSettings["ConnectionString"], model.ConnectionString);
+        }
+
+        model.RequireTablePrefix = _tenantsOptions.RequireTablePrefix;
+        model.HasTablePrefixPattern = !string.IsNullOrWhiteSpace(_tenantsOptions.TablePrefixPattern);
+        model.HasSchemaPattern = !string.IsNullOrWhiteSpace(_tenantsOptions.SchemaPattern);
+        ApplyPresetDatabaseConfiguration(model);
+        ApplyConfiguredDatabasePatterns(model);
+
+        if (ModelState.IsValid)
+        {
+            try
             {
-                return Forbid();
+                await ValidateViewModelAsync(model, false);
             }
-
-            if (!IsDefaultShell())
+            catch (Exception ex) when (!ex.IsFatal())
             {
-                return Forbid();
+                _logger.LogError(ex, "An error occurred while validating the tenant '{TenantName}'.", model.Name);
+                ModelState.AddModelError(string.Empty, S["An error occurred while validating the tenant database settings."]);
             }
+        }
 
-            if (ModelState.IsValid)
-            {
-                await ValidateViewModel(model, false);
-            }
-
-            var shellSettings = _shellHost.GetAllSettings()
-                .Where(x => String.Equals(x.Name, model.Name, StringComparison.OrdinalIgnoreCase))
-                .FirstOrDefault();
-
-            if (shellSettings == null)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
+        if (ModelState.IsValid)
+        {
+            try
             {
                 shellSettings["Description"] = model.Description;
+                shellSettings["Category"] = model.Category;
                 shellSettings.RequestUrlPrefix = model.RequestUrlPrefix;
                 shellSettings.RequestUrlHost = model.RequestUrlHost;
-                shellSettings["FeatureProfile"] = model.FeatureProfile;
+                shellSettings["FeatureProfile"] = string.Join(',', model.FeatureProfiles ?? []);
 
                 // The user can change the 'preset' database information only if the
                 // tenant has not been initialized yet
-                if (shellSettings.State == TenantState.Uninitialized)
+                if (shellSettings.IsUninitialized())
                 {
-                    SetConfigurationShellValues(model);
                     shellSettings["DatabaseProvider"] = model.DatabaseProvider;
                     shellSettings["TablePrefix"] = model.TablePrefix;
+                    shellSettings["Schema"] = model.Schema;
                     shellSettings["ConnectionString"] = model.ConnectionString;
                     shellSettings["RecipeName"] = model.RecipeName;
                     shellSettings["Secret"] = Guid.NewGuid().ToString();
@@ -460,225 +561,231 @@ namespace OrchardCore.Tenants.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
-
-            // The user can change the 'preset' database information only if the
-            // tenant has not been initialized yet
-            if (shellSettings.State == TenantState.Uninitialized)
+            catch (Exception ex) when (!ex.IsFatal())
             {
-                model.DatabaseProvider = shellSettings["DatabaseProvider"];
-                model.TablePrefix = shellSettings["TablePrefix"];
-                model.ConnectionString = shellSettings["ConnectionString"];
-                model.RecipeName = shellSettings["RecipeName"];
-                model.CanEditDatabasePresets = true;
-                SetConfigurationShellValues(model);
+                _logger.LogError(ex, "An error occurred while saving the tenant '{TenantName}'.", model.Name);
+                ModelState.AddModelError(string.Empty, S["An error occurred while saving the tenant settings."]);
             }
-
-            var recipeCollections = await Task.WhenAll(_recipeHarvesters.Select(x => x.HarvestRecipesAsync()));
-            var recipes = recipeCollections.SelectMany(x => x).Where(x => x.IsSetupRecipe).OrderBy(r => r.DisplayName).ToArray();
-            model.Recipes = recipes;
-            model.FeatureProfiles = await GetFeatureProfilesAsync(model.FeatureProfile);
-
-            // If we got this far, something failed, redisplay form
-            return View(model);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Disable(string id)
+        // If we got this far, something failed. Reinitialize the model and re-display form.
+
+        // The user can change the 'preset' database information only if the
+        // tenant has not been initialized yet
+        if (shellSettings.IsUninitialized())
         {
-            if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
-            {
-                return Forbid();
-            }
+            model.DatabaseProvider = shellSettings["DatabaseProvider"];
+            model.TablePrefix = shellSettings["TablePrefix"];
+            model.Schema = shellSettings["Schema"];
+            model.ConnectionString = GetDisplayedConnectionString(shellSettings["ConnectionString"]);
+            model.RecipeName = shellSettings["RecipeName"];
+            ApplyPresetDatabaseConfiguration(model);
+            ApplyConfiguredDatabasePatterns(model);
+            model.CanEditDatabasePresets = !model.DatabaseConfigurationPreset;
+        }
 
-            if (!IsDefaultShell())
-            {
-                return Forbid();
-            }
+        var recipeCollections = await Task.WhenAll(_recipeHarvesters.Select(x => x.HarvestRecipesAsync()));
+        var recipes = recipeCollections.SelectMany(x => x).Where(x => x.IsSetupRecipe).OrderBy(r => r.DisplayName).ToArray();
+        model.Recipes = recipes;
+        model.FeatureProfilesItems = await GetFeatureProfilesAsync(model.FeatureProfiles);
 
-            var shellSettings = _shellHost.GetAllSettings()
-                .Where(s => String.Equals(s.Name, id, StringComparison.OrdinalIgnoreCase))
-                .FirstOrDefault();
+        return View(model);
+    }
 
-            if (shellSettings == null)
-            {
-                return NotFound();
-            }
+    [HttpPost]
+    public async Task<IActionResult> Disable(string id)
+    {
+        if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
+        {
+            return Forbid();
+        }
 
-            if (String.Equals(shellSettings.Name, ShellHelper.DefaultShellName, StringComparison.OrdinalIgnoreCase))
-            {
-                await _notifier.ErrorAsync(H["You cannot disable the default tenant."]);
-                return RedirectToAction(nameof(Index));
-            }
+        if (!_currentShellSettings.IsDefaultShell())
+        {
+            return Forbid();
+        }
 
-            if (shellSettings.State != TenantState.Running)
-            {
-                await _notifier.ErrorAsync(H["You can only disable an Enabled tenant."]);
-                return RedirectToAction(nameof(Index));
-            }
+        if (!_shellHost.TryGetSettings(id, out var shellSettings))
+        {
+            return NotFound();
+        }
 
-            shellSettings.State = TenantState.Disabled;
-            await _shellHost.UpdateShellSettingsAsync(shellSettings);
-
+        if (shellSettings.IsDefaultShell())
+        {
+            await _notifier.ErrorAsync(H["You cannot disable the default tenant."]);
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Enable(string id)
+        if (!shellSettings.IsRunning())
         {
-            if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
-            {
-                return Forbid();
-            }
-
-            if (!IsDefaultShell())
-            {
-                return Forbid();
-            }
-
-            var shellSettings = _shellHost.GetAllSettings()
-                .Where(x => String.Equals(x.Name, id, StringComparison.OrdinalIgnoreCase))
-                .FirstOrDefault();
-
-            if (shellSettings == null)
-            {
-                return NotFound();
-            }
-
-            if (shellSettings.State != TenantState.Disabled)
-            {
-                await _notifier.ErrorAsync(H["You can only enable a Disabled tenant."]);
-            }
-
-            shellSettings.State = TenantState.Running;
-            await _shellHost.UpdateShellSettingsAsync(shellSettings);
-
+            await _notifier.ErrorAsync(H["You can only disable a Running tenant."]);
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Reload(string id)
+        await _shellHost.UpdateShellSettingsAsync(shellSettings.AsDisabled());
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Enable(string id)
+    {
+        if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
         {
-            if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
-            {
-                return Forbid();
-            }
-
-            if (!IsDefaultShell())
-            {
-                return Forbid();
-            }
-
-            var shellSettings = _shellHost.GetAllSettings()
-                .Where(x => String.Equals(x.Name, id, StringComparison.OrdinalIgnoreCase))
-                .FirstOrDefault();
-
-            if (shellSettings == null)
-            {
-                return NotFound();
-            }
-
-            // Generating routes can fail while the tenant is recycled as routes can use services.
-            // It could be fixed by waiting for the next request or the end of the current one
-            // to actually release the tenant. Right now we render the url before recycling the tenant.
-
-            var redirectUrl = Url.Action(nameof(Index));
-
-            await _shellHost.ReloadShellContextAsync(shellSettings);
-
-            return Redirect(redirectUrl);
+            return Forbid();
         }
 
-        private async Task ValidateViewModel(EditTenantViewModel model, bool newTenant)
+        if (!_currentShellSettings.IsDefaultShell())
         {
-            var selectedProvider = _databaseProviders.FirstOrDefault(x => x.Value == model.DatabaseProvider);
-
-            if (selectedProvider != null && selectedProvider.HasConnectionString && String.IsNullOrWhiteSpace(model.ConnectionString))
-            {
-                ModelState.AddModelError(nameof(EditTenantViewModel.ConnectionString), S["The connection string is mandatory for this provider."]);
-            }
-
-            if (String.IsNullOrWhiteSpace(model.Name))
-            {
-                ModelState.AddModelError(nameof(EditTenantViewModel.Name), S["The tenant name is mandatory."]);
-            }
-
-            if (!String.IsNullOrWhiteSpace(model.FeatureProfile))
-            {
-                var featureProfiles = await _featureProfilesService.GetFeatureProfilesAsync();
-                if (!featureProfiles.ContainsKey(model.FeatureProfile))
-                {
-                    ModelState.AddModelError(nameof(EditTenantViewModel.FeatureProfile), S["The feature profile does not exist.", model.FeatureProfile]);
-                }
-            }
-
-            var allSettings = _shellHost.GetAllSettings();
-
-            if (newTenant && allSettings.Any(tenant => String.Equals(tenant.Name, model.Name, StringComparison.OrdinalIgnoreCase)))
-            {
-                ModelState.AddModelError(nameof(EditTenantViewModel.Name), S["A tenant with the same name already exists.", model.Name]);
-            }
-
-            if (!String.IsNullOrEmpty(model.Name) && !Regex.IsMatch(model.Name, @"^\w+$"))
-            {
-                ModelState.AddModelError(nameof(EditTenantViewModel.Name), S["Invalid tenant name. Must contain characters only and no spaces."]);
-            }
-
-            if (!IsDefaultShell() && String.IsNullOrWhiteSpace(model.RequestUrlHost) && String.IsNullOrWhiteSpace(model.RequestUrlPrefix))
-            {
-                ModelState.AddModelError(nameof(EditTenantViewModel.RequestUrlPrefix), S["Host and url prefix can not be empty at the same time."]);
-            }
-
-            var allOtherShells = allSettings.Where(tenant => !string.Equals(tenant.Name, model.Name, StringComparison.OrdinalIgnoreCase));
-            if (allOtherShells.Any(tenant => String.Equals(tenant.RequestUrlPrefix, model.RequestUrlPrefix?.Trim(), StringComparison.OrdinalIgnoreCase) && String.Equals(tenant.RequestUrlHost, model.RequestUrlHost, StringComparison.OrdinalIgnoreCase)))
-            {
-                ModelState.AddModelError(nameof(EditTenantViewModel.RequestUrlPrefix), S["A tenant with the same host and prefix already exists.", model.Name]);
-            }
-
-            if (!String.IsNullOrWhiteSpace(model.RequestUrlPrefix))
-            {
-                if (model.RequestUrlPrefix.Contains('/'))
-                {
-                    ModelState.AddModelError(nameof(EditTenantViewModel.RequestUrlPrefix), S["The url prefix can not contain more than one segment."]);
-                }
-            }
+            return Forbid();
         }
 
-        private bool IsDefaultShell()
+        if (!_shellHost.TryGetSettings(id, out var shellSettings))
         {
-            return String.Equals(_currentShellSettings.Name, ShellHelper.DefaultShellName, StringComparison.OrdinalIgnoreCase);
+            return NotFound();
         }
 
-        private void SetConfigurationShellValues(EditTenantViewModel model)
+        if (!shellSettings.IsDisabled())
         {
-            var shellSettings = _shellSettingsManager.CreateDefaultSettings();
-            var configurationShellConnectionString = shellSettings["ConnectionString"];
-            var configurationDatabaseProvider = shellSettings["DatabaseProvider"];
-
-            model.DatabaseConfigurationPreset = !string.IsNullOrEmpty(configurationShellConnectionString) || !string.IsNullOrEmpty(configurationDatabaseProvider);
-
-            if (!string.IsNullOrEmpty(configurationShellConnectionString))
-            {
-                model.ConnectionString = configurationShellConnectionString;
-            }
-
-            if (!string.IsNullOrEmpty(configurationDatabaseProvider))
-            {
-                model.DatabaseProvider = configurationDatabaseProvider;
-            }
+            await _notifier.ErrorAsync(H["You can only enable a Disabled tenant."]);
+            return RedirectToAction(nameof(Index));
         }
 
-        private async Task<List<SelectListItem>> GetFeatureProfilesAsync(string currentFeatureProfile)
-        {
-            var featureProfiles = (await _featureProfilesService.GetFeatureProfilesAsync())
-                .Select(x => new SelectListItem(x.Key, x.Key, String.Equals(x.Key, currentFeatureProfile, StringComparison.OrdinalIgnoreCase)))
-                .ToList();
+        await _shellHost.UpdateShellSettingsAsync(shellSettings.AsRunning());
 
-            if (featureProfiles.Any())
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Reload(string id)
+    {
+        if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants))
+        {
+            return Forbid();
+        }
+
+        if (!_currentShellSettings.IsDefaultShell())
+        {
+            return Forbid();
+        }
+
+        if (!_shellHost.TryGetSettings(id, out var shellSettings))
+        {
+            return NotFound();
+        }
+
+        // Generating routes can fail while the tenant is recycled as routes can use services.
+        // It could be fixed by waiting for the next request or the end of the current one
+        // to actually release the tenant. Right now we render the url before recycling the tenant.
+
+        var redirectUrl = Url.Action(nameof(Index));
+
+        await _shellHost.ReloadShellContextAsync(shellSettings);
+
+        return Redirect(redirectUrl);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Remove(string id)
+    {
+        if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageTenants) || !_tenantsOptions.TenantRemovalAllowed)
+        {
+            return Forbid();
+        }
+
+        if (!_currentShellSettings.IsDefaultShell())
+        {
+            return Forbid();
+        }
+
+        if (!_shellHost.TryGetSettings(id, out var shellSettings))
+        {
+            return NotFound();
+        }
+
+        if (!shellSettings.IsRemovable())
+        {
+            await _notifier.ErrorAsync(H["You can only remove a 'Disabled' or 'Uninitialized' tenant."]);
+            return RedirectToAction(nameof(Index));
+        }
+
+        var context = await _shellRemovalManager.RemoveAsync(shellSettings);
+        if (!context.Success)
+        {
+            await _notifier.ErrorAsync(H["An error occurred while removing the tenant '{0}'. {1}", id, context.ErrorMessage]);
+        }
+        else
+        {
+            if (_logger.IsEnabled(LogLevel.Warning))
             {
-                featureProfiles.Insert(0, new SelectListItem(S["None"], String.Empty, currentFeatureProfile == String.Empty));
+                _logger.LogWarning("The tenant '{TenantName}' was removed.", shellSettings.Name);
             }
 
-            return featureProfiles;
+            await _notifier.SuccessAsync(H["The tenant '{0}' was removed, see the log file for more info.", shellSettings.Name]);
         }
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    private async Task<List<SelectListItem>> GetFeatureProfilesAsync(IEnumerable<string> currentFeatureProfiles)
+    {
+        var featureProfiles = (await _featureProfilesService.GetFeatureProfilesAsync())
+            .Select(x => new SelectListItem(x.Value.Name ?? x.Key, x.Key, currentFeatureProfiles != null && currentFeatureProfiles.Contains(x.Key)))
+            .ToList();
+
+        return featureProfiles;
+    }
+
+    private async Task ValidateViewModelAsync(EditTenantViewModel model, bool isNewTenant)
+    {
+        model.IsNewTenant = isNewTenant;
+
+        ModelState.AddModelErrors(await _tenantValidator.ValidateAsync(model));
+    }
+
+    private void ApplyPresetDatabaseConfiguration(EditTenantViewModel model)
+    {
+        model.DatabaseProviderPreset = false;
+        model.DatabaseConfigurationPreset = false;
+
+        // Read from the root application configuration, not from the current
+        // shell settings which may have tenant-specific overrides (e.g., the
+        // Default tenant was set up with SQLite while root config says SqlConnection).
+        using var defaultSettings = _shellSettingsManager.CreateDefaultSettings().AsDisposable();
+        var databaseProvider = defaultSettings["DatabaseProvider"];
+
+        if (string.IsNullOrEmpty(databaseProvider) ||
+            !_databaseProviderLookup.TryGetValue(databaseProvider, out var provider))
+        {
+            return;
+        }
+
+        model.DatabaseProviderPreset = true;
+        model.DatabaseProvider = databaseProvider;
+
+        var connectionString = defaultSettings["ConnectionString"];
+        if (!provider.HasConnectionString || !string.IsNullOrWhiteSpace(connectionString))
+        {
+            model.DatabaseConfigurationPreset = true;
+            model.ConnectionString = connectionString;
+            model.Schema = defaultSettings["Schema"];
+        }
+    }
+
+    private static string GetDisplayedConnectionString(string connectionString) =>
+        TenantConnectionStringRedactor.RedactPassword(connectionString);
+
+    private void ApplyConfiguredDatabasePatterns(EditTenantViewModel model)
+    {
+        if (string.IsNullOrWhiteSpace(model.Name))
+        {
+            model.ResolvedTablePrefix = model.HasTablePrefixPattern ? string.Empty : model.TablePrefix;
+            model.ResolvedSchema = model.HasSchemaPattern ? string.Empty : model.Schema;
+            return;
+        }
+
+        var databasePatternResolution = _tenantDatabasePatternResolver.Apply(model);
+        model.ResolvedTablePrefix = databasePatternResolution.TablePrefix;
+        model.ResolvedSchema = databasePatternResolution.Schema;
     }
 }

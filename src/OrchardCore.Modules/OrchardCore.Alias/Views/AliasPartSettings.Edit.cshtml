@@ -1,7 +1,7 @@
 @model OrchardCore.Alias.Settings.AliasPartSettingsViewModel
 @using OrchardCore.Alias.Settings
 <style asp-name="codemirror"></style>
-<script asp-name="codemirror" depends-on="admin" at="Foot"></script>
+<script asp-name="codemirror" at="Foot"></script>
 <script asp-name="codemirror-mode-javascript" at="Foot"></script>
 <script asp-name="codemirror-addon-display-autorefresh" at="Foot"></script>
 <script asp-name="codemirror-addon-mode-simple" at="Foot"></script>
@@ -10,26 +10,34 @@
 
 <script asp-src="~/OrchardCore.Liquid/codemirror/liquid.js" at="Foot"></script>
 
-<div class="form-group row">
-    <div class="col-sm-6">
-        <label asp-for="Options">@T["Options"]</label>
-        <select asp-for="Options" class="form-control">
+<div class="ocat-limited-wrapper">
+    <label asp-for="Options" class="ocat-label">@T["Options"]</label>
+    <div class="ocat-limited">
+        <select asp-for="Options" class="form-select">
             <option value="@AliasPartOptions.Editable" selected="@(Model.Options == AliasPartOptions.Editable)">@T["Alias is editable"]</option>
             <option value="@AliasPartOptions.GeneratedDisabled" selected="@(Model.Options == AliasPartOptions.GeneratedDisabled)">@T["Alias is generated and input is disabled"]</option>
         </select>
     </div>
 </div>
-<div class="form-group row">
-    <div class="col-large">
-        <label asp-for="Pattern">@T["Pattern"]</label>
+<div class="ocat-limited-wrapper">
+    <label asp-for="Pattern" class="ocat-label">@T["Pattern"]</label>
+    <div class="ocat-limited">
         <textarea asp-for="Pattern" rows="5" class="form-control"></textarea>
         <span class="hint">@T["The pattern used to render the alias of this content type."]</span>
     </div>
 </div>
 
-<script at="Foot" depends-on="jquery">
+<script at="Foot">
     //<![CDATA[
-    $(function () {
+    function onDocumentReady(callback) {
+        if (document.readyState !== 'loading') {
+            callback();
+        } else {
+            document.addEventListener('DOMContentLoaded', callback);
+        }
+    }
+
+    onDocumentReady(function () {
         editor = CodeMirror.fromTextArea(document.getElementById('@Html.IdFor(x => x.Pattern)'), {
             autoRefresh: true,
             lineNumbers: true,

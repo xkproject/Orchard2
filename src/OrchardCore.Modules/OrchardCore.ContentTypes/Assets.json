@@ -1,0 +1,9 @@
+[
+  {
+    "action": "parcel",
+    "name": "autocomplete",
+    "source": "Assets/js/autocomplete.ts",
+    "dest": "wwwroot/Scripts/autocomplete",
+    "tags": ["admin", "dashboard", "js"]
+  }
+]

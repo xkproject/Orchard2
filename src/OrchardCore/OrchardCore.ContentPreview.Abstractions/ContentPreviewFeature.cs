@@ -1,10 +1,11 @@
-namespace OrchardCore.ContentPreview
+namespace OrchardCore.ContentPreview;
+
+/// <summary>
+/// Used when a content item is being previewed.
+/// </summary>
+public sealed class ContentPreviewFeature
 {
-    /// <summary>
-    /// Used when a content item is being previewed.
-    /// </summary>
-    public class ContentPreviewFeature
-    {
-        public bool Previewing { get; set; } = true;
-    }
+    public static readonly ContentPreviewFeature Instance = new();
+
+    public bool Previewing { get; init; } = true;
 }

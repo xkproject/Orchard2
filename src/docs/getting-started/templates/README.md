@@ -1,6 +1,6 @@
 # Code Generation Templates
 
-Orchard Core Templates uses `dotnet new` template configurations for creating new websites, themes and modules from the command shell.
+Orchard Core Templates use `dotnet new` template configurations for creating new websites, themes and modules from the command shell.
 
 More information about `dotnet new` can be found at <https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-new>
 
@@ -9,28 +9,28 @@ More information about `dotnet new` can be found at <https://docs.microsoft.com/
 Once the .NET Core SDK has been installed, type the following command to install the templates for creating Orchard Core web applications:
 
 ```CMD
-dotnet new -i OrchardCore.ProjectTemplates::1.2.1
+dotnet new install OrchardCore.ProjectTemplates@3.0.1
 ```
 
 This will use the most stable release of Orchard Core. In order to use the latest `main` branch of Orchard Core, the following command can be used:
 
 ```CMD
-dotnet new -i OrchardCore.ProjectTemplates::1.2.1-* --nuget-source https://nuget.cloudsmith.io/orchardcore/preview/v3/index.json  
+dotnet new install OrchardCore.ProjectTemplates@3.0.1-* --nuget-source https://nuget.cloudsmith.io/orchardcore/preview/v3/index.json  
 ```
 
 ## Create a new website
 
 ### From Command Shell (automated way)
 
-#### Generate an Orchard Cms Web Application
+#### Generate an Orchard CMS Web Application
 
 ```CMD
-dotnet new occms  
+dotnet new occms
 ```
 
 The above command will use the default options.
 
-You can pass the following CLI parameters to setup options:
+You can pass the following CLI parameters for setup options:
 
 ```CMD
 Orchard Core Cms Web App (C#)
@@ -44,7 +44,7 @@ Options:
 
   -ov|--orchard-version  Specifies which version of Orchard Core packages to use.
                          string - Optional
-                         Default: 1.2.1
+                         Default: 3.0.1
 ```
 
 Logging can be ignored with this command:
@@ -70,43 +70,39 @@ Fire up Visual Studio, create a new solution file (`.sln`) by creating a new ASP
 ![image](../assets/images/templates/orchard-screencast-1.gif)
 
 Now that we created a new Web Application we need to add proper dependencies so that this new Web Application be targeted as an Orchard Core application.
+Orchard Core can be added through two distinct NuGet meta packages: `OrchardCore.Application.Cms.Core.Targets` and `OrchardCore.Application.Cms.Targets`. For additional information regarding these packages, please refer to [this link](../starter-recipes.md). You must add one of these NuGet packages in your Web Application.
 
 !!! note
-    If you want to use the `preview` packages, [configure the OrchardCore Preview url in your Package sources](../preview-package-source.md)
+    If you want to use the `preview` packages, [configure the OrchardCore Preview URL in your Package sources](../preview-package-source.md)
 
 ![image](../assets/images/templates/orchard-screencast-2.gif)
 
-Finally, we will need to register Orchard CMS service in our `Startup.cs` file like this:
+Visual Studio may automatically include Models, Views, and Controllers folders with boilerplate code, depending on the template used to create the web application. To prevent potential conflicts with OrchardCore services, it is advisable to delete these folders.
+Finally, we will need to register Orchard CMS service in our `Program.cs` file like this:
 
 ```csharp
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using OrchardCore.Logging;
 
-namespace MyNewWebsite
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseNLogHost();
+
+builder.Services
+    .AddOrchardCms()
+    .AddSetupFeatures("OrchardCore.AutoSetup");
+
+var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
 {
-    public class Startup
-    {
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddOrchardCms();
-        }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseStaticFiles();
-            app.UseOrchardCore();
-        }
-    }
+    app.UseExceptionHandler("/Error");
 }
+
+app.UseStaticFiles();
+
+app.UseOrchardCore();
+
+app.Run();
 ```
 
 ## Create a new CMS module
@@ -121,13 +117,13 @@ dotnet new ocmodulecms
 
 The above command will use the default options.
 
-You can pass the following CLI parameters to setup options:
+You can pass the following CLI parameters for setup options:
 
 ```CMD
 Orchard Core Module (C#)
 Author: Orchard Project
 Options:
-  -A|--AddPart           Add dependency injection for part in Startup.cs. If PartName is not provided, default name will be used
+  -A|--AddPart           Add dependency injection for part in Program.cs. If PartName is not provided, default name will be used
                          bool - Optional
                          Default: false / (*) true
 
@@ -137,7 +133,7 @@ Options:
 
   -ov|--orchard-version  Specifies which version of Orchard Core packages to use.
                          string - Optional
-                         Default: 1.2.1
+                         Default: 3.0.1
 ```
 
 ```CMD
@@ -160,7 +156,7 @@ Fire up Visual Studio, open Orchard Core solution file (`.sln`), select `Orchard
 For marking this new Class Library as an Orchard Module, we will now need to reference `OrchardCore.Module.Targets` NuGet package.
 
 !!! note
-    If you want to use the `preview` packages, [configure the OrchardCore Preview url in your Package sources](../preview-package-source.md)
+    If you want to use the `preview` packages, [configure the OrchardCore Preview URL in your Package sources](../preview-package-source.md)
 
 Each of these `*.Targets` NuGet packages are used to mark a Class Library as a specific Orchard Core functionality.  
 `OrchardCore.Module.Targets` is the one we are interested in for now.  

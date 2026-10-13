@@ -1,0 +1,29 @@
+@model OrchardCore.Users.ViewModels.LinkExternalLoginViewModel
+
+@{
+    ViewLayout = "Layout__Login";
+}
+
+<form asp-action="LinkExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal no-multisubmit">
+    <h4>@T["Link your account."]</h4>
+    <p class="text-info">
+        @T["You've successfully authenticated with <strong>{0}</strong>. You already have an account that can be linked with this external login. Enter your local account password and click the Register button to link the accounts and finish logging in.", ViewData["LoginProvider"]]
+    </p>
+    <hr />
+    <div asp-validation-summary="ModelOnly"></div>
+
+    <div class="mb-3">
+        <label for="UserName" class="form-label">@T["Username"]</label>
+        <input id="UserName" value="@ViewData["UserName"]" class="form-control" disabled />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label">@T["Password"]</label>
+        <input asp-for="Password" class="form-control" required autofocus />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary">@T["Register"]</button>
+    </div>
+</form>

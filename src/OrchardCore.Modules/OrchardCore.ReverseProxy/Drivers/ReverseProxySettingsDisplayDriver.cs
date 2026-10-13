@@ -1,88 +1,112 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc.Localization;
+using Microsoft.Extensions.Options;
 using OrchardCore.DisplayManagement.Entities;
 using OrchardCore.DisplayManagement.Handlers;
+using OrchardCore.DisplayManagement.Notify;
 using OrchardCore.DisplayManagement.Views;
 using OrchardCore.Environment.Shell;
 using OrchardCore.ReverseProxy.Settings;
 using OrchardCore.ReverseProxy.ViewModels;
 using OrchardCore.Settings;
 
-namespace OrchardCore.ReverseProxy.Drivers
+namespace OrchardCore.ReverseProxy.Drivers;
+
+public sealed class ReverseProxySettingsDisplayDriver : SiteDisplayDriver<ReverseProxySettings>
 {
-    public class ReverseProxySettingsDisplayDriver : SectionDisplayDriver<ISite, ReverseProxySettings>
+    public const string GroupId = "ReverseProxy";
+
+    private readonly IShellReleaseManager _shellReleaseManager;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IAuthorizationService _authorizationService;
+
+    private readonly ReverseProxySettings _reverseProxySettings;
+    private readonly INotifier _notifier;
+
+    internal readonly IHtmlLocalizer H;
+
+    public ReverseProxySettingsDisplayDriver(
+        IShellReleaseManager shellReleaseManager,
+        IHttpContextAccessor httpContextAccessor,
+        IAuthorizationService authorizationService,
+        IOptionsSnapshot<ReverseProxySettings> reverseProxySettings,
+        INotifier notifier,
+        IHtmlLocalizer<ReverseProxySettingsDisplayDriver> htmlLocalizer)
     {
-        private const string SettingsGroupId = "ReverseProxy";
-        private readonly IShellHost _shellHost;
-        private readonly ShellSettings _shellSettings;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IAuthorizationService _authorizationService;
+        _shellReleaseManager = shellReleaseManager;
+        _httpContextAccessor = httpContextAccessor;
+        _authorizationService = authorizationService;
+        _reverseProxySettings = reverseProxySettings.Value;
+        _notifier = notifier;
+        H = htmlLocalizer;
+    }
 
-        public ReverseProxySettingsDisplayDriver(
-            IShellHost shellHost,
-            ShellSettings shellSettings,
-            IHttpContextAccessor httpContextAccessor,
-            IAuthorizationService authorizationService)
+    protected override string SettingsGroupId
+        => GroupId;
+
+    public override async Task<IDisplayResult> EditAsync(ISite site, ReverseProxySettings settings, BuildEditorContext context)
+    {
+        var user = _httpContextAccessor.HttpContext?.User;
+
+        if (!await _authorizationService.AuthorizeAsync(user, Permissions.ManageReverseProxySettings))
         {
-            _shellHost = shellHost;
-            _shellSettings = shellSettings;
-            _httpContextAccessor = httpContextAccessor;
-            _authorizationService = authorizationService;
+            return null;
         }
 
-        public override async Task<IDisplayResult> EditAsync(ReverseProxySettings settings, BuildEditorContext context)
+        context.AddTenantReloadWarningWrapper();
+
+        // Set the settings from configuration when AdminSettings are overridden via ConfigureReverseProxySettings()
+        var currentSettings = settings;
+        if (_reverseProxySettings.FromConfiguration)
         {
-            var user = _httpContextAccessor.HttpContext?.User;
+            currentSettings = _reverseProxySettings;
 
-            if (!await _authorizationService.AuthorizeAsync(user, Permissions.ReverseProxySettings))
-            {
-                return null;
-            }
-
-            return Initialize<ReverseProxySettingsViewModel>("ReverseProxySettings_Edit", model =>
-            {
-                model.EnableXForwardedFor = settings.ForwardedHeaders.HasFlag(ForwardedHeaders.XForwardedFor);
-                model.EnableXForwardedHost = settings.ForwardedHeaders.HasFlag(ForwardedHeaders.XForwardedHost);
-                model.EnableXForwardedProto = settings.ForwardedHeaders.HasFlag(ForwardedHeaders.XForwardedProto);
-            }).Location("Content:2").OnGroup(SettingsGroupId);
+            await _notifier.InformationAsync(H["The current settings are coming from configuration sources, saving the settings will affect the AdminSettings not the configuration."]);
         }
 
-        public override async Task<IDisplayResult> UpdateAsync(ReverseProxySettings section, BuildEditorContext context)
+        return Initialize<ReverseProxySettingsViewModel>("ReverseProxySettings_Edit", model =>
         {
-            var user = _httpContextAccessor.HttpContext?.User;
+            model.EnableXForwardedFor = currentSettings.ForwardedHeaders.HasFlag(ForwardedHeaders.XForwardedFor);
+            model.EnableXForwardedHost = currentSettings.ForwardedHeaders.HasFlag(ForwardedHeaders.XForwardedHost);
+            model.EnableXForwardedProto = currentSettings.ForwardedHeaders.HasFlag(ForwardedHeaders.XForwardedProto);
+        }).Location("Content:2")
+        .OnGroup(SettingsGroupId);
+    }
 
-            if (!await _authorizationService.AuthorizeAsync(user, Permissions.ReverseProxySettings))
-            {
-                return null;
-            }
+    public override async Task<IDisplayResult> UpdateAsync(ISite site, ReverseProxySettings settings, UpdateEditorContext context)
+    {
+        var user = _httpContextAccessor.HttpContext?.User;
 
-            if (context.GroupId == SettingsGroupId)
-            {
-                var model = new ReverseProxySettingsViewModel();
-
-                await context.Updater.TryUpdateModelAsync(model, Prefix);
-
-                section.ForwardedHeaders = ForwardedHeaders.None;
-
-                if (model.EnableXForwardedFor)
-                    section.ForwardedHeaders |= ForwardedHeaders.XForwardedFor;
-
-                if (model.EnableXForwardedHost)
-                    section.ForwardedHeaders |= ForwardedHeaders.XForwardedHost;
-
-                if (model.EnableXForwardedProto)
-                    section.ForwardedHeaders |= ForwardedHeaders.XForwardedProto;
-
-                // If the settings are valid, release the current tenant.
-                if (context.Updater.ModelState.IsValid)
-                {
-                    await _shellHost.ReleaseShellContextAsync(_shellSettings);
-                }
-            }
-
-            return await EditAsync(section, context);
+        if (!await _authorizationService.AuthorizeAsync(user, Permissions.ManageReverseProxySettings))
+        {
+            return null;
         }
+
+        var model = new ReverseProxySettingsViewModel();
+
+        await context.Updater.TryUpdateModelAsync(model, Prefix);
+
+        settings.ForwardedHeaders = ForwardedHeaders.None;
+
+        if (model.EnableXForwardedFor)
+        {
+            settings.ForwardedHeaders |= ForwardedHeaders.XForwardedFor;
+        }
+
+        if (model.EnableXForwardedHost)
+        {
+            settings.ForwardedHeaders |= ForwardedHeaders.XForwardedHost;
+        }
+
+        if (model.EnableXForwardedProto)
+        {
+            settings.ForwardedHeaders |= ForwardedHeaders.XForwardedProto;
+        }
+
+        _shellReleaseManager.RequestRelease();
+
+        return await EditAsync(site, settings, context);
     }
 }

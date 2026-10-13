@@ -1,32 +1,56 @@
 @using OrchardCore.Localization
+@using OrchardCore.Navigation
 @{
-    // Morphing the shape to keep Model untouched
+    // Morphing the shape to keep Model untouched.
     Model.Metadata.Alternates.Clear();
     Model.Metadata.Type = "NavigationItemText";
-    Model.Metadata.Alternates.Add("NavigationItemText_Id__" + Model.Id);
 
-    TagBuilder tag = Tag(Model, "a");
-    tag.Attributes["id"] = null;
-    tag.Attributes["href"] = Model.Href ?? "#";
-
-    var prefix = "icon-class-";
-
-    // Extract classes that are not icons from Model.Classes
-    var notIconClasses = ((IEnumerable<string>)Model.Classes)
-                    .ToList()
-                    .Where(c => !c.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
-
-    if (notIconClasses.Count() > 0)
+    if (Model.Id != null)
     {
-        tag.Attributes["class"] = string.Join(" ", notIconClasses);
+        Model.Metadata.Alternates.Add("NavigationItemText_Id__" + Model.Id);
+    }
+
+    var isToggleOnlyItem = Model.HasItems && (Model.Href == null || Model.Href.ToString() == "#");
+    TagBuilder tag = Tag(Model, isToggleOnlyItem ? "button" : "a");
+    tag.Attributes["id"] = null;
+    tag.Attributes["data-admin-hash"] = Model.Hash;
+
+    if (isToggleOnlyItem)
+    {
+        tag.Attributes["type"] = "button";
+    }
+    else
+    {
+        tag.Attributes["href"] = Model.Href;
+    }
+
+    if (!string.IsNullOrEmpty(Model.Target))
+    {
+        tag.Attributes["target"] = Model.Target;
+    }
+    
+    // Extract classes that are not icons from 'Model.Classes'.
+    var notIconClasses = ((IEnumerable<string>)Model.Classes)
+        .Where(c => !c.StartsWith(NavigationConstants.CssClassPrefix, StringComparison.OrdinalIgnoreCase))
+        .ToArray();
+
+    if (notIconClasses.Length > 0)
+    {
+        tag.Attributes["class"] = string.Join(' ', notIconClasses);
+    }
+    else
+    {
+        // This removes the class attribute on the li element when
+        // an empty class attribute gets rendered.
+        tag.Attributes.Remove("class");
     }
 
     tag.AddCssClass("item-label d-flex");
 
     if (Model.HasItems)
     {
-        tag.Attributes["data-toggle"] = "collapse";
-        tag.Attributes["data-target"] = "#m" + Model.GetHashCode().ToString();
+        tag.Attributes["data-bs-toggle"] = "collapse";
+        tag.Attributes["data-bs-target"] = "#m" + Model.GetHashCode().ToString();
         tag.Attributes["aria-expanded"] = "false";
         tag.Attributes["aria-controls"] = "m" + Model.GetHashCode().ToString();
         tag.TagRenderMode = TagRenderMode.Normal;
@@ -45,7 +69,7 @@
 
     if (Model.HasItems)
     {
-        tag.InnerHtml.AppendHtml(Html.Raw("<div class=\"btn-nostyle\"><span class=\"collapse-icon\"><i class=\"fas fa-chevron-" + (Orchard.CultureDir() == LanguageDirection.LTR ? "right" : "left") + " fa-xs chevron\"></i></span></div>"));
+        tag.InnerHtml.AppendHtml(Html.Raw("<div class=\"btn-nostyle\"><span class=\"collapse-icon\"><i class=\"fa-solid fa-chevron-" + (Orchard.CultureDir() == LanguageDirection.LTR ? "right" : "left") + " fa-xs chevron\"></i></span></div>"));
     }
 }
 

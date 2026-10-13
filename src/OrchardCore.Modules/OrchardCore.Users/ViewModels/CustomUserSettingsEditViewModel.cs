@@ -1,7 +1,8 @@
-namespace OrchardCore.Users.ViewModels
+using OrchardCore.DisplayManagement;
+
+namespace OrchardCore.Users.ViewModels;
+
+public class CustomUserSettingsEditViewModel
 {
-    public class CustomUserSettingsEditViewModel
-    {
-        public dynamic Editor { get; set; }
-    }
+    public IShape Editor { get; set; }
 }

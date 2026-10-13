@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -8,218 +6,184 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-using SixLabors.ImageSharp.Web.Processors;
+using OrchardCore.Media.Models;
 
-namespace OrchardCore.Media.Processing
+namespace OrchardCore.Media.Processing;
+
+public class MediaTokenService : IMediaTokenService
 {
-    public class MediaTokenService : IMediaTokenService
+    private const string TokenCacheKeyPrefix = "MediaToken:";
+
+    // Commands that participate in the HMAC token. The version ("v") and token commands are
+    // intentionally excluded: "v" is a cache-buster appended after tokenization, and including it
+    // here would make the generated token disagree with the validated commands (which never
+    // include "v"), silently dropping all processing on versioned URLs.
+    private static readonly HashSet<string> _knownCommands = new(StringComparer.OrdinalIgnoreCase)
     {
-        private const string TokenCacheKeyPrefix = "MediaToken:";
-        private readonly IMemoryCache _memoryCache;
+        MediaCommands.WidthCommand,
+        MediaCommands.HeightCommand,
+        MediaCommands.ResizeModeCommand,
+        MediaCommands.ResizeFocalPointCommand,
+        MediaCommands.FormatCommand,
+        MediaCommands.BackgroundColorCommand,
+        MediaCommands.QualityCommand,
+        MediaCommands.AutoOrientCommand,
+    };
 
-        private readonly HashSet<string> _knownCommands = new HashSet<string>(12);
-        private readonly byte[] _hashKey;
+    private readonly IMemoryCache _memoryCache;
+    private readonly byte[] _hashKey;
 
-        public MediaTokenService(
-            IMemoryCache memoryCache,
-            IOptions<MediaTokenOptions> options,
-            IEnumerable<IImageWebProcessor> processors)
+    public MediaTokenService(
+        IMemoryCache memoryCache,
+        IOptions<MediaTokenOptions> options)
+    {
+        _memoryCache = memoryCache;
+        _hashKey = options.Value.HashKey;
+    }
+
+    public string AddTokenToPath(string path)
+    {
+        var pathIndex = path.IndexOf('?');
+
+        Dictionary<string, StringValues> processingCommands = null;
+        Dictionary<string, StringValues> otherCommands = null;
+
+        if (pathIndex != -1)
         {
-            _memoryCache = memoryCache;
-
-            foreach (var processor in processors)
-            {
-                foreach (var command in processor.Commands)
-                {
-                    _knownCommands.Add(command);
-                }
-            }
-
-            _hashKey = options.Value.HashKey;
+            ParseQuery(path[(pathIndex + 1)..], out processingCommands, out otherCommands);
         }
 
-        public string AddTokenToPath(string path)
+        // If there are no processing commands (for example only a version "v" cache-buster), there
+        // is nothing to tokenize. The "v" value is preserved via otherCommands in the returned path.
+        if (processingCommands is null || processingCommands.Count == 0)
         {
-            var pathIndex = path.IndexOf('?');
-
-            Dictionary<string, StringValues> processingCommands = null;
-            Dictionary<string, StringValues> otherCommands = null;
-
-            if (pathIndex != -1)
-            {
-                ParseQuery(path.Substring(pathIndex + 1), out processingCommands, out otherCommands);
-            }
-
-            // If no commands or only a version command don't bother tokenizing.
-            if (processingCommands is null
-                || processingCommands.Count == 0
-                || processingCommands.Count == 1 && processingCommands.ContainsKey(ImageVersionProcessor.VersionCommand))
-            {
-                return path;
-            }
-
-            // Using the command values as a key retrieve from cache
-            var queryStringTokenKey = CreateQueryStringTokenKey(processingCommands);
-            var queryStringToken = GetHash(queryStringTokenKey);
-
-            processingCommands["token"] = queryStringToken;
-
-            // If any non-resizing parameters have been added to the path include these on the query string output.
-            if (otherCommands != null)
-            {
-                foreach (var command in otherCommands)
-                {
-                    processingCommands.Add(command.Key, command.Value);
-                }
-            }
-
-            return AddQueryString(path.AsSpan(0, pathIndex), processingCommands);
+            return path;
         }
 
-        private void ParseQuery(
-            string queryString,
-            out Dictionary<string, StringValues> processingCommands,
-            out Dictionary<string, StringValues> otherCommands)
+        var queryStringTokenKey = CreateTokenKey(processingCommands.Select(p => KeyValuePair.Create(p.Key, p.Value.ToString())));
+        var token = GetHash(queryStringTokenKey);
+        processingCommands[MediaCommands.TokenCommand] = token;
+
+        if (otherCommands != null)
         {
-            processingCommands = null;
-            otherCommands = null;
-
-            var accumulator = new KeyValueAccumulator();
-            var otherCommandAccumulator = new KeyValueAccumulator();
-            var enumerable = new QueryStringEnumerable(queryString);
-
-            foreach (var pair in enumerable)
+            foreach (var command in otherCommands)
             {
-                var key = pair.DecodeName().ToString();
-                var value = pair.DecodeValue().ToString();
-
-                if (_knownCommands.Contains(key))
-                {
-                    accumulator.Append(key, value);
-                }
-                else
-                {
-                    otherCommandAccumulator.Append(key, value);
-                }
-            }
-
-            if (accumulator.HasValues)
-            {
-                processingCommands = accumulator.GetResults();
-            }
-
-            if (otherCommandAccumulator.HasValues)
-            {
-                otherCommands = otherCommandAccumulator.GetResults();
+                processingCommands.Add(command.Key, command.Value);
             }
         }
 
-        public bool TryValidateToken(IDictionary<string, string> commands, string token)
+        return AddQueryString(path.AsSpan(0, pathIndex), processingCommands);
+    }
+
+    public bool TryValidateToken(IEnumerable<KeyValuePair<string, string>> commands, string token)
+    {
+        var queryStringTokenKey = CreateTokenKey(commands);
+        return string.Equals(GetHash(queryStringTokenKey), token, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static void ParseQuery(
+        string queryString,
+        out Dictionary<string, StringValues> processingCommands,
+        out Dictionary<string, StringValues> otherCommands)
+    {
+        processingCommands = null;
+        otherCommands = null;
+
+        var accumulator = new KeyValueAccumulator();
+        var otherCommandAccumulator = new KeyValueAccumulator();
+        var enumerable = new QueryStringEnumerable(queryString);
+
+        foreach (var pair in enumerable)
         {
-            var queryStringTokenKey = CreateQueryStringTokenKey(commands);
+            var key = pair.DecodeName().ToString();
+            var value = pair.DecodeValue().ToString();
 
-            // Store a hash of the valid query string commands.
-            var queryStringToken = GetHash(queryStringTokenKey);
-
-            if (String.Equals(queryStringToken, token, StringComparison.OrdinalIgnoreCase))
+            if (_knownCommands.Contains(key))
             {
-                return true;
+                accumulator.Append(key, value);
             }
-
-            return false;
+            else
+            {
+                otherCommandAccumulator.Append(key, value);
+            }
         }
 
-        /// <summary>
-        /// Specialized version with fast enumeration and no StringValues string allocation.
-        /// </summary>
-        private static string CreateQueryStringTokenKey(Dictionary<string, StringValues> values)
+        if (accumulator.HasValues)
         {
-            using var builder = ZString.CreateStringBuilder();
-            builder.Append(TokenCacheKeyPrefix);
-            foreach (var pair in values)
-            {
-                builder.Append(pair.Value.ToString());
-            }
-            return builder.ToString();
+            processingCommands = accumulator.GetResults();
         }
 
-        private static string CreateQueryStringTokenKey(IDictionary<string, string> values)
+        if (otherCommandAccumulator.HasValues)
         {
-            using var builder = ZString.CreateStringBuilder();
-            builder.Append(TokenCacheKeyPrefix);
-            foreach (var pair in values)
-            {
-                builder.Append(pair.Value);
-            }
-            return builder.ToString();
+            otherCommands = otherCommandAccumulator.GetResults();
+        }
+    }
+
+    private static string CreateTokenKey(IEnumerable<KeyValuePair<string, string>> values)
+    {
+        using var builder = ZString.CreateStringBuilder();
+        builder.Append(TokenCacheKeyPrefix);
+        foreach (var pair in values)
+        {
+            builder.Append(pair.Value);
         }
 
-        private string GetHash(string queryStringTokenKey)
+        return builder.ToString();
+    }
+
+    private string GetHash(string tokenKey)
+    {
+        if (!_memoryCache.TryGetValue(tokenKey, out var result))
         {
-            if (!_memoryCache.TryGetValue(queryStringTokenKey, out var result))
-            {
-                using var entry = _memoryCache.CreateEntry(queryStringTokenKey);
+            using var entry = _memoryCache.CreateEntry(tokenKey);
+            entry.SlidingExpiration = TimeSpan.FromHours(5);
 
-                entry.SlidingExpiration = TimeSpan.FromHours(5);
+            var chars = tokenKey.AsSpan(TokenCacheKeyPrefix.Length);
+            var requiredLength = Encoding.UTF8.GetByteCount(chars);
+            var stringBytes = requiredLength < 1024
+                ? stackalloc byte[requiredLength]
+                : new byte[requiredLength];
 
-                using var hmac = new HMACSHA256(_hashKey);
+            Span<byte> hashBytes = stackalloc byte[HMACSHA256.HashSizeInBytes];
+            var stringBytesLength = Encoding.UTF8.GetBytes(chars, stringBytes);
+            HMACSHA256.TryHashData(_hashKey, stringBytes[..stringBytesLength], hashBytes, out var hashBytesLength);
 
-                // queryStringTokenKey also contains prefix
-                var chars = queryStringTokenKey.AsSpan(TokenCacheKeyPrefix.Length);
-
-                // only allocate on stack if it's small enough
-                var requiredLength = Encoding.UTF8.GetByteCount(chars);
-                var stringBytes = requiredLength < 1024
-                    ? stackalloc byte[requiredLength]
-                    : new byte[requiredLength];
-
-                // 256 for SHA-256, fits in stack nicely
-                Span<byte> hashBytes = stackalloc byte[hmac.HashSize];
-
-                var stringBytesLength = Encoding.UTF8.GetBytes(chars, stringBytes);
-
-                hmac.TryComputeHash(stringBytes.Slice(0, stringBytesLength), hashBytes, out var hashBytesLength);
-
-                entry.Value = result = Convert.ToBase64String(hashBytes.Slice(0, hashBytesLength));
-            }
-
-            return (string) result;
+            entry.Value = result = Convert.ToBase64String(hashBytes[..hashBytesLength]);
         }
 
-        /// <summary>
-        /// Custom version of <see cref="QueryHelpers.AddQueryString(string,string,string)"/> that takes our pre-built
-        /// dictionary, uri as ReadOnlySpan&lt;char&gt; and uses ZString. Otherwise same logic.
-        /// </summary>
-        private static string AddQueryString(
-            ReadOnlySpan<char> uri,
-            Dictionary<string, StringValues> queryString)
+        return (string)result;
+    }
+
+    private static string AddQueryString(
+        ReadOnlySpan<char> uri,
+        Dictionary<string, StringValues> queryString)
+    {
+        var anchorIndex = uri.IndexOf('#');
+        var uriToBeAppended = uri;
+        var anchorText = ReadOnlySpan<char>.Empty;
+
+        if (anchorIndex != -1)
         {
-            var anchorIndex = uri.IndexOf('#');
-            var uriToBeAppended = uri;
-            var anchorText = ReadOnlySpan<char>.Empty;
-            // If there is an anchor, then the query string must be inserted before its first occurrence.
-            if (anchorIndex != -1)
-            {
-                anchorText = uri.Slice(anchorIndex);
-                uriToBeAppended = uri.Slice(0, anchorIndex);
-            }
-
-            var queryIndex = uriToBeAppended.IndexOf('?');
-            var hasQuery = queryIndex != -1;
-
-            using var sb = ZString.CreateStringBuilder();
-            sb.Append(uriToBeAppended);
-            foreach (var parameter in queryString)
-            {
-                sb.Append(hasQuery ? '&' : '?');
-                sb.Append(UrlEncoder.Default.Encode(parameter.Key));
-                sb.Append('=');
-                sb.Append(UrlEncoder.Default.Encode(parameter.Value));
-                hasQuery = true;
-            }
-
-            sb.Append(anchorText);
-            return sb.ToString();
+            anchorText = uri[anchorIndex..];
+            uriToBeAppended = uri[..anchorIndex];
         }
+
+        var queryIndex = uriToBeAppended.IndexOf('?');
+        var hasQuery = queryIndex != -1;
+
+        using var sb = ZString.CreateStringBuilder();
+        sb.Append(uriToBeAppended);
+        foreach (var parameter in queryString)
+        {
+            sb.Append(hasQuery ? '&' : '?');
+            sb.Append(UrlEncoder.Default.Encode(parameter.Key));
+            sb.Append('=');
+            sb.Append(UrlEncoder.Default.Encode(parameter.Value));
+            hasQuery = true;
+        }
+
+        sb.Append(anchorText);
+
+        return sb.ToString();
     }
 }

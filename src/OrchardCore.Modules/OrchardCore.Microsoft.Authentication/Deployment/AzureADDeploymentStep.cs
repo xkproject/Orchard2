@@ -1,15 +1,21 @@
+using Microsoft.Extensions.Localization;
 using OrchardCore.Deployment;
 
-namespace OrchardCore.Microsoft.Authentication.Deployment
+namespace OrchardCore.Microsoft.Authentication.Deployment;
+
+/// <summary>
+/// Adds Microsoft Entra ID settings to a <see cref="DeploymentPlanResult"/>.
+/// </summary>
+public class AzureADDeploymentStep : DeploymentStep
 {
-    /// <summary>
-    /// Adds Google Analytics settings to a <see cref="DeploymentPlanResult"/>.
-    /// </summary>
-    public class AzureADDeploymentStep : DeploymentStep
+    public AzureADDeploymentStep()
     {
-        public AzureADDeploymentStep()
-        {
-            Name = "Azure AD";
-        }
+        Name = "Microsoft Entra ID";
+    }
+
+    public AzureADDeploymentStep(IStringLocalizer<AzureADDeploymentStep> S)
+        : this()
+    {
+        Category = S["Microsoft Authentication"];
     }
 }

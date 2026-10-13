@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>OrchardCore.Data</RootNamespace>
+    <RootNamespace>OrchardCore.Data.YesSql</RootNamespace>
     <!-- NuGet properties-->
     <Title>OrchardCore Data YesSql Abstractions</Title>
     <Description>
@@ -17,9 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\yessql\src\YesSql.Abstractions\YesSql.Abstractions.csproj" />
     <ProjectReference Include="..\OrchardCore.Data.Abstractions\OrchardCore.Data.Abstractions.csproj" />
     <ProjectReference Include="..\OrchardCore.Abstractions\OrchardCore.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="YesSql.Abstractions" />
   </ItemGroup>
 
 </Project>

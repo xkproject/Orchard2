@@ -1,36 +1,31 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using OrchardCore.Contents;
 using OrchardCore.Security.Permissions;
 
-namespace OrchardCore.ContentTypes
+namespace OrchardCore.ContentTypes;
+
+public sealed class Permissions : IPermissionProvider
 {
-    public class Permissions : IPermissionProvider
-    {
-        public static readonly Permission ViewContentTypes = new Permission("ViewContentTypes", "View content types.");
-        public static readonly Permission EditContentTypes = new Permission("EditContentTypes", "Edit content types.", isSecurityCritical: true);
+    private readonly IEnumerable<Permission> _allPermissions =
+    [
+        ContentTypesPermissions.ViewContentTypes,
+        ContentTypesPermissions.EditContentTypes,
+    ];
 
-        public Task<IEnumerable<Permission>> GetPermissionsAsync()
-        {
-            return Task.FromResult(GetPermissions());
-        }
+    [Obsolete("This will be removed in a future release. Instead use 'ContentTypesPermissions.ViewContentTypes'.")]
+    public static readonly Permission ViewContentTypes = ContentTypesPermissions.ViewContentTypes;
 
-        public IEnumerable<PermissionStereotype> GetDefaultStereotypes()
-        {
-            return new[] {
-                new PermissionStereotype {
-                    Name = "Administrator",
-                    Permissions = GetPermissions()
-                }
-            };
-        }
+    [Obsolete("This will be removed in a future release. Instead use 'ContentTypesPermissions.EditContentTypes'.")]
+    public static readonly Permission EditContentTypes = ContentTypesPermissions.EditContentTypes;
 
-        private IEnumerable<Permission> GetPermissions()
+    public Task<IEnumerable<Permission>> GetPermissionsAsync()
+        => Task.FromResult(_allPermissions);
+
+    public IEnumerable<PermissionStereotype> GetDefaultStereotypes() =>
+    [
+        new PermissionStereotype
         {
-            return new[]
-            {
-                ViewContentTypes,
-                EditContentTypes
-            };
-        }
-    }
+            Name = OrchardCoreConstants.Roles.Administrator,
+            Permissions = _allPermissions,
+        },
+    ];
 }

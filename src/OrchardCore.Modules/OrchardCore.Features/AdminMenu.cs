@@ -1,37 +1,50 @@
-using System;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Localization;
 using OrchardCore.Navigation;
 
-namespace OrchardCore.Features
+namespace OrchardCore.Features;
+
+public sealed class AdminMenu : AdminNavigationProvider
 {
-    public class AdminMenu : INavigationProvider
+    private static readonly RouteValueDictionary _routeValues = new()
     {
-        private readonly IStringLocalizer S;
+        { "area", FeaturesConstants.FeatureId },
+        // Since features admin accepts tenant, always pass empty string to create valid link for current tenant.
+        { "tenant", string.Empty },
+    };
 
-        public AdminMenu(IStringLocalizer<AdminMenu> localizer)
+    internal readonly IStringLocalizer S;
+
+    public AdminMenu(IStringLocalizer<AdminMenu> stringLocalizer)
+    {
+        S = stringLocalizer;
+    }
+
+    protected override ValueTask BuildAsync(NavigationBuilder builder)
+    {
+        if (NavigationHelper.UseLegacyFormat())
         {
-            S = localizer;
-        }
-
-        public Task BuildNavigationAsync(string name, NavigationBuilder builder)
-        {
-            if (!String.Equals(name, "admin", StringComparison.OrdinalIgnoreCase))
-            {
-                return Task.CompletedTask;
-            }
-
             builder
-                .Add(S["Configuration"], NavigationConstants.AdminMenuConfigurationPosition, configuration => configuration
-                    .AddClass("menu-configuration").Id("configuration")
+                .Add(S["Configuration"], configuration => configuration
                     .Add(S["Features"], S["Features"].PrefixPosition(), deployment => deployment
-                        .Action("Features", "Admin", new { area = "OrchardCore.Features" })
-                        .Permission(Permissions.ManageFeatures)
+                        .Action("Features", "Admin", _routeValues)
+                        .Permission(FeaturesPermissions.ManageFeatures)
                         .LocalNav()
-                    ), priority: 1
+                    )
                 );
 
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
+
+        builder
+            .Add(S["Tools"], tools => tools
+                .Add(S["Features"], S["Features"].PrefixPosition(), deployment => deployment
+                    .Action("Features", "Admin", _routeValues)
+                    .Permission(FeaturesPermissions.ManageFeatures)
+                    .LocalNav()
+                )
+            );
+
+        return ValueTask.CompletedTask;
     }
 }

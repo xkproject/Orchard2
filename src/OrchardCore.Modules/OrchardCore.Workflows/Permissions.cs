@@ -1,32 +1,39 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using OrchardCore.Security.Permissions;
 
-namespace OrchardCore.Workflows
+namespace OrchardCore.Workflows;
+
+public sealed class Permissions : IPermissionProvider
 {
-    public class Permissions : IPermissionProvider
-    {
-        public static readonly Permission ManageWorkflows = new Permission("ManageWorkflows", "Manage workflows", isSecurityCritical: true);
-        public static readonly Permission ExecuteWorkflows = new Permission("ExecuteWorkflows", "Execute workflows", isSecurityCritical: true);
+    private readonly IEnumerable<Permission> _allPermissions =
+    [
+        WorkflowsPermissions.ManageWorkflows,
+        WorkflowsPermissions.ExecuteWorkflows,
+        WorkflowsPermissions.ManageWorkflowSettings,
+    ];
 
-        public Task<IEnumerable<Permission>> GetPermissionsAsync()
-        {
-            return Task.FromResult(new[] { ManageWorkflows, ExecuteWorkflows }.AsEnumerable());
-        }
+    [Obsolete("This will be removed in a future release. Instead use 'WorkflowsPermissions.ManageWorkflows'.")]
+    public static readonly Permission ManageWorkflows = WorkflowsPermissions.ManageWorkflows;
 
-        public IEnumerable<PermissionStereotype> GetDefaultStereotypes()
+    [Obsolete("This will be removed in a future release. Instead use 'WorkflowsPermissions.ExecuteWorkflows'.")]
+    public static readonly Permission ExecuteWorkflows = WorkflowsPermissions.ExecuteWorkflows;
+
+    [Obsolete("This will be removed in a future release. Instead use 'WorkflowsPermissions.ManageWorkflowSettings'.")]
+    public static readonly Permission ManageWorkflowSettings = WorkflowsPermissions.ManageWorkflowSettings;
+
+    public Task<IEnumerable<Permission>> GetPermissionsAsync()
+        => Task.FromResult(_allPermissions);
+
+    public IEnumerable<PermissionStereotype> GetDefaultStereotypes() =>
+    [
+        new PermissionStereotype
         {
-            return new[] {
-                new PermissionStereotype {
-                    Name = "Administrator",
-                    Permissions = new[] { ManageWorkflows, ExecuteWorkflows }
-                },
-                new PermissionStereotype {
-                    Name = "Editor",
-                    Permissions = new[] { ManageWorkflows, ExecuteWorkflows }
-                }
-            };
+            Name = OrchardCoreConstants.Roles.Administrator,
+            Permissions = _allPermissions,
+        },
+        new PermissionStereotype
+        {
+            Name = OrchardCoreConstants.Roles.Editor,
+            Permissions = _allPermissions,
         }
-    }
+    ];
 }

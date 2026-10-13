@@ -1,3 +1,4 @@
+@model NavigationItemViewModel
 @{
     // Morphing the shape to keep Model untouched
     Model.Metadata.Alternates.Clear();
@@ -5,4 +6,4 @@
     Model.Metadata.Alternates.Add("NavigationItemText_Id__" + Model.Id);
 }
 
-<a href="@(Model.Href ?? "#")">@await DisplayAsync(Model)</a>
+<a href="@(Model.Href ?? "#")" target="@(!string.IsNullOrEmpty(Model.Target) ? Model.Target : "_self")">@await DisplayAsync(Model)</a>

@@ -1,19 +1,17 @@
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Identity;
-using Moq;
+namespace OrchardCore.Tests.Modules.OrchardCore.Roles;
 
-namespace OrchardCore.Tests.Modules.OrchardCore.Roles
+public static class RolesMockHelper
 {
-    public static class RolesMockHelper
+    public static Mock<RoleManager<TRole>> MockRoleManager<TRole>()
+        where TRole : class
     {
-        public static Mock<RoleManager<TRole>> MockRoleManager<TRole>()
-            where TRole : class
-        {
-            var store = new Mock<IRoleStore<TRole>>().Object;
-            var validators = new List<IRoleValidator<TRole>>();
-            validators.Add(new RoleValidator<TRole>());
+        var store = new Mock<IRoleStore<TRole>>().Object;
 
-            return new Mock<RoleManager<TRole>>(store, validators, new UpperInvariantLookupNormalizer(), new IdentityErrorDescriber(), null);
-        }
+        var validators = new List<IRoleValidator<TRole>>
+        {
+            new RoleValidator<TRole>(),
+        };
+
+        return new Mock<RoleManager<TRole>>(store, validators, new UpperInvariantLookupNormalizer(), new IdentityErrorDescriber(), null);
     }
 }

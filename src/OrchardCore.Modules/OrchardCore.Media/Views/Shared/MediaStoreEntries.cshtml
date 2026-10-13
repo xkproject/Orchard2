@@ -5,18 +5,18 @@
     @foreach (var entry in Model.Entries)
     {
         var checkd = (Model.DirectoryPaths?.Contains(entry.Path) ?? false) || (Model.FilePaths?.Contains(entry.Path) ?? false);
-        var hasChildren = entry.Entries?.Count != 0;
+        var hasChildren = entry.Entries?.Count > 0;
 
         <li class="list-group-item">
             <div class="form-check">
                 <label class="form-check-label">
                     @if (hasChildren)
                     {
-                        <input class="form-check-input" data-parent-value="@(entry.Parent?.Path ?? String.Empty)" type="checkbox" name="@Html.NameFor(m => m.DirectoryPaths)" value="@entry.Path" checked="@checkd" />
+                        <input class="form-check-input" data-parent-value="@(entry.Parent?.Path ?? string.Empty)" type="checkbox" name="@Html.NameFor(m => m.DirectoryPaths)" value="@entry.Path" checked="@checkd" />
                     }
                     else
                     {
-                        <input class="form-check-input" data-parent-value="@(entry.Parent?.Path ?? String.Empty)" type="checkbox" name="@Html.NameFor(m => m.FilePaths)" value="@entry.Path" checked="@checkd" />
+                        <input class="form-check-input" data-parent-value="@(entry.Parent?.Path ?? string.Empty)" type="checkbox" name="@Html.NameFor(m => m.FilePaths)" value="@entry.Path" checked="@checkd" />
                     }
                     @entry.Name
                 </label>

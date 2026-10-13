@@ -1,24 +1,15 @@
-using System.Collections.Generic;
 using OrchardCore.Features.Models;
 
-namespace OrchardCore.Features.ViewModels
+namespace OrchardCore.Features.ViewModels;
+
+public class FeaturesViewModel
 {
-    public class FeaturesViewModel
-    {
-        public IEnumerable<ModuleFeature> Features { get; set; }
-    }
+    public string Name { get; set; }
 
-    public class BulkActionViewModel
-    {
-        public FeaturesBulkAction BulkAction { get; set; }
-        public string[] FeatureIds { get; set; }
-    }
+    /// <summary>
+    /// True when the current tenant is the Default one, and is executing on behalf of other tenant. Otherwise false.
+    /// </summary>
+    public bool IsProxy { get; set; }
 
-    public enum FeaturesBulkAction
-    {
-        None,
-        Enable,
-        Disable,
-        Toggle
-    }
+    public IEnumerable<ModuleFeature> Features { get; set; }
 }

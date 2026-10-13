@@ -1,10 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
-using Moq;
 using OrchardCore.Layers.Services;
 using OrchardCore.Localization;
 using OrchardCore.Rules;
@@ -12,203 +5,246 @@ using OrchardCore.Rules.Models;
 using OrchardCore.Rules.Services;
 using OrchardCore.Scripting;
 using OrchardCore.Scripting.JavaScript;
-using Xunit;
 
-namespace OrchardCore.Tests.Modules.OrchardCore.Rules
+namespace OrchardCore.Tests.Modules.OrchardCore.Rules;
+
+public class RuleTests
 {
-    public class RuleTests
+    [Fact]
+    public async Task Evaluate_NoConditions_Succeeds()
     {
-        [Fact]
-        public async Task ShouldEvaluateRuleFalseWhenNoConditions()
+        var rule = new Rule();
+
+        var services = CreateRuleServiceCollection();
+
+        var serviceProvider = services.BuildServiceProvider();
+
+        var ruleService = serviceProvider.GetRequiredService<IRuleService>();
+
+        Assert.False(await ruleService.EvaluateAsync(rule));
+    }
+
+    [Theory]
+    [InlineData("/", true, true)]
+    [InlineData("/notthehomepage", true, false)]
+    [InlineData("/", false, false)]
+    [InlineData("/notthehomepage", false, true)]
+    public async Task Evaluate_Homepage_Succeeds(string path, bool isHomepage, bool expected)
+    {
+        var rule = new Rule
         {
-            var rule = new Rule();
-
-            var services = CreateRuleServiceCollection();
-
-            var serviceProvider = services.BuildServiceProvider();
-
-            var ruleService = serviceProvider.GetRequiredService<IRuleService>();
-
-            Assert.False(await ruleService.EvaluateAsync(rule));
-        }
-
-        [Theory]
-        [InlineData("/", true, true)]
-        [InlineData("/notthehomepage", true, false)]
-        [InlineData("/", false, false)]
-        [InlineData("/notthehomepage", false, true)]
-        public async Task ShouldEvaluateHomepage(string path, bool isHomepage, bool expected)
-        {
-            var rule = new Rule
-            {
-                Conditions = new List<Condition>
+            Conditions =
+            [
+                new HomepageCondition
                 {
-                    new HomepageCondition
-                    {
-                        Value = isHomepage
-                    }
+                    Value = isHomepage,
                 }
-            };
+            ],
+        };
 
-            var services = CreateRuleServiceCollection()
-                .AddCondition<HomepageCondition, HomepageConditionEvaluator, ConditionFactory<HomepageCondition>>();
+        var services = CreateRuleServiceCollection()
+            .AddRuleCondition<HomepageCondition, HomepageConditionEvaluator>();
 
-            var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
-            var context = new DefaultHttpContext();
-            context.Request.Path = new PathString(path);
-            mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
+        var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+        var context = new DefaultHttpContext();
+        context.Request.Path = new PathString(path);
+        mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
 
-            services.AddSingleton<IHttpContextAccessor>(mockHttpContextAccessor.Object);
+        services.AddSingleton<IHttpContextAccessor>(mockHttpContextAccessor.Object);
 
-            var serviceProvider = services.BuildServiceProvider();
+        var serviceProvider = services.BuildServiceProvider();
 
-            var ruleService = serviceProvider.GetRequiredService<IRuleService>();
+        var ruleService = serviceProvider.GetRequiredService<IRuleService>();
 
-            Assert.Equal(expected, await ruleService.EvaluateAsync(rule));
-        }
+        Assert.Equal(expected, await ruleService.EvaluateAsync(rule));
+    }
 
-        [Theory]
-        [InlineData(true, true)]
-        [InlineData(false, false)]
-        public async Task ShouldEvaluateBoolean(bool boolean, bool expected)
+    [Theory]
+    [InlineData(true, true)]
+    [InlineData(false, false)]
+    public async Task Evaluate_Boolean_Succeeds(bool boolean, bool expected)
+    {
+        var rule = new Rule
         {
-            var rule = new Rule
-            {
-                Conditions = new List<Condition>
+            Conditions =
+            [
+                new BooleanCondition { Value = boolean }
+            ],
+        };
+
+        var services = CreateRuleServiceCollection()
+            .AddRuleCondition<BooleanCondition, BooleanConditionEvaluator>();
+
+        var serviceProvider = services.BuildServiceProvider();
+
+        var ruleService = serviceProvider.GetRequiredService<IRuleService>();
+
+        Assert.Equal(expected, await ruleService.EvaluateAsync(rule));
+    }
+
+    [Theory]
+    [InlineData(false, true, true)]
+    [InlineData(true, true, true)]
+    [InlineData(false, false, false)]
+    public async Task Evaluate_Any_Succeeds(bool first, bool second, bool expected)
+    {
+        var rule = new Rule
+        {
+            Conditions =
+            [
+                new AnyConditionGroup
                 {
-                    new BooleanCondition { Value = boolean }
+                    Conditions =
+                    [
+                        new BooleanCondition { Value = first },
+                        new BooleanCondition { Value = second }
+                    ],
                 }
-            };
+            ],
+        };
 
-            var services = CreateRuleServiceCollection()
-                .AddCondition<BooleanCondition, BooleanConditionEvaluator, ConditionFactory<BooleanCondition>>();
+        var services = CreateRuleServiceCollection()
+            .AddRuleCondition<AnyConditionGroup, AnyConditionEvaluator>()
+            .AddRuleCondition<BooleanCondition, BooleanConditionEvaluator>();
 
-            var serviceProvider = services.BuildServiceProvider();
+        var serviceProvider = services.BuildServiceProvider();
 
-            var ruleService = serviceProvider.GetRequiredService<IRuleService>();
+        var ruleService = serviceProvider.GetRequiredService<IRuleService>();
 
-            Assert.Equal(expected, await ruleService.EvaluateAsync(rule));
-        }
+        Assert.Equal(expected, await ruleService.EvaluateAsync(rule));
+    }
 
-        [Theory]
-        [InlineData(false, true, true)]
-        [InlineData(true, true, true)]
-        [InlineData(false, false, false)]
-        public async Task ShouldEvaluateAny(bool first, bool second, bool expected)
+    [Theory]
+    [InlineData("/foo", "/foo", true)]
+    [InlineData("/bar", "/foo", false)]
+    public async Task Evaluate_UrlEquals_Succeeds(string path, string requestPath, bool expected)
+    {
+        var rule = new Rule
         {
-            var rule = new Rule
-            {
-                Conditions = new List<Condition>
+            Conditions =
+            [
+                new UrlCondition
                 {
-                    new AnyConditionGroup
-                    {
-                        Conditions = new List<Condition>
-                        {
-                            new BooleanCondition { Value = first },
-                            new BooleanCondition { Value = second }
-                        }
-                    }
+                    Value = path,
+                    Operation = new StringEqualsOperator(),
                 }
-            };
+            ],
+        };
 
-            var services = CreateRuleServiceCollection()
-                .AddCondition<AnyConditionGroup, AnyConditionEvaluator, ConditionFactory<AnyConditionGroup>>()
-                .AddCondition<BooleanCondition, BooleanConditionEvaluator, ConditionFactory<BooleanCondition>>();
+        var services = CreateRuleServiceCollection()
+            .AddRuleCondition<UrlCondition, UrlConditionEvaluator>();
 
-            var serviceProvider = services.BuildServiceProvider();
+        var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+        var context = new DefaultHttpContext();
+        context.Request.Path = new PathString(requestPath);
+        mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
 
-            var ruleService = serviceProvider.GetRequiredService<IRuleService>();
+        services.AddSingleton<IHttpContextAccessor>(mockHttpContextAccessor.Object);
 
-            Assert.Equal(expected, await ruleService.EvaluateAsync(rule));
-        }
+        var serviceProvider = services.BuildServiceProvider();
 
-        [Theory]
-        [InlineData("/foo", "/foo", true)]
-        [InlineData("/bar", "/foo", false)]
-        public async Task ShouldEvaluateUrlEquals(string path, string requestPath, bool expected)
+        var ruleService = serviceProvider.GetRequiredService<IRuleService>();
+
+        Assert.Equal(expected, await ruleService.EvaluateAsync(rule));
+    }
+
+    [Theory]
+    [InlineData("isHomepage()", "/", true)]
+    [InlineData("isHomepage()", "/foo", false)]
+    public async Task Evaluate_JavascriptCondition_Succeeds(string script, string requestPath, bool expected)
+    {
+        var rule = new Rule
         {
-            var rule = new Rule
-            {
-                Conditions = new List<Condition>
+            Conditions =
+            [
+                new JavascriptCondition
                 {
-                    new UrlCondition
-                    {
-                        Value = path,
-                        Operation = new StringEqualsOperator()
-                    }
+                    Script = script,
                 }
-            };
+            ],
+        };
 
-            var services = CreateRuleServiceCollection()
-                .AddCondition<UrlCondition, UrlConditionEvaluator, ConditionFactory<UrlCondition>>();
+        var services = CreateRuleServiceCollection()
+            .AddRuleCondition<JavascriptCondition, JavascriptConditionEvaluator>()
+            .AddSingleton<IGlobalMethodProvider, DefaultLayersMethodProvider>()
+            .AddMemoryCache()
+            .AddScripting()
+            .AddJavaScriptEngine();
 
-            var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
-            var context = new DefaultHttpContext();
-            context.Request.Path = new PathString(requestPath);
-            mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
+        var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+        var context = new DefaultHttpContext();
+        context.Request.Path = new PathString(requestPath);
+        mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
 
-            services.AddSingleton<IHttpContextAccessor>(mockHttpContextAccessor.Object);
+        services.AddSingleton<IHttpContextAccessor>(mockHttpContextAccessor.Object);
 
-            var serviceProvider = services.BuildServiceProvider();
+        var serviceProvider = services.BuildServiceProvider();
 
-            var ruleService = serviceProvider.GetRequiredService<IRuleService>();
+        var ruleService = serviceProvider.GetRequiredService<IRuleService>();
+        Assert.Equal(expected, await ruleService.EvaluateAsync(rule));
+    }
 
-            Assert.Equal(expected, await ruleService.EvaluateAsync(rule));
-        }
-
-        [Theory]
-        [InlineData("isHomepage()", "/", true)]
-        [InlineData("isHomepage()", "/foo", false)]
-        public async Task ShouldEvaluateJavascriptCondition(string script, string requestPath, bool expected)
+    [Fact]
+    public async Task Evaluate_JavascriptConditionWithAsyncGlobalMethod_Succeeds()
+    {
+        var rule = new Rule
         {
-            var rule = new Rule
-            {
-                Conditions = new List<Condition>
+            Conditions =
+            [
+                new JavascriptCondition
                 {
-                    new JavascriptCondition
-                    {
-                        Script = script
-                    }
+                    Script = "isAsyncAllowedAsync()",
                 }
-            };
+            ],
+        };
 
-            var services = CreateRuleServiceCollection()
-                .AddCondition<JavascriptCondition, JavascriptConditionEvaluator, ConditionFactory<JavascriptCondition>>()
-                .AddSingleton<IGlobalMethodProvider, DefaultLayersMethodProvider>()
-                .AddMemoryCache()
-                .AddScripting()
-                .AddJavaScriptEngine();
+        var services = CreateRuleServiceCollection()
+            .AddRuleCondition<JavascriptCondition, JavascriptConditionEvaluator>()
+            .AddSingleton<IGlobalMethodProvider, AsyncBooleanMethodProvider>()
+            .AddMemoryCache()
+            .AddScripting()
+            .AddJavaScriptEngine();
 
-            var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
-            var context = new DefaultHttpContext();
-            context.Request.Path = new PathString(requestPath);
-            mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
+        var serviceProvider = services.BuildServiceProvider();
 
-            services.AddSingleton<IHttpContextAccessor>(mockHttpContextAccessor.Object);
+        var ruleService = serviceProvider.GetRequiredService<IRuleService>();
 
-            var serviceProvider = services.BuildServiceProvider();
+        Assert.True(await ruleService.EvaluateAsync(rule));
+    }
 
-            var ruleService = serviceProvider.GetRequiredService<IRuleService>();
-            Assert.Equal(expected, await ruleService.EvaluateAsync(rule));
-        }
+    public static ServiceCollection CreateRuleServiceCollection()
+    {
+        var services = new ServiceCollection();
+        services.AddOptions<ConditionOptions>();
 
-        public static ServiceCollection CreateRuleServiceCollection()
+        services.AddTransient<IConditionResolver, ConditionResolver>();
+        services.AddTransient<IConditionOperatorResolver, ConditionOperatorResolver>();
+
+        services.AddRules();
+
+        services.AddTransient<AllConditionEvaluator>();
+
+        services.AddLocalization();
+        services.AddSingleton<IStringLocalizerFactory, NullStringLocalizerFactory>();
+        services.AddTransient<IConfigureOptions<ConditionOperatorOptions>, ConditionOperatorConfigureOptions>();
+
+        return services;
+    }
+
+    private sealed class AsyncBooleanMethodProvider : IGlobalMethodProvider
+    {
+        public IEnumerable<GlobalMethod> GetMethods()
         {
-            var services = new ServiceCollection();
-            services.AddOptions<ConditionOptions>();
-
-            services.AddTransient<IConditionResolver, ConditionResolver>();
-            services.AddTransient<IConditionOperatorResolver, ConditionOperatorResolver>();
-
-            services.AddTransient<IRuleService, RuleService>();
-
-            services.AddTransient<AllConditionEvaluator>();
-
-            services.AddLocalization();
-            services.AddSingleton<IStringLocalizerFactory, NullStringLocalizerFactory>();
-            services.AddTransient<IConfigureOptions<ConditionOperatorOptions>, ConditionOperatorConfigureOptions>();
-
-            return services;
+            yield return new GlobalMethod
+            {
+                Name = "isAsyncAllowed",
+                Method = serviceProvider => (Func<bool>)(() => false),
+                AsyncMethod = serviceProvider => (Func<Task<bool>>)(async () =>
+                {
+                    await Task.Yield();
+                    return true;
+                }),
+            };
         }
     }
 }

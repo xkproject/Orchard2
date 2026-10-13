@@ -5,6 +5,11 @@ using OrchardCore.Modules.Manifest;
     Author = ManifestConstants.OrchardCoreTeam,
     Website = ManifestConstants.OrchardCoreWebsite,
     Version = ManifestConstants.OrchardCoreVersion,
-    Dependencies = new[] { "OrchardCore.ContentTypes" },
+    Description = "Provides a way to automatically generate routes for content items based on their content type and title.",
+    Dependencies =
+    [
+        "OrchardCore.ContentTypes",
+        "OrchardCore.HomeRoute",
+    ],
     Category = "Navigation"
 )]

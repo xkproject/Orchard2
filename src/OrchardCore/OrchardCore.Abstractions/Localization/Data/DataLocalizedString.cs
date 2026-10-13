@@ -1,0 +1,36 @@
+namespace OrchardCore.Localization.Data;
+
+public class DataLocalizedString
+{
+    public DataLocalizedString(string context, string name, string value)
+        : this(context, name, value, resourceNotFound: false)
+    {
+    }
+
+    public DataLocalizedString(string context, string name, string value, bool resourceNotFound)
+    {
+        ArgumentNullException.ThrowIfNullOrEmpty(context, nameof(context));
+        ArgumentNullException.ThrowIfNullOrEmpty(name, nameof(name));
+
+        Context = context;
+        Name = name;
+        Value = value;
+        ResourceNotFound = resourceNotFound;
+    }
+
+    public static implicit operator string(DataLocalizedString dataLocalizedString) => dataLocalizedString?.Value;
+
+    /// <summary>
+    /// The context string for categorization (e.g., "Content Types", "Content Fields:BlogPost").
+    /// </summary>
+    public string Context { get; }
+
+    public string Name { get; }
+
+    public string Value { get; }
+
+    public bool ResourceNotFound { get; }
+
+    /// <inheritdoc/>
+    public override string ToString() => Value;
+}

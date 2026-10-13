@@ -1,10 +1,12 @@
-@using OrchardCore.Twitter.Workflows.ViewModels;
+@using OrchardCore.Twitter.Workflows.ViewModels
 
 @model UpdateTwitterStatusTaskViewModel
 
-<div class="form-group" asp-validation-class-for="StatusTemplate">
-    <label asp-for="StatusTemplate">@T["Template for updating twitter status"]</label>
-    <input type="text" asp-for="StatusTemplate" class="form-control code" />
-    <span asp-validation-for="StatusTemplate"></span>
-    <span class="hint">@T["The status text of the tweet."]</span>
+<div class="ocat-wrapper" asp-validation-class-for="StatusTemplate">
+    <label asp-for="StatusTemplate" class="ocat-label">@T["Template for updating X (Twitter) status"]</label>
+    <div class="ocat-end">
+        <input type="text" asp-for="StatusTemplate" class="form-control code" />
+        <span asp-validation-for="StatusTemplate"></span>
+        <span class="hint">@T["The status text of the post."]</span>
+    </div>
 </div>

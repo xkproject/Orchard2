@@ -1,57 +1,69 @@
-using System;
-using System.Threading.Tasks;
+using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using OrchardCore.Apis.GraphQL;
 using OrchardCore.ContentManagement.GraphQL.Queries.Types;
 
-namespace OrchardCore.ContentManagement.GraphQL.Queries
+namespace OrchardCore.ContentManagement.GraphQL.Queries;
+
+public sealed class ContentItemQuery : ISchemaBuilder
 {
-    public class ContentItemQuery : ISchemaBuilder
+    internal readonly IStringLocalizer S;
+
+    public ContentItemQuery(IStringLocalizer<ContentItemQuery> localizer)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IStringLocalizer S;
+        S = localizer;
+    }
 
-        public ContentItemQuery(IHttpContextAccessor httpContextAccessor,
-            IStringLocalizer<ContentItemQuery> localizer)
+    public Task<string> GetIdentifierAsync()
+        => Task.FromResult(string.Empty);
+
+    public Task BuildAsync(ISchema schema)
+    {
+        var field = new FieldType
         {
-            _httpContextAccessor = httpContextAccessor;
+            Name = "ContentItem",
+            Description = S["Content items are instances of content types, just like objects are instances of classes."],
+            Type = typeof(ContentItemInterface),
+            Arguments = new QueryArguments(
+                new QueryArgument<NonNullGraphType<StringGraphType>>
+                {
+                    Name = "contentItemId",
+                    Description = S["Content item id"],
+                }
+            ),
+            Resolver = new FuncFieldResolver<ContentItem>(ResolveAsync),
+        };
 
-            S = localizer;
+        field.RequirePermission(GraphQLPermissions.ExecuteGraphQL);
+
+        schema.Query.AddField(field);
+
+        return Task.CompletedTask;
+    }
+
+    private async ValueTask<ContentItem> ResolveAsync(IResolveFieldContext context)
+    {
+        var contentItemId = context.GetArgument<string>("contentItemId");
+        var contentManager = context.RequestServices.GetService<IContentManager>();
+        var authorizationService = context.RequestServices.GetService<IAuthorizationService>();
+
+        var contentItem = await contentManager.GetAsync(contentItemId);
+
+        if (contentItem == null)
+        {
+            return null;
         }
 
-        public Task<string> GetIdentifierAsync() => Task.FromResult(String.Empty);
-
-        public Task BuildAsync(ISchema schema)
+        if (!await authorizationService.AuthorizeAsync(context.User, Contents.CommonPermissions.ViewContent, contentItem))
         {
-            var field = new FieldType
-            {
-                Name = "ContentItem",
-                Description = S["Content items are instances of content types, just like objects are instances of classes."],
-                Type = typeof(ContentItemInterface),
-                Arguments = new QueryArguments(
-                    new QueryArgument<NonNullGraphType<StringGraphType>>
-                    {
-                        Name = "contentItemId",
-                        Description = S["Content item id"]
-                    }
-                ),
-                Resolver = new AsyncFieldResolver<ContentItem>(ResolveAsync)
-            };
-
-            schema.Query.AddField(field);
-
-            return Task.CompletedTask;
+            // Return null if the user doesn't have permission to view the content item, so that it doesn't appear in the GraphQL response.
+            return null;
         }
 
-        private Task<ContentItem> ResolveAsync(ResolveFieldContext context)
-        {
-            var contentItemId = context.GetArgument<string>("contentItemId");
-            var contentManager = _httpContextAccessor.HttpContext.RequestServices.GetService<IContentManager>();
-            return contentManager.GetAsync(contentItemId);
-        }
+        return contentItem;
     }
 }

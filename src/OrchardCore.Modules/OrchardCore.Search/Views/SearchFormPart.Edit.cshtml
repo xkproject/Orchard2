@@ -1,0 +1,17 @@
+@model SearchPartViewModel
+
+<div class="ocat-wrapper" asp-validation-class-for="Placeholder">
+    <label asp-for="Placeholder" class="ocat-label">@T["Placeholder"]</label>
+    <div class="ocat-end">
+        <input type="text" class="form-control" asp-for="Placeholder" required />
+        <span class="hint">@T["The placeholder text to use in the search bar."]</span>
+    </div>
+</div>
+
+<div class="ocat-wrapper" asp-validation-class-for="IndexName">
+    <label asp-for="IndexName" class="ocat-label">@T["Index Name"]</label>
+    <div class="ocat-end">
+        <input type="text" class="form-control" asp-for="IndexName" />
+        <span class="hint">@T["Leave it empty to use the default index."]</span>
+    </div>
+</div>

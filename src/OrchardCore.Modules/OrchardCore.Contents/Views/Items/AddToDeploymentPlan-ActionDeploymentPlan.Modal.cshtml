@@ -13,24 +13,22 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="deployment-plan-title">@T["Available Deployment Plans"]</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="row">
+                        <div class="row row-cols-1 row-cols-md-2 g-2">
                             @foreach (var deploymentPlan in deploymentPlans)
                             {
-                                <div class="col-sm-12 col-md-6 col-lg-4 d-flex align-items-stretch card-item">
-                                    <div class="card w-100 mb-3">
+                                <div class="col">
+                                    <div class="card h-100 mb-3">
                                         <div class="card-body">
                                             <h4 class="card-title">@deploymentPlan.Name</h4>
                                         </div>
                                         @{
                                             var url = Url.Action("AddContentItem", "AddToDeploymentPlan", new { area = "OrchardCore.Contents", deploymentPlanId = deploymentPlan.Id, returnUrl = FullRequestPath });
                                         }
-                                        <div class="card-footer text-muted text-xs-right">
-                                            <button type="button" class="add-to-deployment-plan text-white btn btn-primary btn-sm" data-dismiss="modal" data-target-url="@url">@T["Select"]</button>
+                                        <div class="card-footer text-muted text-sm-right">
+                                            <button type="button" class="add-to-deployment-plan text-white btn btn-primary btn-sm" data-bs-dismiss="modal" data-target-url="@url">@T["Select"]</button>
                                         </div>
                                     </div>
                                 </div>
@@ -38,40 +36,65 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">@T["Cancel"]</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@T["Cancel"]</button>
                     </div>
                 </div>
             </div>
         </div>
     </zone>
 
-    <script at="Foot" depends-on="jQuery">
-        $(function () {
-            $('#modalAddToDeploymentPlanActionDeploymentPlan').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget) // Button that triggered the modal
-                var contentItemId = button.data('content-item-id');
+    <script at="Foot">
+        function onDocumentReady(callback) {
+            if (document.readyState !== 'loading') {
+                callback();
+            } else {
+                document.addEventListener('DOMContentLoaded', callback);
+            }
+        }
 
-                $('.add-to-deployment-plan').one('click', function () {
-                    var targetButton = this;
-                    var magicToken = $("input[name=__RequestVerificationToken]").first();
-                    if (magicToken) {
-                        var hrefParts = $(targetButton).data("target-url").split("?");
-                        var deployForm = $("<form action=\"" + hrefParts[0] + "\" method=\"POST\" />");
-                        deployForm.append(magicToken.clone());
+        onDocumentReady(function () {
+            var modal = document.getElementById('modalAddToDeploymentPlanActionDeploymentPlan');
+            modal?.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                var contentItemId = button?.dataset.contentItemId;
+
+                document.querySelectorAll('.add-to-deployment-plan').forEach(function (button) {
+                    button.addEventListener('click', function () {
+                        var targetButton = this;
+                        var magicToken = document.querySelector("input[name=__RequestVerificationToken]");
+                        var hrefParts = targetButton.dataset.targetUrl.split("?");
+                        var deployForm = document.createElement("form");
+                        deployForm.action = hrefParts[0];
+                        deployForm.method = "POST";
+
+                        if (magicToken) {
+                            deployForm.appendChild(magicToken.cloneNode(true));
+                        }
+
                         if (hrefParts.length > 1) {
                             var queryParts = hrefParts[1].split("&");
                             for (var i = 0; i < queryParts.length; i++) {
                                 var queryPartKVP = queryParts[i].split("=");
                                 //trusting hrefs in the page here
-                                deployForm.append($("<input type=\"hidden\" name=\"" + decodeURIComponent(queryPartKVP[0]) + "\" value=\"" + decodeURIComponent(queryPartKVP[1]) + "\" />"));
+                                var input = document.createElement("input");
+                                input.type = "hidden";
+                                input.name = decodeURIComponent(queryPartKVP[0]);
+                                input.value = decodeURIComponent(queryPartKVP[1]);
+                                deployForm.appendChild(input);
                             }
                         }
-                        deployForm.append($("<input type=\"hidden\" name=\"contentItemId\" + value=\"" + contentItemId + "\"/>"));
-                        $("body").append(deployForm);
+
+                        var contentItemInput = document.createElement("input");
+                        contentItemInput.type = "hidden";
+                        contentItemInput.name = "contentItemId";
+                        contentItemInput.value = contentItemId;
+                        deployForm.appendChild(contentItemInput);
+
+                        document.body.appendChild(deployForm);
                         deployForm.submit();
-                    }
-                })
-            })
+                    }, { once: true });
+                });
+            });
         });
     </script>
 }

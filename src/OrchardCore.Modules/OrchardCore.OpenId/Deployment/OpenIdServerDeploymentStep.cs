@@ -1,15 +1,21 @@
+using Microsoft.Extensions.Localization;
 using OrchardCore.Deployment;
 
-namespace OrchardCore.OpenId.Deployment
+namespace OrchardCore.OpenId.Deployment;
+
+/// <summary>
+/// Adds Open ID settings to a <see cref="DeploymentPlanResult"/>.
+/// </summary>
+public class OpenIdServerDeploymentStep : DeploymentStep
 {
-    /// <summary>
-    /// Adds Open ID settings to a <see cref="DeploymentPlanResult"/>.
-    /// </summary>
-    public class OpenIdServerDeploymentStep : DeploymentStep
+    public OpenIdServerDeploymentStep()
     {
-        public OpenIdServerDeploymentStep()
-        {
-            Name = "OpenID Server";
-        }
+        Name = "OpenID Server";
+    }
+
+    public OpenIdServerDeploymentStep(IStringLocalizer<OpenIdServerDeploymentStep> S)
+        : this()
+    {
+        Category = S["OpenID Connect"];
     }
 }

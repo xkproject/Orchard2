@@ -1,153 +1,58 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Castle.DynamicProxy;
 using OrchardCore.DisplayManagement.Implementation;
-using OrchardCore.DisplayManagement.Shapes;
-using OrchardCore.DisplayManagement.Views;
 
-namespace OrchardCore.DisplayManagement
+namespace OrchardCore.DisplayManagement;
+
+/// <summary>
+/// Service that creates new instances of dynamic shape objects.
+/// This may be used directly, or through the <c>IShapeHelperFactory</c>.
+/// </summary>
+public interface IShapeFactory
 {
     /// <summary>
-    /// Service that creates new instances of dynamic shape objects
-    /// This may be used directly, or through the IShapeHelperFactory.
+    /// Creates a new shape instance of the specified type.
     /// </summary>
-    public interface IShapeFactory
-    {
-        ValueTask<IShape> CreateAsync(
-            string shapeType,
-            Func<ValueTask<IShape>> shapeFactory,
-            Action<ShapeCreatingContext> creating,
-            Action<ShapeCreatedContext> created);
+    /// <param name="shapeType">The type name of the shape to create.</param>
+    /// <param name="shapeFactory">A factory function that produces the initial <see cref="IShape"/> instance.</param>
+    /// <param name="creating">A callback invoked before the shape is created, allowing modification of the <see cref="ShapeCreatingContext"/>.</param>
+    /// <param name="created">A callback invoked after the shape is created.</param>
+    /// <returns>A <see cref="ValueTask{IShape}"/> that resolves to the created shape.</returns>
+    /// <remarks>
+    /// If the callbacks or factory need to capture external variables, prefer using
+    /// <see cref="CreateAsync{TState}(string, Func{TState, ValueTask{IShape}}, Action{ShapeCreatingContext, TState}, Action{ShapeCreatedContext, TState}, TState)"/>
+    /// to avoid closure allocations.
+    /// </remarks>
+    ValueTask<IShape> CreateAsync(
+        string shapeType,
+        Func<ValueTask<IShape>> shapeFactory,
+        Action<ShapeCreatingContext> creating,
+        Action<ShapeCreatedContext> created);
 
-        dynamic New { get; }
-    }
+    /// <summary>
+    /// Creates a new shape instance of the specified type, passing a <typeparamref name="TState"/> value
+    /// through the callbacks and factory to avoid closure allocations.
+    /// </summary>
+    /// <typeparam name="TState">The type of the state object passed to the factory and callbacks.</typeparam>
+    /// <param name="shapeType">The type name of the shape to create.</param>
+    /// <param name="shapeFactory">A factory function that receives <paramref name="state"/> and produces the initial <see cref="IShape"/> instance.</param>
+    /// <param name="creating">A callback invoked before the shape is created, receiving both the <see cref="ShapeCreatingContext"/> and <paramref name="state"/>.</param>
+    /// <param name="created">A callback invoked after the shape is created, receiving both the <see cref="ShapeCreatedContext"/> and <paramref name="state"/>.</param>
+    /// <param name="state">A state object passed to <paramref name="shapeFactory"/>, <paramref name="creating"/>, and <paramref name="created"/> to avoid closure allocations.</param>
+    /// <returns>A <see cref="ValueTask{IShape}"/> that resolves to the created shape.</returns>
+    ValueTask<IShape> CreateAsync<TState>(
+        string shapeType,
+        Func<TState, ValueTask<IShape>> shapeFactory,
+        Action<ShapeCreatingContext, TState> creating,
+        Action<ShapeCreatedContext, TState> created,
+        TState state)
+        => CreateAsync(
+            shapeType,
+            () => shapeFactory(state),
+            creating is null ? null : (ctx) => creating(ctx, state),
+            created is null ? null : (ctx) => created(ctx, state));
 
-    public static class ShapeFactoryExtensions
-    {
-        private static readonly ProxyGenerator ProxyGenerator = new ProxyGenerator();
-        private static readonly Func<ValueTask<IShape>> NewShape = () => new ValueTask<IShape>(new Shape());
-
-        /// <summary>
-        /// Creates a new shape by copying the properties of the specific model.
-        /// </summary>
-        /// <param name="factory">The <see cref="IShapeFactory"/>.</param>
-        /// <param name="shapeType">The type of shape to create.</param>
-        /// <param name="model">The model to copy.</param>
-        /// <returns></returns>
-        public static ValueTask<IShape> CreateAsync<TModel>(this IShapeFactory factory, string shapeType, TModel model)
-        {
-            return factory.CreateAsync(shapeType, Arguments.From(model));
-        }
-
-        private static IShape CreateShape(Type baseType)
-        {
-            // Don't generate a proxy for shape types
-            if (typeof(IShape).IsAssignableFrom(baseType))
-            {
-                var shape = Activator.CreateInstance(baseType) as IShape;
-                return shape;
-            }
-            else
-            {
-                var options = new ProxyGenerationOptions();
-                options.AddMixinInstance(new ShapeViewModel());
-                return (IShape)ProxyGenerator.CreateClassProxy(baseType, options);
-            }
-        }
-
-        public static ValueTask<IShape> CreateAsync(this IShapeFactory factory, string shapeType)
-        {
-            return factory.CreateAsync(shapeType, NewShape);
-        }
-
-        public static ValueTask<IShape> CreateAsync(this IShapeFactory factory, string shapeType, Func<ValueTask<IShape>> shapeFactory)
-        {
-            return factory.CreateAsync(shapeType, shapeFactory, null, null);
-        }
-
-        /// <summary>
-        /// Creates a dynamic proxy instance for the type and initializes it.
-        /// </summary>
-        /// <typeparam name="TModel">The type to instantiate.</typeparam>
-        /// <param name="factory">The <see cref="IShapeFactory"/>.</param>
-        /// <param name="shapeType">The shape type to create.</param>
-        /// <param name="initializeAsync">The initialization method.</param>
-        /// <returns></returns>
-        public static ValueTask<IShape> CreateAsync<TModel>(this IShapeFactory factory, string shapeType, Func<TModel, ValueTask> initializeAsync)
-        {
-            static async ValueTask<IShape> Awaited(ValueTask task, IShape shape)
-            {
-                await task;
-                return shape;
-            }
-
-            static ValueTask<IShape> ShapeFactory(Func<TModel, ValueTask> init)
-            {
-                var shape = CreateShape(typeof(TModel));
-                var task = init((TModel)shape);
-                if (!task.IsCompletedSuccessfully)
-                {
-                    return Awaited(task, shape);
-                }
-
-                return new ValueTask<IShape>(shape);
-            }
-
-            return factory.CreateAsync(shapeType, () => ShapeFactory(initializeAsync));
-        }
-
-        /// <summary>
-        /// Creates a dynamic proxy instance for the type and initializes it.
-        /// </summary>
-        /// <typeparam name="TModel">The type to instantiate.</typeparam>
-        /// <param name="factory">The <see cref="IShapeFactory"/>.</param>
-        /// <param name="shapeType">The shape type to create.</param>
-        /// <param name="initialize">The initialization method.</param>
-        /// <returns></returns>
-        public static ValueTask<IShape> CreateAsync<TModel>(this IShapeFactory factory, string shapeType, Action<TModel> initialize)
-        {
-            return factory.CreateAsync(shapeType, () =>
-            {
-                var shape = CreateShape(typeof(TModel));
-                initialize((TModel)shape);
-                return new ValueTask<IShape>(shape);
-            });
-        }
-
-        public static ValueTask<IShape> CreateAsync<T>(this IShapeFactory factory, string shapeType, INamedEnumerable<T> parameters)
-        {
-            if (parameters == null || parameters == Arguments.Empty)
-            {
-                return factory.CreateAsync(shapeType);
-            }
-
-            return factory.CreateAsync(shapeType, NewShape, null, createdContext =>
-            {
-                var shape = (Shape)createdContext.Shape;
-
-                // If only one non-Type, use it as the source object to copy
-
-                var initializer = parameters.Positional.SingleOrDefault();
-
-                if (initializer != null)
-                {
-                    // Use the Arguments class to optimize reflection code
-                    var arguments = Arguments.From(initializer);
-
-                    foreach (var prop in arguments.Named)
-                    {
-                        shape.Properties[prop.Key] = prop.Value;
-                    }
-                }
-                else
-                {
-                    foreach (var kv in parameters.Named)
-                    {
-                        shape.Properties[kv.Key] = kv.Value;
-                    }
-                }
-            });
-        }
-    }
+    /// <summary>
+    /// Gets a dynamic proxy object that provides a fluent API for creating shapes by name.
+    /// </summary>
+    /// <value>A dynamic object whose members correspond to shape type names.</value>
+    dynamic New { get; }
 }

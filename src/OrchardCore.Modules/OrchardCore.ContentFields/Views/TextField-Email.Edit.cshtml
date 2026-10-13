@@ -1,19 +1,31 @@
 @model OrchardCore.ContentFields.ViewModels.EditTextFieldViewModel
-
+@using OrchardCore.ContentFields
+@using OrchardCore.Mvc.Utilities
+@using OrchardCore.Localization.Data
+@inject IDataLocalizer D
 @{
     var settings = Model.PartFieldDefinition.GetSettings<TextFieldSettings>();
+    string localizedFieldName = D[Model.PartFieldDefinition.DisplayName(), DataLocalizationContext.ContentField(Model.PartFieldDefinition.PartDefinition.Name)];
 }
 
-<div class="form-group">
-    <label asp-for="Text">@Model.PartFieldDefinition.DisplayName()</label>
-    <div class="input-group mb-2">
-        <div class="input-group-prepend">
-            <div class="input-group-text">@@</div>
+@if (settings.Type == FieldBehaviorType.GeneratedHidden)
+{
+    <input type="hidden" asp-for="Text" />
+
+    return;
+}
+
+<div class="@($"ocat-wrapper field-wrapper field-wrapper-{Model.PartFieldDefinition.PartDefinition.Name.HtmlClassify()}-{Model.PartFieldDefinition.Name.HtmlClassify()}" + (Model.PartFieldDefinition.IsNamedPart() ? $" field-wrapper-{Model.PartFieldDefinition.ContentTypePartDefinition.Name.HtmlClassify()}-{Model.PartFieldDefinition.Name.HtmlClassify()}" : string.Empty))" id="@Html.IdFor(x => x.Text)_FieldWrapper">
+    <label asp-for="Text" class="ocat-label @(settings.Required ? "ocat-label-required" : "")">@localizedFieldName</label>
+    <div class="ocat-end">
+        <div class="input-group">
+            <span class="input-group-text">@@</span>
+            <input asp-for="Text" class="form-control content-preview-text" type="email" placeholder="@settings.Placeholder" asp-is-disabled="settings.Type == FieldBehaviorType.GeneratedDisabled" />
+            <span asp-validation-for="Text"></span>
         </div>
-        <input asp-for="Text" class="form-control content-preview-text" type="email" />
+        @if (!string.IsNullOrEmpty(settings.Hint))
+        {
+            <span class="hint">@settings.Hint</span>
+        }
     </div>
-    @if (!String.IsNullOrEmpty(settings.Hint))
-    {
-        <span class="hint">@settings.Hint</span>
-    }
 </div>

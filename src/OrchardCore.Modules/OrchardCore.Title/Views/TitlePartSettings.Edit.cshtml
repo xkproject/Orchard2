@@ -2,7 +2,7 @@
 @model OrchardCore.Title.ViewModels.TitlePartSettingsViewModel
 
 <style asp-name="codemirror"></style>
-<script asp-name="codemirror" depends-on="admin" at="Foot"></script>
+<script asp-name="codemirror" at="Foot"></script>
 <script asp-name="codemirror-mode-javascript" at="Foot"></script>
 <script asp-name="codemirror-addon-display-autorefresh" at="Foot"></script>
 <script asp-name="codemirror-addon-mode-simple" at="Foot"></script>
@@ -11,35 +11,45 @@
 
 <script asp-src="~/OrchardCore.Liquid/codemirror/liquid.js" at="Foot"></script>
 
-<div class="row mb-3">
-    <div class="col-sm-6">
-        <label asp-for="Options">@T["Options"]</label>
-        <select asp-for="Options" class="form-control">
-            <option value="@TitlePartOptions.Editable" selected="@(Model.Options == TitlePartOptions.Editable)">@T["Title is editable"]</option>
-            <option value="@TitlePartOptions.EditableRequired" selected="@(Model.Options == TitlePartOptions.EditableRequired)">@T["Title is editable and required"]</option>
-            <option value="@TitlePartOptions.GeneratedDisabled" selected="@(Model.Options == TitlePartOptions.GeneratedDisabled)">@T["Title is generated and input is disabled"]</option>
-            <option value="@TitlePartOptions.GeneratedHidden" selected="@(Model.Options == TitlePartOptions.GeneratedHidden)">@T["Title is generated and input is hidden"]</option>
+<div class="ocat-limited-wrapper">
+    <label asp-for="Options" class="ocat-label">@T["Behavior option"]</label>
+    <div class="ocat-limited">
+        <select asp-for="Options" class="form-select">
+            <option value="@nameof(TitlePartOptions.Editable)" selected="@(Model.Options == TitlePartOptions.Editable)">@T["Title is editable"]</option>
+            <option value="@nameof(TitlePartOptions.EditableRequired)" selected="@(Model.Options == TitlePartOptions.EditableRequired)">@T["Title is editable and required"]</option>
+            <option value="@nameof(TitlePartOptions.GeneratedDisabled)" selected="@(Model.Options == TitlePartOptions.GeneratedDisabled)">@T["Title is generated and input is disabled"]</option>
+            <option value="@nameof(TitlePartOptions.GeneratedHidden)" selected="@(Model.Options == TitlePartOptions.GeneratedHidden)">@T["Title is generated and input is hidden"]</option>
         </select>
     </div>
 </div>
-<div class="form-group pb-1">
-    <div class="custom-control custom-checkbox">
-        <input asp-for="RenderTitle" class="custom-control-input" />
-        <label asp-for="RenderTitle" class="custom-control-label">@T["Render Title"]</label>
-        <span class="hint dashed">@T["Check to render the title in display views."]</span>
+<div class="ocat-wrapper pb-1">
+    <div class="ocat-end-offset">
+        <div class="form-check">
+            <input asp-for="RenderTitle" class="form-check-input" />
+            <label asp-for="RenderTitle" class="form-check-label">@T["Render Title"]</label>
+            <span class="hint dashed">@T["Check to render the title in display views."]</span>
+        </div>
     </div>
 </div>
 
-<div class="row mb-3">
-    <div class="col-large">
-        <label asp-for="Pattern">@T["Pattern"]</label>
+<div class="ocat-limited-wrapper" id="patternEditor">
+    <label asp-for="Pattern" class="ocat-label">@T["Pattern"]</label>
+    <div class="ocat-limited">
         <textarea asp-for="Pattern" rows="5" class="form-control"></textarea>
         <span class="hint">@T["The pattern used to render the title of this content type. With Liquid support."]</span>
     </div>
 </div>
 
-<script at="Foot" depends-on="jquery">
-    $(function () {
+<div class="ocat-limited-wrapper">
+    <label asp-for="Placeholder" class="ocat-label">@T["Placeholder"]</label>
+    <div class="ocat-limited">
+        <input asp-for="Placeholder" class="form-control" />
+        <span class="hint">@T["The placeholder text to display for this field on the editor."]</span>
+    </div>
+</div>
+
+<script at="Foot">
+    document.addEventListener('DOMContentLoaded', function () {
         editor = CodeMirror.fromTextArea(document.getElementById('@Html.IdFor(x => x.Pattern)'), {
             autoRefresh: true,
             lineNumbers: true,
@@ -47,5 +57,25 @@
             matchBrackets: true,
             mode: { name: "liquid" },
         });
+
+        setPatternVisibility();
+
+        document.getElementById('@Html.IdFor(x => x.Options)').addEventListener('change', function () {
+            setPatternVisibility();
+        });
     });
+
+    function setPatternVisibility() {
+        var selectedValue = document.getElementById('@Html.IdFor(x => x.Options)').value;
+        var patternEditor = document.getElementById('patternEditor');
+        switch (selectedValue) {
+            case '@nameof(TitlePartOptions.GeneratedDisabled)':
+            case '@nameof(TitlePartOptions.GeneratedHidden)':
+                patternEditor.classList.remove('d-none');
+                break;
+            default:
+                patternEditor.classList.add('d-none');
+                break;
+        }
+    }
 </script>

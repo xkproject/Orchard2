@@ -1,35 +1,34 @@
-using System.Threading.Tasks;
 using OrchardCore.ContentManagement;
+using OrchardCore.Contents.Indexing;
 using OrchardCore.Indexing;
 using OrchardCore.Lists.Models;
 
-namespace OrchardCore.Lists.Indexes
+namespace OrchardCore.Lists.Indexes;
+
+public class ContainedPartContentIndexHandler : IDocumentIndexHandler
 {
-    public class ContainedPartContentIndexHandler : IContentItemIndexHandler
+    public Task BuildIndexAsync(BuildDocumentIndexContext context)
     {
-        public const string ListContentItemIdKey = "Content.ContentItem.ContainedPart.ListContentItemId";
-        public const string OrderKey = "Content.ContentItem.ContainedPart.Order";
-
-        public Task BuildIndexAsync(BuildIndexContext context)
+        if (context.Record is not ContentItem contentItem)
         {
-            var parent = context.ContentItem.As<ContainedPart>();
-
-            if (parent == null)
-            {
-                return Task.CompletedTask;
-            }
-
-            context.DocumentIndex.Set(
-                ListContentItemIdKey,
-                parent.ListContentItemId,
-                DocumentIndexOptions.Store);
-
-            context.DocumentIndex.Set(
-                OrderKey,
-                parent.Order,
-                DocumentIndexOptions.Store);
-
             return Task.CompletedTask;
         }
+
+        if (!contentItem.TryGet<ContainedPart>(out var parent))
+        {
+            return Task.CompletedTask;
+        }
+
+        context.DocumentIndex.Set(
+            ContentIndexingConstants.ContainedPartKey + ContentIndexingConstants.IdsKey,
+            parent.ListContentItemId,
+            DocumentIndexOptions.Keyword | DocumentIndexOptions.Store);
+
+        context.DocumentIndex.Set(
+            ContentIndexingConstants.ContainedPartKey + ContentIndexingConstants.OrderKey,
+            parent.Order,
+            DocumentIndexOptions.Keyword | DocumentIndexOptions.Store);
+
+        return Task.CompletedTask;
     }
 }

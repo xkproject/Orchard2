@@ -17,25 +17,25 @@
             }
         </div>
 
-        <div class="edit-item-secondary group">
+        <div class="ocat-wrapper edit-item-secondary group">
             @if (Model.Actions != null)
             {
-                <div class="edit-item-actions form-group">
+                <div class="ocat-end-offset edit-item-actions">
                     @await DisplayAsync(Model.Actions)
                 </div>
             }
         </div>
     </div>
-@if (Model.Sidebar != null)
-{
-    <div class="edit-sidebar-handler"></div>
-    <div class="edit-sidebar group">
-        @await DisplayAsync(Model.Sidebar)
-    </div>
-}
+    @if (Model.Sidebar != null)
+    {
+        <div class="edit-sidebar-handler"></div>
+        <div class="edit-sidebar group">
+            @await DisplayAsync(Model.Sidebar)
+        </div>
+    }
 </div>
 
-@if (!String.IsNullOrWhiteSpace(Context.Request.Query["returnUrl"]))
+@if (!string.IsNullOrWhiteSpace(Context.Request.Query["returnUrl"]))
 {
     @Html.Hidden("returnUrl", Context.Request.Query["returnUrl"])
 }

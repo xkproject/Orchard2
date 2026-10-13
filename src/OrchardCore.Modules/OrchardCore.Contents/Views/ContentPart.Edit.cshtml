@@ -1,26 +1,52 @@
+@model OrchardCore.ContentManagement.Display.ViewModels.ContentPartShapeViewModel
+@using OrchardCore.ContentManagement
 @using OrchardCore.ContentManagement.Metadata.Models
 @using OrchardCore.ContentManagement.Metadata.Settings
-@using OrchardCore.ContentManagement
+@using OrchardCore.ContentTypes
+@using OrchardCore.Localization.Data
+@using OrchardCore.Mvc.Utilities
+
+@inject IDataLocalizer D
 
 @{
+    var shapes = Model.Items;
+
+    if (shapes.Count == 0)
+    {
+        return;
+    }
+
     ContentPart contentPart = Model.ContentPart;
     ContentTypePartDefinition typePartDefinition = Model.ContentTypePartDefinition;
     var description = typePartDefinition.Description();
-    var namedPart = typePartDefinition.PartDefinition.IsReusable() && typePartDefinition.Name != typePartDefinition.PartDefinition.Name;
 }
 
-@if (namedPart)
-{
-    <h5>
-        @typePartDefinition.DisplayName()
+<div class="@($"ocat-wrapper content-part-wrapper content-part-wrapper-{typePartDefinition.PartDefinition.Name.HtmlClassify()}" + (typePartDefinition.IsNamedPart() ? $" content-part-wrapper-{typePartDefinition.Name.HtmlClassify()}" : string.Empty))">
 
-        @if (!String.IsNullOrEmpty(description))
+    @if (typePartDefinition.IsNamedPart())
+    {
+        <div class="ocat-label">
+            @D[typePartDefinition.DisplayName(), DataLocalizationContext.ContentType]
+
+            @if (!string.IsNullOrEmpty(description))
+            {
+                <small class="form-text text-muted">@description</small>
+            }
+        </div>
+
+        <div class="ocat-end">
+            @foreach (var shape in shapes)
+            {
+                @await DisplayAsync(shape)
+            }
+        </div>
+    }
+    else
+    {
+        foreach (var shape in shapes)
         {
-            <span class="hint dashed">@description</span>
+            @await DisplayAsync(shape)
         }
-    </h5>
-}
-@foreach (var shape in Model)
-{
-    @await DisplayAsync(shape)
-}
+    }
+
+</div>

@@ -1,31 +1,31 @@
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace OrchardCore.Lucene.ViewModels
+namespace OrchardCore.Lucene.ViewModels;
+
+public class LuceneIndexSettingsViewModel
 {
-    public class LuceneIndexSettingsViewModel
-    {
-        public string IndexName { get; set; }
+    public string IndexName { get; set; }
 
-        public string AnalyzerName { get; set; }
+    public string AnalyzerName { get; set; }
 
-        public bool IndexLatest { get; set; }
+    public bool IndexLatest { get; set; }
 
-        public string Culture { get; set; }
+    public string Culture { get; set; }
 
-        public string[] IndexedContentTypes { get; set; }
+    public string[] IndexedContentTypes { get; set; }
 
-        public bool IsCreate { get; set; }
+    public bool IsCreate { get; set; }
 
-        #region List to populate
+    public bool StoreSourceData { get; set; }
 
-        [BindNever]
-        public IEnumerable<SelectListItem> Analyzers { get; set; }
+    #region List to populate
 
-        [BindNever]
-        public IEnumerable<SelectListItem> Cultures { get; set; }
+    [BindNever]
+    public IEnumerable<SelectListItem> Analyzers { get; set; }
 
-        #endregion List to populate
-    }
+    [BindNever]
+    public IEnumerable<SelectListItem> Cultures { get; set; }
+
+    #endregion List to populate
 }

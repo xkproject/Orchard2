@@ -1,71 +1,144 @@
-@model OrchardCore.ContentFields.Settings.ContentPickerFieldSettings
-@using OrchardCore.ContentManagement;
+@model OrchardCore.ContentFields.Settings.ContentPickerFieldSettingsViewModel
+@using OrchardCore.ContentManagement
 
-@inject IEnumerable<IContentPickerResultProvider> ResultProviders
+<style asp-name="codemirror"></style>
+<script asp-name="codemirror" at="Foot"></script>
+<script asp-name="codemirror-mode-javascript" at="Foot"></script>
+<script asp-name="codemirror-addon-display-autorefresh" at="Foot"></script>
+<script asp-name="codemirror-addon-mode-simple" at="Foot"></script>
+<script asp-name="codemirror-addon-mode-multiplex" at="Foot"></script>
+<script asp-name="codemirror-mode-xml" at="Foot"></script>
+<script asp-src="~/OrchardCore.Liquid/codemirror/liquid.js" at="Foot"></script>
 
-@{
-    var resultProviderItems = ResultProviders.Select(p => new SelectListItem
-    {
-        Text = p.Name,
-        Value = p.Name
-    });
-}
-
-
-<script asp-name="vuejs" at="Foot"></script>
-
-<div class="form-group">
-    <div class="custom-control custom-checkbox">
-        <input asp-for="Required" type="checkbox" class="custom-control-input">
-        <label class="custom-control-label" asp-for="Required">@T["Required"]</label>
-        <span class="hint dashed">@T["Whether to ensure at least one element is selected."]</span>
+<div class="ocat-wrapper">
+    <div class="ocat-end-offset">
+        <div class="form-check">
+            <input asp-for="Required" type="checkbox" class="form-check-input">
+            <label class="form-check-label" asp-for="Required">@T["Required"]</label>
+            <span class="hint dashed">@T["Whether to ensure at least one element is selected."]</span>
+        </div>
     </div>
 </div>
 
-<div class="form-group">
-    <div class="custom-control custom-checkbox">
-        <input asp-for="Multiple" type="checkbox" class="custom-control-input">
-        <label class="custom-control-label" asp-for="Multiple">@T["Allow multiple"]</label>
-        <span class="hint dashed">@T["Whether to allow multiple elements to be selected."]</span>
+<div class="ocat-wrapper">
+    <div class="ocat-end-offset">
+        <div class="form-check">
+            <input asp-for="Multiple" type="checkbox" class="form-check-input">
+            <label class="form-check-label" asp-for="Multiple">@T["Allow multiple"]</label>
+            <span class="hint dashed">@T["Whether to allow multiple elements to be selected."]</span>
+        </div>
     </div>
 </div>
 
-<div id="contentTypesVue" class="form-group">
-    <label asp-for="DisplayedContentTypes">@T["Content Types"]</label>
-    <span class="hint">@T["The content types to display. Choose at least one."]</span>
-
-    <div class="custom-control custom-checkbox">
-        <input asp-for="DisplayAllContentTypes" type="checkbox" class="custom-control-input" v-model="displayAllContentTypes">
-        <label class="custom-control-label" asp-for="DisplayAllContentTypes">@T["Display All Content Types"]</label>
-        <span class="hint dashed">@T["Whether to allow picker to display all content types."]</span>
+<div class="ocat-wrapper">
+    <label asp-for="Source" class="ocat-label">@T["Contained Content Types"]</label>
+    <div class="ocat-end" id="@Html.IdFor(x => x.Source)">
+        <div class="form-check">
+            <input class="form-check-input" type="radio" asp-for="Source" id="SourceAll" value="@ContentPickerSettingType.AllTypes" checked="@(Model.Source == ContentPickerSettingType.AllTypes)">
+            <label for="SourceAll" class="form-check-label">
+                @T["Display All Content Types"]
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" asp-for="Source" id="SourceContentTypes" value="@ContentPickerSettingType.ContentTypes" checked="@(Model.Source == ContentPickerSettingType.ContentTypes)">
+            <label for="SourceContentTypes" class="form-check-label">
+                @T["Content Types"]
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" asp-for="Source" id="SourceStereotypes" value="@ContentPickerSettingType.Stereotypes" checked="@(Model.Source == ContentPickerSettingType.Stereotypes)">
+            <label for="SourceStereotypes" class="form-check-label">
+                @T["Stereotype"] <span class="hint">@T["All content types of these Stereotypes"]</span>
+            </label>
+        </div>
     </div>
+</div>
 
-    <div v-show="!displayAllContentTypes">
+<div class="ocat-wrapper" id="StereotypesContainer">
+    <label asp-for="Stereotypes" class="ocat-label">@T["Stereotypes"]</label>
+    <div class="ocat-end">
+        <input asp-for="Stereotypes" class="form-control medium" />
+        <span class="hint">@T["The Stereotypes of the content types that this field can contain. You may define multiple Stereotypes using the comma (,) as a separator"]</span>
+    </div>
+</div>
+
+<div class="ocat-wrapper" id="ContentTypesContainer">
+    <label asp-for="DisplayedContentTypes" class="ocat-label">@T["Content Types"]</label>
+    <div class="ocat-end">
+        <span class="hint">@T["The content types to display. Choose at least one."]</span>
         @await Component.InvokeAsync("SelectContentTypes", new { selectedContentTypes = Model.DisplayedContentTypes, htmlName = Html.NameFor(m => m.DisplayedContentTypes) })
     </div>
 </div>
 
-<div class="form-group">
-    <div class="w-md-75 w-xl-50 pr-md-3">
-        <label asp-for="Hint">@T["Hint"]</label>
-        <textarea asp-for="Hint" rows="2" class="form-control"></textarea>
+<div class="ocat-wrapper">
+    <label asp-for="Placeholder" class="ocat-label">@T["Placeholder"]</label>
+    <div class="ocat-end">
+        <input asp-for="Placeholder" class="form-control" />
+        <span class="hint">@T["The placeholder text to display for this field on the editor."]</span>
     </div>
-    <span class="hint">@T["The hint text to display for this field on the editor."]</span>
 </div>
 
-@*<div class="form-group">
-        <div class="w-sm-50">
-            <label asp-for="SearchResultProvider">@T["Search Result Provider"]</label>
-            <select asp-for="SearchResultProvider" asp-items="resultProviderItems" class="form-control"></select>
-        </div>
-        <span class="hint">@T["The search result provider to use when selecting content items."]</span>
-    </div>*@
+<div class="ocat-wrapper">
+    <label asp-for="Hint" class="ocat-label">@T["Hint"]</label>
+    <div class="ocat-end">
+        <textarea asp-for="Hint" rows="2" class="form-control"></textarea>
+        <span class="hint">@T["The hint text to display for this field on the editor."]</span>
+    </div>
+</div>
 
-<script at="Foot" depends-on="vuejs">
-    var app = new Vue({
-        el: "#contentTypesVue",
-        data: {
-            displayAllContentTypes: @Model.DisplayAllContentTypes.ToString().ToLower()
+<div class="ocat-wrapper">
+    <label asp-for="TitlePattern" class="ocat-label">@T["Title Pattern"]</label>
+    <div class="ocat-end">
+        <textarea asp-for="TitlePattern" rows="5" class="form-control"></textarea>
+        <span class="hint">@T["The pattern used to render the title in content picker. With Liquid support."]</span>
+    </div>
+</div>
+
+<script at="Foot">
+    function onDocumentReady(callback) {
+        if (document.readyState !== 'loading') {
+            callback();
+        } else {
+            document.addEventListener('DOMContentLoaded', callback);
+        }
+    }
+
+    onDocumentReady(function() {
+        var sources = document.getElementsByName('@Html.NameFor(x => x.Source)');
+        var contentTypesContainer = document.getElementById('ContentTypesContainer');
+        var stereotypeContainer = document.getElementById('StereotypesContainer');
+        for (var i = 0; i < sources.length; i++) {
+            var source = sources[i];
+            source.addEventListener('change', function(src) {
+                if (!src.target.checked) {
+                    return;
+                }
+                if (src.target.value == '@(ContentPickerSettingType.Stereotypes)') {
+                    contentTypesContainer.classList.add('d-none');
+                    stereotypeContainer.classList.remove('d-none');
+                } else if (src.target.value == '@(ContentPickerSettingType.ContentTypes)') {
+                    contentTypesContainer.classList.remove('d-none');
+                    stereotypeContainer.classList.add('d-none');
+                } else {
+                    contentTypesContainer.classList.add('d-none');
+                    stereotypeContainer.classList.add('d-none');
+                }
+            });
+            source.dispatchEvent(new Event('change'));
         }
     });
+</script>
+
+<script at="Foot">
+    //<![CDATA[
+    onDocumentReady(function () {
+        editor = CodeMirror.fromTextArea(document.getElementById('@Html.IdFor(x => x.TitlePattern)'), {
+            autoRefresh: true,
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchBrackets: true,
+            mode: { name: "liquid" },
+        });
+    });
+    //]]>
 </script>

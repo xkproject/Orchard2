@@ -23,15 +23,15 @@ PO files are found at these locations:
 
 `[CultureName]` can be either the culture neutral part, e.g. `fr`, or the full one, e.g. `fr-CA`.
 
-It is suggested to put your localization files in the `/Localization/` folder if you are using docker.  
-Especially if mounting a volume at `/App_Data/` as mounting hides pre-existing files.
+It is suggested to put your localization files in the `/Localization/` folder if you are using Docker.
+Especially if mounting a volume at `/App_Data/`, as mounting hides pre-existing files.
 
 !!! note
     If you edit a .po file, you need to restart the application to make your change effective.
 
 ### Publishing Localization files
 
-The PO files need to be included in the publish output directory. 
+The PO files need to be included in the publish output directory.
 Add the following configurations to your `[Web Project].csproj` file to include them as Content.
 
 ```xml
@@ -56,7 +56,7 @@ Cultures can be added during recipes using the settings step. Here is a sample s
     "DefaultCulture":  "fr",
     "SupportedCultures": [ "fr", "en" ]
   }
-},
+}
 ```
 
 ### Examples
@@ -136,9 +136,9 @@ It is necessary to reference the `OrchardCore.Localization.Abstractions` package
 
 ```
 msgctxt "TheAdmin.Views.Layout"
-msgid "1 book"
+msgid "{0} book"
 msgid_plural "{0} books"
-msgstr[0] "[1 livre]"
+msgstr[0] "[{0} livre]"
 msgstr[1] "[{0} livres]"
 ```
 
@@ -148,21 +148,69 @@ msgstr[1] "[{0} livres]"
 - Inject an instance of `IStringLocalizer` or `IViewLocalizer` (represented as the `T` variable in the following example).
 
 ```csharp
-T.Plural(count, "1 book", "{0} books")
+T.Plural(count, "{0} book", "{0} books")
 ```
+In this example
+* `"{0} book"` is the singular form
+* `"{0} books"` is the plural form
+* `count` will determine if the singular or plural form is used and will replace the {0} placeholder
+
+!!! warning
+    You should not hardcode a number in the singular or plural forms because different languages have different rules about when each form is used.
 
 ### Extract translations to PO files
 
-In order to generate the .po files, you can use [this tool](https://github.com/lukaskabrt/PoExtractor).
+In order to generate the .po files, you can use [this tool](https://github.com/OrchardCoreContrib/OrchardCoreContrib.PoExtractor).
 
 The simpler way to use it is to install it with this command:
 
 ```bash
-dotnet tool install --global PoExtractor.OrchardCore
+dotnet tool install --global OrchardCoreContrib.PoExtractor
 ```
 
 Then, you will be able to run this command to generate the .po files:
 
 ``` bash
-extractpo-oc C:\Path\OrchardCore C:\temp\OrchardCore --liquid
+extractpo <INTPUT_PATH> <OUTPUT_PATH> [-l|--language {"C#"|"VB"}] [-t|--template {"razor"|"liquid"}]
 ```
+
+## JavaScript Localization
+
+See [JavaScript Localization (`IJSLocalizer`)](javascript-localization.md) for guidance on exposing PO-file-backed translations to JavaScript / TypeScript assets.
+
+## Liquid filters
+
+For more information on using locaization filters in Liquid templates, see the [Liquid Localization filters documentation](../Liquid/README.md#localization-filters).
+
+## Video
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/cwKa1OA48-4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## Recipe Configuration
+
+Localization settings can be configured using the `Settings` recipe step:
+
+```json
+{
+  "steps": [
+    {
+      "name": "settings",
+      "LocalizationSettings": {
+        "DefaultCulture": "en-US",
+        "SupportedCultures": [
+          "en-US",
+          "fr-FR",
+          "es-ES"
+        ],
+        "FallBackToParentCulture": true
+      }
+    }
+  ]
+}
+```
+
+| Property                  | Type            | Description                                                                 |
+|---------------------------|-----------------|-----------------------------------------------------------------------------|
+| `DefaultCulture`          | String          | The default culture for the site (e.g., `en-US`).                           |
+| `SupportedCultures`       | Array of String | The list of supported cultures.                                             |
+| `FallBackToParentCulture` | Boolean         | Whether to fall back to the parent culture when a translation is not found. |

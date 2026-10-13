@@ -1,0 +1,672 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using OrchardCore.Tests.Apis.Context;
+using OrchardCore.Tests.OrchardCore.Users;
+using OrchardCore.Users;
+using OrchardCore.Users.Controllers;
+using OrchardCore.Users.Handlers;
+using OrchardCore.Users.Indexes;
+using OrchardCore.Users.Models;
+using OrchardCore.Users.ViewModels;
+
+namespace OrchardCore.Tests.Modules.OrchardCore.Users;
+
+public class AccountControllerTests
+{
+    [Fact]
+    public async Task ExternalLoginSignIn_Default_Succeeds()
+    {
+        // Arrange
+        var context = await GetSiteContextAsync(new RegistrationSettings(), true, true, true);
+
+        // Act
+        var model = new RegisterViewModel()
+        {
+            UserName = "TestUserName",
+            Email = "test@orchardcore.com",
+            Password = "test@OC!123",
+            ConfirmPassword = "test@OC!123",
+        };
+
+        var responseFromGet = await context.Client.GetAsync("Register", TestContext.Current.CancellationToken);
+        responseFromGet.EnsureSuccessStatusCode();
+        var response = await context.Client.SendAsync(await CreateRequestMessageAsync(model, responseFromGet), TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Equal($"/{context.TenantName}/", response.Headers.Location.ToString());
+
+        await context.UsingTenantScopeAsync(async scope =>
+        {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IUser>>();
+
+            var user = await userManager.FindByNameAsync(model.UserName) as User;
+
+            var externalClaims = new List<SerializableClaim>();
+            var userRoles = await userManager.GetRolesAsync(user);
+
+            var context = new UpdateUserContext(user, "TestLoginProvider", externalClaims, user.Properties.DeepClone() as JsonObject)
+            {
+                UserClaims = user.UserClaims,
+                UserRoles = userRoles,
+            };
+
+            context.UserProperties["Test"] = 111;
+            Assert.NotEqual(user.Properties["Test"], context.UserProperties["Test"]);
+
+            var scriptExternalLoginEventHandler = scope.ServiceProvider.GetServices<IExternalLoginEventHandler>()
+                        .FirstOrDefault(x => x.GetType() == typeof(ScriptExternalLoginEventHandler)) as ScriptExternalLoginEventHandler;
+            var loginSettings = new ExternalLoginSettings
+            {
+                UseScriptToSyncProperties = true,
+                SyncPropertiesScript = """
+                    if(!context.user.userClaims?.find(x=> x.claimType=="lastName" && claimValue=="Zhang")){
+                        context.claimsToUpdate.push({claimType:"lastName",    claimValue:"Zhang"});
+                    }
+                    context.claimsToUpdate.push({claimType:"firstName",   claimValue:"Sam"});
+                    context.claimsToUpdate.push({claimType:"displayName", claimValue:"Sam Zhang(CEO)"});
+                    context.claimsToUpdate.push({claimType:"jobTitle",    claimValue:"CEO"});
+
+                    if(!context.user.userRoles?.includes('Administrator')){
+                        context.rolesToAdd.push("Administrator");
+                    }
+
+                    if(context.user.userProperties?.UserProfile?.UserProfile?.DisplayName?.Text!="Sam Zhang(CEO)")
+                    {
+                        context.propertiesToUpdate = {
+                            "UserProfile": {
+                                "UserProfile": {
+                                    "DisplayName": {
+                                        "Text": "Sam Zhang(CEO)"
+                                    }
+                                }
+                            }
+                        };
+                    }
+                    """,
+            };
+            await scriptExternalLoginEventHandler.UpdateUserInternalAsync(context, loginSettings);
+
+            if (await userManager.UpdateUserPropertiesAsync(user, context))
+            {
+                await userManager.UpdateAsync(user);
+            }
+
+            var session = scope.ServiceProvider.GetRequiredService<YesSql.ISession>();
+            var sam = await session.Query<User, UserByClaimIndex>()
+                    .Where(claim => claim.ClaimType == "displayName" && claim.ClaimValue == "Sam Zhang(CEO)")
+                    .FirstOrDefaultAsync();
+            Assert.NotNull(sam);
+
+            var claimsDict = sam.UserClaims.ToDictionary(claim => claim.ClaimType, claim => claim.ClaimValue);
+            Assert.Equal("Sam", claimsDict["firstName"]);
+            Assert.Equal("Zhang", claimsDict["lastName"]);
+            Assert.Equal("CEO", claimsDict["jobTitle"]);
+            Assert.Contains("Administrator", sam.RoleNames.FirstOrDefault());
+            Assert.Equal("Sam Zhang(CEO)", sam.Properties.SelectNode("$.UserProfile.UserProfile.DisplayName.Text").ToString());
+
+        });
+        await context.UsingTenantScopeAsync(async scope =>
+        {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IUser>>();
+
+            var user = await userManager.FindByNameAsync(model.UserName) as User;
+
+            var externalClaims = new List<SerializableClaim>();
+            var userRoles = await userManager.GetRolesAsync(user);
+
+            var updateContext = new UpdateUserContext(user, "TestLoginProvider", externalClaims, user.Properties.DeepClone() as JsonObject)
+            {
+                UserClaims = user.UserClaims,
+                UserRoles = userRoles,
+            };
+
+            var scriptExternalLoginEventHandler = scope.ServiceProvider.GetServices<IExternalLoginEventHandler>()
+                      .FirstOrDefault(x => x.GetType() == typeof(ScriptExternalLoginEventHandler)) as ScriptExternalLoginEventHandler;
+            var loginSettings = new ExternalLoginSettings
+            {
+                UseScriptToSyncProperties = true,
+                SyncPropertiesScript = """
+                    context.claimsToUpdate.push({claimType:"displayName", claimValue:"Sam Zhang"});
+                    context.claimsToUpdate.push({claimType:"firstName",   claimValue:"Sam"});
+                    context.claimsToUpdate.push({claimType:"lastName",    claimValue:"Zhang"});
+                    context.claimsToRemove.push({claimType:"jobTitle",    claimValue:"CEO"});
+                    context.rolesToRemove.push("Administrator");
+                    context.propertiesToUpdate = {
+                        "UserProfile": {
+                            "UserProfile": {
+                                "DisplayName": {
+                                    "Text": "Sam Zhang"
+                                }
+                            }
+                        }
+                    };
+                    """,
+            };
+            await scriptExternalLoginEventHandler.UpdateUserInternalAsync(updateContext, loginSettings);
+
+            if (await userManager.UpdateUserPropertiesAsync(user, updateContext))
+            {
+                await userManager.UpdateAsync(user);
+            }
+
+            var session = scope.ServiceProvider.GetRequiredService<YesSql.ISession>();
+            var userFromDb = await session.Query<User, UserByClaimIndex>()
+                         .Where(claim => claim.ClaimType == "displayName" && claim.ClaimValue == "Sam Zhang")
+                         .FirstOrDefaultAsync();
+
+            Assert.DoesNotContain("Administrator", userFromDb.RoleNames);
+            Assert.DoesNotContain(userFromDb.UserClaims, x => x.ClaimType == "jobTitle" && x.ClaimValue == "CEO");
+            Assert.Equal("Sam Zhang", userFromDb.Properties.SelectNode("$.UserProfile.UserProfile.DisplayName.Text").ToString());
+        });
+    }
+
+    [Fact]
+    public async Task Register_AllowedRegisterUser_Succeeds()
+    {
+        // Arrange
+        var context = await GetSiteContextAsync(new RegistrationSettings());
+
+        var responseFromGet = await context.Client.GetAsync("Register", TestContext.Current.CancellationToken);
+
+        Assert.True(responseFromGet.IsSuccessStatusCode);
+
+        // Act
+        var model = new RegisterViewModel()
+        {
+            UserName = "test",
+            Email = "test@orchardcore.com",
+            Password = "test@OC!123",
+            ConfirmPassword = "test@OC!123",
+        };
+
+        var response = await context.Client.SendAsync(await CreateRequestMessageAsync(model, responseFromGet), TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Equal($"/{context.TenantName}/", response.Headers.Location.ToString());
+
+        await context.UsingTenantScopeAsync(async scope =>
+        {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IUser>>();
+
+            var user = await userManager.FindByNameAsync(model.UserName) as User;
+
+            Assert.NotNull(user);
+            Assert.Equal(model.Email, user.Email);
+        });
+    }
+
+    [Fact]
+    public async Task Register_NotAllowedReturnNotFound_Succeeds()
+    {
+        // Arrange
+        var context = await GetSiteContextAsync(new RegistrationSettings(), false);
+
+        // Act
+        var response = await context.Client.GetAsync("Register", TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Register_FeatureIsNotEnableReturnNotFound_Succeeds()
+    {
+        // Arrange
+        var context = await GetSiteContextAsync(new RegistrationSettings(), enableRegistrationFeature: false);
+
+        // Act
+        var response = await context.Client.GetAsync("Register", TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Register_RequireUniqueEmailIsTruePreventRegisteringMultipleUsersWithTheSameEmails_Succeeds()
+    {
+        // Arrange
+        var context = await GetSiteContextAsync(new RegistrationSettings());
+
+        var responseFromGet = await context.Client.GetAsync("Register", TestContext.Current.CancellationToken);
+
+        Assert.True(responseFromGet.IsSuccessStatusCode);
+
+        var emailAddress = "test@orchardcore.com";
+
+        var requestForPost = await CreateRequestMessageAsync(new RegisterViewModel()
+        {
+            UserName = "test1",
+            Email = emailAddress,
+            Password = "test1@OC!123",
+            ConfirmPassword = "test1@OC!123",
+        }, responseFromGet);
+
+        // Act
+        var responseFromPost1 = await context.Client.SendAsync(requestForPost, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Redirect, responseFromPost1.StatusCode);
+
+        var responseFromGet2 = await context.Client.GetAsync("Register", TestContext.Current.CancellationToken);
+
+        Assert.True(responseFromGet2.IsSuccessStatusCode);
+
+        var requestForPost2 = await CreateRequestMessageAsync(new RegisterViewModel()
+        {
+            UserName = "test2",
+            Email = emailAddress,
+            Password = "test2@OC!123",
+            ConfirmPassword = "test2@OC!123",
+        }, responseFromGet);
+
+        var responseFromPost2 = await context.Client.SendAsync(requestForPost2, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.True(responseFromPost2.IsSuccessStatusCode);
+        Assert.Contains("A user with the same email address already exists.", await responseFromPost2.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task Register_RequireUniqueEmailIsFalseAllowRegisteringMultipleUsersWithTheSameEmails_Succeeds()
+    {
+        // Arrange
+        var context = await GetSiteContextAsync(new RegistrationSettings(), enableRegistrationFeature: true, requireUniqueEmail: false);
+
+        // Register First User
+        var responseFromGet = await context.Client.GetAsync("Register", TestContext.Current.CancellationToken);
+
+        Assert.True(responseFromGet.IsSuccessStatusCode);
+        var emailAddress = "test@orchardcore.com";
+
+        var requestForPost = await CreateRequestMessageAsync(new RegisterViewModel()
+        {
+            UserName = "test1",
+            Email = emailAddress,
+            Password = "test1@OC!123",
+            ConfirmPassword = "test1@OC!123",
+        }, responseFromGet);
+
+        var responseFromPost = await context.Client.SendAsync(requestForPost, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Redirect, responseFromPost.StatusCode);
+
+        // Register Second User
+        var responseFromGet2 = await context.Client.GetAsync("Register", TestContext.Current.CancellationToken);
+
+        Assert.True(responseFromGet2.IsSuccessStatusCode);
+
+        var requestForPost2 = await CreateRequestMessageAsync(new RegisterViewModel()
+        {
+            UserName = "test2",
+            Email = emailAddress,
+            Password = "test2@OC!123",
+            ConfirmPassword = "test2@OC!123",
+        }, responseFromGet);
+
+        var responseFromPost2 = await context.Client.SendAsync(requestForPost2, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Redirect, responseFromPost2.StatusCode);
+
+        var body = await responseFromPost2.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+
+        Assert.DoesNotContain("A user with the same email address already exists.", body);
+    }
+
+    [Fact]
+    public async Task Register_ModerationRedirectToRegistrationPending_Succeeds()
+    {
+        // Arrange
+        var context = await GetSiteContextAsync(new RegistrationSettings()
+        {
+            UsersAreModerated = true,
+        });
+
+        var responseFromGet = await context.Client.GetAsync("Register", TestContext.Current.CancellationToken);
+
+        Assert.True(responseFromGet.IsSuccessStatusCode);
+
+        // Act
+        var model = new RegisterViewModel()
+        {
+            UserName = "ModerateMe",
+            Email = "ModerateMe@orchardcore.com",
+            Password = "ModerateMe@OC!123",
+            ConfirmPassword = "ModerateMe@OC!123",
+        };
+
+        var responseFromPost = await context.Client.SendAsync(await CreateRequestMessageAsync(model, responseFromGet), TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, responseFromPost.StatusCode);
+        Assert.Equal($"/{context.TenantName}/{nameof(RegistrationController.RegistrationPending)}", responseFromPost.Headers.Location.ToString());
+
+        await context.UsingTenantScopeAsync(async scope =>
+        {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IUser>>();
+
+            var user = await userManager.FindByNameAsync(model.UserName) as User;
+
+            Assert.NotNull(user);
+            Assert.Equal(model.Email, user.Email);
+            Assert.False(user.IsEnabled);
+        });
+    }
+
+    [Fact]
+    public async Task Register_RequireEmailConfirmationRedirectToConfirmEmailSent_Succeeds()
+    {
+        // Arrange
+        var context = await GetSiteContextAsync(new RegistrationSettings
+        {
+            UsersMustValidateEmail = true,
+        }, true, true, false);
+
+        var responseFromGet = await context.Client.GetAsync("Register", TestContext.Current.CancellationToken);
+
+        Assert.True(responseFromGet.IsSuccessStatusCode);
+
+        // Act
+        var model = new RegisterViewModel()
+        {
+            UserName = "ConfirmMe",
+            Email = "ConfirmMe@orchardcore.com",
+            Password = "ConfirmMe@OC!123",
+            ConfirmPassword = "ConfirmMe@OC!123",
+        };
+
+        var requestForPost = await CreateRequestMessageAsync(model, responseFromGet);
+
+        var responseFromPost = await context.Client.SendAsync(requestForPost, TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, responseFromPost.StatusCode);
+        Assert.Equal($"/{context.TenantName}/ConfirmEmailSent", responseFromPost.Headers.Location.ToString());
+
+        await context.UsingTenantScopeAsync(async scope =>
+        {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IUser>>();
+
+            var user = await userManager.FindByNameAsync(model.UserName) as User;
+
+            Assert.NotNull(user);
+            Assert.Equal(model.Email, user.Email);
+            Assert.False(user.EmailConfirmed);
+        });
+    }
+
+    [Fact]
+    public async Task Login_UserIsDisabledRedirectsToLoginWithError_Succeeds()
+    {
+        // Arrange
+        var context = await GetSiteContextAsync(new RegistrationSettings());
+
+        var registerGet = await context.Client.GetAsync("Register", TestContext.Current.CancellationToken);
+        Assert.True(registerGet.IsSuccessStatusCode);
+
+        var model = new RegisterViewModel()
+        {
+            UserName = "DisabledUser",
+            Email = "DisabledUser@orchardcore.com",
+            Password = "DisabledUser@OC!123",
+            ConfirmPassword = "DisabledUser@OC!123",
+        };
+
+        var registerPost = await context.Client.SendAsync(await CreateRequestMessageAsync(model, registerGet), TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.Redirect, registerPost.StatusCode);
+
+        await context.UsingTenantScopeAsync(async scope =>
+        {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IUser>>();
+            var user = await userManager.FindByNameAsync(model.UserName) as User;
+            Assert.NotNull(user);
+
+            user.IsEnabled = false;
+            await userManager.UpdateAsync(user);
+        });
+
+        // Act
+        var loginGet = await context.Client.GetAsync("Login", TestContext.Current.CancellationToken);
+        Assert.True(loginGet.IsSuccessStatusCode);
+
+        var loginPost = await context.Client.SendAsync(await CreateLoginRequestMessageAsync(model.UserName, model.Password, loginGet), TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, loginPost.StatusCode);
+        Assert.EndsWith("/Login", loginPost.Headers.Location.ToString());
+
+        var cookies = CookiesHelper.ExtractCookies(loginPost);
+        Assert.DoesNotContain("orchauth_" + context.TenantName, cookies.Keys);
+    }
+
+    [Fact]
+    public async Task Login_UserIsEnabledSucceeds_Succeeds()
+    {
+        // Arrange
+        var context = await GetSiteContextAsync(new RegistrationSettings());
+
+        var registerGet = await context.Client.GetAsync("Register", TestContext.Current.CancellationToken);
+        Assert.True(registerGet.IsSuccessStatusCode);
+
+        var model = new RegisterViewModel()
+        {
+            UserName = "EnabledUser",
+            Email = "EnabledUser@orchardcore.com",
+            Password = "EnabledUser@OC!123",
+            ConfirmPassword = "EnabledUser@OC!123",
+        };
+
+        var registerPost = await context.Client.SendAsync(await CreateRequestMessageAsync(model, registerGet), TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.Redirect, registerPost.StatusCode);
+
+        // Act
+        var loginGet = await context.Client.GetAsync("Login", TestContext.Current.CancellationToken);
+        Assert.True(loginGet.IsSuccessStatusCode);
+
+        var loginPost = await context.Client.SendAsync(await CreateLoginRequestMessageAsync(model.UserName, model.Password, loginGet), TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, loginPost.StatusCode);
+        Assert.Equal($"/{context.TenantName}/", loginPost.Headers.Location.ToString());
+
+        var cookies = CookiesHelper.ExtractCookies(loginPost);
+        Assert.Contains("orchauth_" + context.TenantName, cookies.Keys);
+    }
+
+    [Fact]
+    public async Task Register_RateLimitExceededReturnsTooManyRequests_Succeeds()
+    {
+        // Arrange
+        var context = await GetSiteContextAsync(new RegistrationSettings(), enableRateLimits: true);
+
+        var registerGet = await context.Client.GetAsync("Register", TestContext.Current.CancellationToken);
+        Assert.True(registerGet.IsSuccessStatusCode);
+
+        // Act
+        HttpResponseMessage response = null;
+
+        for (var i = 0; i < 4; i++)
+        {
+            var model = new RegisterViewModel()
+            {
+                UserName = $"RateLimitUser{i}",
+                Email = $"ratelimit{i}@orchardcore.com",
+                Password = "Password1!",
+                ConfirmPassword = "Password1!",
+            };
+
+            response = await context.Client.SendAsync(await CreateRequestMessageAsync(model, registerGet), TestContext.Current.CancellationToken);
+        }
+
+        // Assert
+        Assert.Equal(HttpStatusCode.TooManyRequests, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Login_UsernameIsInvalidReturnsGenericError_Succeeds()
+    {
+        // Arrange
+        var context = await GetSiteContextAsync(new RegistrationSettings());
+
+        var loginGet = await context.Client.GetAsync("Login", TestContext.Current.CancellationToken);
+        Assert.True(loginGet.IsSuccessStatusCode);
+
+        // Act
+        var loginPost = await context.Client.SendAsync(await CreateLoginRequestMessageAsync("missing-user", "Password1!", loginGet), TestContext.Current.CancellationToken);
+        var body = await loginPost.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.True(loginPost.IsSuccessStatusCode);
+        Assert.Contains("Invalid login attempt.", body);
+
+        var cookies = CookiesHelper.ExtractCookies(loginPost);
+        Assert.DoesNotContain("orchauth_" + context.TenantName, cookies.Keys);
+    }
+
+    [Fact]
+    public async Task Login_RateLimitExceededReturnsTooManyRequests_Succeeds()
+    {
+        // Arrange
+        var context = await GetSiteContextAsync(new RegistrationSettings(), enableRateLimits: true);
+
+        var loginGet = await context.Client.GetAsync("Login", TestContext.Current.CancellationToken);
+        Assert.True(loginGet.IsSuccessStatusCode);
+
+        // Act
+        HttpResponseMessage response = null;
+
+        for (var i = 0; i < 11; i++)
+        {
+            response = await context.Client.SendAsync(await CreateLoginRequestMessageAsync("missing-user", "Password1!", loginGet), TestContext.Current.CancellationToken);
+        }
+
+        // Assert
+        Assert.Equal(HttpStatusCode.TooManyRequests, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Login_UserDisabledUnderModerationDefersToModerationHandler_Succeeds()
+    {
+        // Arrange
+        var context = await GetSiteContextAsync(new RegistrationSettings()
+        {
+            UsersAreModerated = true,
+        });
+
+        var registerGet = await context.Client.GetAsync("Register", TestContext.Current.CancellationToken);
+        Assert.True(registerGet.IsSuccessStatusCode);
+
+        var model = new RegisterViewModel()
+        {
+            UserName = "ModeratedUser",
+            Email = "ModeratedUser@orchardcore.com",
+            Password = "ModeratedUser@OC!123",
+            ConfirmPassword = "ModeratedUser@OC!123",
+        };
+
+        var registerPost = await context.Client.SendAsync(await CreateRequestMessageAsync(model, registerGet), TestContext.Current.CancellationToken);
+        Assert.Equal(HttpStatusCode.Redirect, registerPost.StatusCode);
+
+        await context.UsingTenantScopeAsync(async scope =>
+        {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IUser>>();
+            var user = await userManager.FindByNameAsync(model.UserName) as User;
+            Assert.NotNull(user);
+            Assert.False(user.IsEnabled);
+        });
+
+        // Act
+        var loginGet = await context.Client.GetAsync("Login", TestContext.Current.CancellationToken);
+        Assert.True(loginGet.IsSuccessStatusCode);
+
+        var loginPost = await context.Client.SendAsync(await CreateLoginRequestMessageAsync(model.UserName, model.Password, loginGet), TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, loginPost.StatusCode);
+        Assert.Equal($"/{context.TenantName}/{nameof(RegistrationController.RegistrationPending)}", loginPost.Headers.Location.ToString());
+    }
+
+    private static async Task<HttpRequestMessage> CreateRequestMessageAsync(RegisterViewModel model, HttpResponseMessage response)
+    {
+        var data = new Dictionary<string, string>
+        {
+            {"__RequestVerificationToken", await AntiForgeryHelper.ExtractAntiForgeryToken(response) },
+            {$"{nameof(RegisterUserForm)}.{nameof(model.UserName)}", model.UserName},
+            {$"{nameof(RegisterUserForm)}.{nameof(model.Email)}", model.Email},
+            {$"{nameof(RegisterUserForm)}.{nameof(model.Password)}", model.Password},
+            {$"{nameof(RegisterUserForm)}.{nameof(model.ConfirmPassword)}", model.ConfirmPassword},
+        };
+
+        return HttpRequestHelper.CreatePostMessageWithCookies("Register", data, response);
+    }
+
+    private static async Task<HttpRequestMessage> CreateLoginRequestMessageAsync(string userName, string password, HttpResponseMessage response)
+    {
+        var data = new Dictionary<string, string>
+        {
+            {"__RequestVerificationToken", await AntiForgeryHelper.ExtractAntiForgeryToken(response) },
+            {$"{nameof(LoginForm)}.{nameof(LoginViewModel.UserName)}", userName},
+            {$"{nameof(LoginForm)}.{nameof(LoginViewModel.Password)}", password},
+        };
+
+        return HttpRequestHelper.CreatePostMessageWithCookies("Login", data, response);
+    }
+
+    private static async Task<SiteContext> GetSiteContextAsync(RegistrationSettings settings, bool enableRegistrationFeature = true, bool requireUniqueEmail = true, bool enableExternalAuthentication = false, bool enableRateLimits = false)
+    {
+        var context = new SiteContext();
+
+        await context.InitializeAsync();
+
+        var recipeSteps = new JsonArray
+        {
+            new JsonObject
+            {
+                { "name", "settings" },
+                { nameof(RegistrationSettings), JsonSerializer.SerializeToNode(settings)},
+                { nameof(IdentitySettings), JsonSerializer.SerializeToNode(new IdentitySettings
+                {
+                    UserSettings = new IdentityUserSettings
+                    {
+                        RequireUniqueEmail = requireUniqueEmail,
+                    },
+                })},
+            },
+        };
+
+        if (enableRegistrationFeature || enableExternalAuthentication)
+        {
+            var featureIds = new JsonArray();
+
+            if (enableRegistrationFeature)
+            {
+                featureIds.Add(UserConstants.Features.UserRegistration);
+            }
+
+            if (enableExternalAuthentication)
+            {
+                featureIds.Add(UserConstants.Features.ExternalAuthentication);
+            }
+
+            if (enableRateLimits)
+            {
+                featureIds.Add("OrchardCore.RateLimits");
+            }
+
+            recipeSteps.Add(new JsonObject
+            {
+                { "name", "feature" },
+                { "enable", featureIds },
+            });
+        }
+
+        var recipe = new JsonObject
+        {
+            ["steps"] = recipeSteps,
+        };
+
+        await RecipeHelpers.RunRecipeAsync(context, recipe);
+
+        return context;
+    }
+}

@@ -1,32 +1,44 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Localization;
 using OrchardCore.Navigation;
 
-namespace OrchardCore.Workflows
+namespace OrchardCore.Workflows;
+
+public sealed class AdminMenu : AdminNavigationProvider
 {
-    public class AdminMenu : INavigationProvider
+    internal readonly IStringLocalizer S;
+
+    public AdminMenu(IStringLocalizer<AdminMenu> stringLocalizer)
     {
-        private readonly IStringLocalizer S;
+        S = stringLocalizer;
+    }
 
-        public AdminMenu(IStringLocalizer<AdminMenu> localizer)
+    protected override ValueTask BuildAsync(NavigationBuilder builder)
+    {
+        if (NavigationHelper.UseLegacyFormat())
         {
-            S = localizer;
+            builder
+                .Add(S["Workflows"], NavigationConstants.AdminMenuWorkflowsPosition, workflow => workflow
+                    .AddClass("workflows")
+                    .Id("workflows")
+                    .Action("Index", "WorkflowType", "OrchardCore.Workflows")
+                    .Permission(WorkflowsPermissions.ManageWorkflows)
+                    .LocalNav()
+                );
+
+            return ValueTask.CompletedTask;
         }
 
-        public Task BuildNavigationAsync(string name, NavigationBuilder builder)
-        {
-            if (!string.Equals(name, "admin", StringComparison.OrdinalIgnoreCase))
-            {
-                return Task.CompletedTask;
-            }
+        builder
+            .Add(S["Design"], design => design
+                .Add(S["Workflows"], S["Workflows"].PrefixPosition(), workflow => workflow
+                    .AddClass("workflows")
+                    .Id("workflows")
+                    .Action("Index", "WorkflowType", "OrchardCore.Workflows")
+                    .Permission(WorkflowsPermissions.ManageWorkflows)
+                    .LocalNav()
+                )
+            );
 
-            builder.Add(S["Workflows"], NavigationConstants.AdminMenuWorkflowsPosition, workflow => workflow
-                .AddClass("workflows").Id("workflows").Action("Index", "WorkflowType", new { area = "OrchardCore.Workflows" })
-                    .Permission(Permissions.ManageWorkflows)
-                    .LocalNav());
-
-            return Task.CompletedTask;
-        }
+        return ValueTask.CompletedTask;
     }
 }

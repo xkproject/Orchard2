@@ -6,12 +6,15 @@ Orchard Core provides many security features to give an authenticated access to 
 
 - [Microsoft Authentication](../../reference/modules/Microsoft.Authentication/README.md)
 - [Facebook Authentication](../../reference/modules/Facebook/README.md)
-- [Twitter Authentication](../../reference/modules/Twitter/README.md)
+- [Twitter Authentication](../../reference/modules/X/README.md)
 - [GitHub Authentication](../../reference/modules/GitHub/README.md)
 - [Google Authentication](../../reference/modules/Google/README.md)
 - [OpenId](../../reference/modules/OpenId/README.md)
 - [Roles](../../reference/modules/Roles/README.md)
 - [DataProtection (Azure Storage)](../../reference/modules/DataProtection.Azure/README.md)
-- TBD Users
-- TBD Permissions
-- TBD Login, Registration
+- [Permissions](../../reference/modules/Security/Permissions.md)
+- [Users](users.md)
+- [Roles and Permissions](roles.md)
+- [Login](login.md)
+- [Registration](registration.md)
+- [Security Settings](security-settings.md)

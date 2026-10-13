@@ -61,9 +61,9 @@ Executes a query with the specified name.
 
 Verbs: **POST** and **GET**
 
-| Parameter | Example | Description |
-| --------- | ---- |------------ |
-| `name` | `myQuery` | The name of the query to execute. |
+| Parameter    | Example      | Description                                             |
+|--------------|--------------|---------------------------------------------------------|
+| `name`       | `myQuery`    | The name of the query to execute.                       |
 | `parameters` | `{ size: 3}` | A Json object representing the parameters of the query. |
 
 ## GraphQL
@@ -100,7 +100,10 @@ For Lucene queries with custom object schema, you are limited to elements stored
 
 For SQL queries, you can expose any column where property name is a column alias from the query.
 
-Here is an example of a custom Query from a manually added table in a database : 
+!!! note
+    When returning documents from a SQL query, make sure your query returns a list of document IDs. This is commonly available in the `DocumentId` column, but check the tables you're querying.
+
+Here is an example of a custom Query from a manually added table in a database :
 
 ```sql
 -- On the Query don't check the "return content items" checkbox
@@ -141,6 +144,9 @@ For SQL and Lucene queries you can then define a custom field type name in their
 
 This feature provides a new type of query targeting the SQL database.
 
+!!! note
+    SQL queries can be used as a data source for custom widgets. If parameterized, widgets can control queries by providing values for the query parameters. For example, in the Blog Theme, the `RecentBlogPosts` Query has a parameter for SQL `LIMIT`: `SELECT DocumentId FROM ContentItemIndex WHERE ContentType='BlogPost' AND Published = 1 ORDER BY CreatedUtc DESC LIMIT @limit:3`. This allows you to add a numeric field 'Limit' to your custom widget and then provide the value of that field to the query.
+
 ### Queries recipe step
 
 Here is an example for creating a SQL query from a Queries recipe step:
@@ -150,7 +156,7 @@ Here is an example for creating a SQL query from a Queries recipe step:
     "Source": "Sql",
     "Name": "ContentItems",
     "Template": "select * from ContentItemIndex", // json encoded query template
-    "ReturnDocuments": false
+    "ReturnContentItems": false
 }
 ```
 
@@ -234,6 +240,7 @@ group by day(CreatedUtc), month(CreatedUtc), year(CreatedUtc)
 
 Parameters can be provided when running queries.  
 Parameters are safe to use as they will always be parsed before being included in a query.  
+When using untrusted or user-provided input, you should use SQL parameters and not Liquid output expressions (`{{ ... }}`).
 The syntax of a parameter is `@name:default_value`,
 where `name` is the name of the parameter, and `default_value` an expression (usually a literal) to use in case
 the parameter is not defined.
@@ -253,8 +260,26 @@ Parameter names are case-sensitive.
 ## Templates
 
 A SQL query is actually a Liquid template. This allows your queries to be shaped based on the parameters it gets.  
-When injecting user-provided values, be sure to encode these such that they can't be exploited.  
-It is recommended to use parameters to inject values in the queries, and only use Liquid templates to change the shape of the query.
+Do not inject user-provided values directly with Liquid output expressions (`{{ ... }}`), as this can lead to SQL injection.  
+Use SQL parameters (`@name` or `@name:default`) for all user-provided values, and only use Liquid templates to change the shape of the query.
+
+Unsafe example:
+
+```liquid
+SELECT DocumentId
+FROM UserIndex
+WHERE UserName LIKE '%{{ input }}%'
+```
+
+Safe example:
+
+```sql
+SELECT DocumentId
+FROM UserIndex
+WHERE UserName LIKE @pattern
+```
+
+Where the caller provides `pattern` as a parameter value (for example `%alice%`). See [Parameters](#parameters).
 
 This example checks that a `limit` parameter is provided and if so uses it:
 
@@ -276,8 +301,8 @@ These statements will be converted automatically based on the RDBMS in use.
 
 The SQL parser is also able to convert some specific functions to the intended dialect.
 
-| Name             | Description                        |
-| ---------------- |----------------------------------- |
+| Name             | Description                         |
+|------------------|-------------------------------------|
 | `second(_date_)` | Returns the seconds part of a date. |
 | `minute(_date_)` | Returns the minutes part of a date. |
 | `hour(_date_)`   | Returns the hours part of a date.   |
@@ -286,14 +311,45 @@ The SQL parser is also able to convert some specific functions to the intended d
 | `year(_date_)`   | Returns the years part of a date.   |
 | `now()`          | Returns current date time (utc).    |
 
+Order By clauses can also use the `random()` function (case insensitive) to order results randomly, e.g., 
+
+```
+SELECT * FROM ContentItemIndex ORDER BY random()
+```
+
 ## Scripting
 
 The following JavaScript functions are available with this module.
 
-| Function | Description | Signature |
-| -------- | ----------- | --------- |
+| Function       | Description                      | Signature                                                                                |
+|----------------|----------------------------------|------------------------------------------------------------------------------------------|
 | `executeQuery` | Returns the result of the query. | `executeQuery(name: String, parameters: Dictionary<string,object>): IEnumerable<object>` |
 
-## Tutorial
+## Videos
 
-<https://www.youtube.com/watch?v=6ZaqWmq8Pog&t=2891s>
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/6ZaqWmq8Pog" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/JYES1i6BdWs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/IYKEeYxeNck" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## Breaking changes
+
+1.0 -> 1.1
+
+The Query API now returns an IQueryResults which now will also contain a count for the Lucene results. The JSON data structure has changed from :
+
+```json
+[
+    {...}
+]
+```
+
+To :
+
+```json
+{
+  items:[...],
+  count:1231
+}
+```

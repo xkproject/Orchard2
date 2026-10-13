@@ -1,91 +1,95 @@
-using System;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
-using OrchardCore.Admin;
+using OrchardCore.Data.Migration;
 using OrchardCore.Deployment;
-using OrchardCore.DisplayManagement.Handlers;
 using OrchardCore.Environment.Shell;
+using OrchardCore.Environment.Shell.Configuration;
+using OrchardCore.Localization.Data;
 using OrchardCore.Modules;
-using OrchardCore.Mvc.Core.Utilities;
 using OrchardCore.Navigation;
 using OrchardCore.Recipes;
-using OrchardCore.Roles.Controllers;
 using OrchardCore.Roles.Deployment;
+using OrchardCore.Roles.Migrations;
 using OrchardCore.Roles.Recipes;
 using OrchardCore.Roles.Services;
 using OrchardCore.Security;
 using OrchardCore.Security.Permissions;
 using OrchardCore.Security.Services;
+using OrchardCore.Users.Services;
 
-namespace OrchardCore.Roles
+namespace OrchardCore.Roles;
+
+public sealed class Startup : StartupBase
 {
-    public class Startup : StartupBase
+    private readonly IShellConfiguration _shellConfiguration;
+
+    public Startup(IShellConfiguration shellConfiguration)
     {
-        private readonly AdminOptions _adminOptions;
-
-        public Startup(IOptions<AdminOptions> adminOptions)
-        {
-            _adminOptions = adminOptions.Value;
-        }
-
-        public override void ConfigureServices(IServiceCollection services)
-        {
-            services.TryAddScoped<RoleManager<IRole>>();
-            services.TryAddScoped<IRoleStore<IRole>, RoleStore>();
-            services.TryAddScoped<IRoleService, RoleService>();
-            services.TryAddScoped<IRoleClaimStore<IRole>, RoleStore>();
-            services.AddRecipeExecutionStep<RolesStep>();
-
-            services.AddScoped<IFeatureEventHandler, RoleUpdater>();
-            services.AddScoped<IAuthorizationHandler, RolesPermissionsHandler>();
-            services.AddScoped<INavigationProvider, AdminMenu>();
-            services.AddScoped<IPermissionProvider, Permissions>();
-        }
-
-        public override void Configure(IApplicationBuilder builder, IEndpointRouteBuilder routes, IServiceProvider serviceProvider)
-        {
-            var adminControllerName = typeof(AdminController).ControllerName();
-
-            routes.MapAreaControllerRoute(
-                name: "RolesIndex",
-                areaName: "OrchardCore.Roles",
-                pattern: _adminOptions.AdminUrlPrefix + "/Roles/Index",
-                defaults: new { controller = adminControllerName, action = nameof(AdminController.Index) }
-            );
-            routes.MapAreaControllerRoute(
-                name: "RolesCreate",
-                areaName: "OrchardCore.Roles",
-                pattern: _adminOptions.AdminUrlPrefix + "/Roles/Create",
-                defaults: new { controller = adminControllerName, action = nameof(AdminController.Create) }
-            );
-            routes.MapAreaControllerRoute(
-                name: "RolesDelete",
-                areaName: "OrchardCore.Roles",
-                pattern: _adminOptions.AdminUrlPrefix + "/Roles/Delete/{id}",
-                defaults: new { controller = adminControllerName, action = nameof(AdminController.Delete) }
-            );
-            routes.MapAreaControllerRoute(
-                name: "RolesEdit",
-                areaName: "OrchardCore.Roles",
-                pattern: _adminOptions.AdminUrlPrefix + "/Roles/Edit/{id}",
-                defaults: new { controller = adminControllerName, action = nameof(AdminController.Edit) }
-            );
-        }
+        _shellConfiguration = shellConfiguration;
     }
 
-    [RequireFeatures("OrchardCore.Deployment")]
-    public class DeploymentStartup : StartupBase
+    public override void ConfigureServices(IServiceCollection services)
     {
-        public override void ConfigureServices(IServiceCollection services)
+        services.AddScoped<IUserClaimsProvider, RoleClaimsProvider>();
+
+        services.AddDataMigration<SystemRolesMigrations>();
+        services.AddDataMigration<RolesMigrations>();
+
+        services.AddScoped<RoleStore>();
+        services.Replace(ServiceDescriptor.Scoped<IRoleClaimStore<IRole>>(sp => sp.GetRequiredService<RoleStore>()));
+        services.Replace(ServiceDescriptor.Scoped<IRoleStore<IRole>>(sp => sp.GetRequiredService<RoleStore>()));
+        services.AddRecipeExecutionStep<RolesStep>();
+        services.AddScoped<IAuthorizationHandler, RolesPermissionsHandler>();
+        services.AddPermissionProvider<Permissions>();
+        services.AddNavigationProvider<AdminMenu>();
+        services.Configure<SystemRoleOptions>(options =>
         {
-            services.AddTransient<IDeploymentSource, AllRolesDeploymentSource>();
-            services.AddSingleton<IDeploymentStepFactory>(new DeploymentStepFactory<AllRolesDeploymentStep>());
-            services.AddScoped<IDisplayDriver<DeploymentStep>, AllRolesDeploymentStepDriver>();
-        }
+            var adminRoleName = _shellConfiguration.GetSection("OrchardCore_Roles").GetValue<string>("AdminRoleName");
+
+            if (!string.IsNullOrWhiteSpace(adminRoleName))
+            {
+                options.SystemAdminRoleName = adminRoleName;
+            }
+            else
+            {
+                options.SystemAdminRoleName = OrchardCoreConstants.Roles.Administrator;
+            }
+        });
+    }
+}
+
+[RequireFeatures("OrchardCore.Deployment")]
+public sealed class DeploymentStartup : StartupBase
+{
+    public override void ConfigureServices(IServiceCollection services)
+    {
+        services.AddDeployment<AllRolesDeploymentSource, AllRolesDeploymentStep, AllRolesDeploymentStepDriver>();
+    }
+}
+
+[Feature("OrchardCore.Roles.Core")]
+public sealed class RoleUpdaterStartup : StartupBase
+{
+    public override void ConfigureServices(IServiceCollection services)
+    {
+        services.AddRolesCoreServices();
+        services.AddScoped<RoleManager<IRole>>();
+        services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<RoleUpdater>();
+        services.AddScoped<IFeatureEventHandler>(sp => sp.GetRequiredService<RoleUpdater>());
+        services.AddScoped<IRoleCreatedEventHandler>(sp => sp.GetRequiredService<RoleUpdater>());
+        services.AddScoped<IRoleRemovedEventHandler>(sp => sp.GetRequiredService<RoleUpdater>());
+    }
+}
+
+[RequireFeatures("OrchardCore.DataLocalization")]
+public sealed class DataLocalizationStartup : StartupBase
+{
+    public override void ConfigureServices(IServiceCollection services)
+    {
+        services.AddScoped<ILocalizationDataProvider, PermissionsLocalizationDataProvider>();
     }
 }

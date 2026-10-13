@@ -1,64 +1,54 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using OrchardCore.Security.Permissions;
 
-namespace OrchardCore.ContentLocalization
+namespace OrchardCore.ContentLocalization;
+
+public sealed class Permissions : IPermissionProvider
 {
-    public class Permissions : IPermissionProvider
-    {
-        public static readonly Permission LocalizeContent = new Permission("LocalizeContent", "Localize content for others");
-        public static readonly Permission LocalizeOwnContent = new Permission("LocalizeOwnContent", "Localize own content", new[] { LocalizeContent });
-        public static readonly Permission ManageContentCulturePicker = new Permission("ManageContentCulturePicker", "Manage ContentCulturePicker settings");
+    private readonly IEnumerable<Permission> _allPermissions =
+    [
+        ContentLocalizationPermissions.LocalizeContent,
+        ContentLocalizationPermissions.LocalizeOwnContent,
+        ContentLocalizationPermissions.ManageContentCulturePicker,
+    ];
 
-        public Task<IEnumerable<Permission>> GetPermissionsAsync()
-        {
-            return Task.FromResult(new[]
-            {
-                LocalizeContent,
-                LocalizeOwnContent,
-                ManageContentCulturePicker
-            }
-            .AsEnumerable());
-        }
+    private readonly IEnumerable<Permission> _generalPermissions =
+    [
+        ContentLocalizationPermissions.LocalizeOwnContent,
+    ];
 
-        public IEnumerable<PermissionStereotype> GetDefaultStereotypes()
+    [Obsolete("This will be removed in a future release. Instead use 'ContentLocalizationPermissions.LocalizeContent'.")]
+    public static readonly Permission LocalizeContent = ContentLocalizationPermissions.LocalizeContent;
+
+    [Obsolete("This will be removed in a future release. Instead use 'ContentLocalizationPermissions.LocalizeOwnContent'.")]
+    public static readonly Permission LocalizeOwnContent = ContentLocalizationPermissions.LocalizeOwnContent;
+
+    [Obsolete("This will be removed in a future release. Instead use 'ContentLocalizationPermissions.ManageContentCulturePicker'.")]
+    public static readonly Permission ManageContentCulturePicker = ContentLocalizationPermissions.ManageContentCulturePicker;
+
+    public Task<IEnumerable<Permission>> GetPermissionsAsync()
+        => Task.FromResult(_allPermissions);
+
+    public IEnumerable<PermissionStereotype> GetDefaultStereotypes() =>
+    [
+        new PermissionStereotype
         {
-            return new[]
-            {
-                new PermissionStereotype
-                {
-                    Name = "Administrator",
-                    Permissions = new[] { LocalizeContent, LocalizeOwnContent, ManageContentCulturePicker }
-                },
-                new PermissionStereotype
-                {
-                    Name = "Editor",
-                    Permissions = new[] { LocalizeContent, LocalizeOwnContent, ManageContentCulturePicker }
-                },
-                new PermissionStereotype
-                {
-                    Name = "Moderator"
-                },
-                new PermissionStereotype
-                {
-                    Name = "Author",
-                    Permissions = new[] { LocalizeOwnContent }
-                },
-                new PermissionStereotype
-                {
-                    Name = "Contributor",
-                    Permissions = new[] { LocalizeOwnContent }
-                },
-                new PermissionStereotype
-                {
-                    Name = "Authenticated"
-                },
-                new PermissionStereotype
-                {
-                    Name = "Anonymous"
-                },
-            };
-        }
-    }
+            Name = OrchardCoreConstants.Roles.Administrator,
+            Permissions = _allPermissions,
+        },
+        new PermissionStereotype
+        {
+            Name = OrchardCoreConstants.Roles.Editor,
+            Permissions = _allPermissions,
+        },
+        new PermissionStereotype
+        {
+            Name = OrchardCoreConstants.Roles.Author,
+            Permissions = _generalPermissions,
+        },
+        new PermissionStereotype
+        {
+            Name = OrchardCoreConstants.Roles.Contributor,
+            Permissions = _generalPermissions,
+        },
+    ];
 }

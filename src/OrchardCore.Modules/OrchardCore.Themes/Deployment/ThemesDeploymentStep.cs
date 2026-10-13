@@ -1,15 +1,21 @@
+using Microsoft.Extensions.Localization;
 using OrchardCore.Deployment;
 
-namespace OrchardCore.Themes.Deployment
+namespace OrchardCore.Themes.Deployment;
+
+/// <summary>
+/// Adds the currently selected admin theme and site theme to a <see cref="DeploymentPlanResult"/>.
+/// </summary>
+public class ThemesDeploymentStep : DeploymentStep
 {
-    /// <summary>
-    /// Adds the currently selected admin theme and site theme to a <see cref="DeploymentPlanResult"/>.
-    /// </summary>
-    public class ThemesDeploymentStep : DeploymentStep
+    public ThemesDeploymentStep()
     {
-        public ThemesDeploymentStep()
-        {
-            Name = "Themes";
-        }
+        Name = "Themes";
+    }
+
+    public ThemesDeploymentStep(IStringLocalizer<ThemesDeploymentStep> S)
+        : this()
+    {
+        Category = S["Theming"];
     }
 }
